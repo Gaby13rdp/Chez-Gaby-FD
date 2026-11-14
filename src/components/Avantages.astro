@@ -1,0 +1,21 @@
+---
+import Icone from './Icone.astro';
+import { C } from '../lib/site';
+interface Props { titreNiveau?: 'h2' | 'h3'; afficherTitre?: boolean }
+const { afficherTitre = true } = Astro.props;
+const p = C.pourquoi_reserver_en_direct;
+---
+{p.active && p.arguments.length > 0 && (
+  <div>
+    {afficherTitre && <h2>{p.titre}</h2>}
+    <div class="avantages">
+      {p.arguments.map((a: any) => (
+        <div class="avantage">
+          <span class="avantage__icone"><Icone nom={a.icone} /></span>
+          <h3>{a.titre}</h3>
+          {a.texte && <p>{a.texte}</p>}
+        </div>
+      ))}
+    </div>
+  </div>
+)}

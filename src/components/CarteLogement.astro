@@ -1,0 +1,49 @@
+---
+import Icone from './Icone.astro';
+import Photo from './Photo.astro';
+import { C, t, tn, lien, prix, etablissement, libelleType } from '../lib/site';
+interface Props { logement: any; langue: string; prioritaire?: boolean; titreNiveau?: 'h2' | 'h3' }
+const { logement: l, langue, prioritaire = false, titreNiveau = 'h3' } = Astro.props;
+const e = etablissement(l.etablissement);
+const txt = l.i18n[langue] ?? l.i18n.fr;
+const url = lien(l.url[langue] ?? l.url.fr);
+const barre = C.tarifs.afficher_prix_plateforme && l.prixPlateformeVerifie && l.prixAPartirDe.plateforme > l.prixAPartirDe.direct;
+const Titre = titreNiveau;
+const lits = (l.lits || []).reduce((s: number, x: any) => s + (x.nombre || 1), 0);
+---
+<article class="carte" data-carte data-slug={l.slug} data-destination={l.destination} data-capacite={l.capacite}
+  data-prix={l.prixAPartirDe.direct} data-devise={l.devise} data-ordre={l.ordre} data-equipements={l.equipements.map((x: any) => x.cle).join(',')}>
+  <div class="carte__visuel">
+    <Photo photo={l.photos[0]} tailles="(min-width: 1240px) 380px, (min-width: 700px) 45vw, 100vw" prioritaire={prioritaire} largeurCible={480} />
+    {l.labels?.length > 0 && <div class="carte__etiquettes">{l.labels.slice(0, 2).map((x: string) => <span class="etiquette">{x}</span>)}</div>}
+  </div>
+  {C.liste.favoris && (
+    <div class="carte__favori">
+      <button type="button" class="bouton bouton--icone bouton--petit" data-favori={l.slug} aria-pressed="false" aria-label={`${t(langue, 'liste.ajouter_favori')} : ${txt.nom}`}>
+        <Icone nom="heart" taille={18} />
+      </button>
+    </div>
+  )}
+  <div class="carte__corps">
+    <span class="carte__lieu"><Icone nom="map-pin" taille={14} />{e.ville}, {e.pays}</span>
+    <Titre class="carte__titre"><a href={url}>{txt.nom}</a></Titre>
+    <div class="carte__infos">
+      <span>{libelleType(l.type, langue)}</span>
+      <span>{tn(langue, 'commun.voyageur', l.capacite)}</span>
+      {l.chambres > 0 ? <span>{tn(langue, 'commun.chambre', l.chambres)}</span> : <span>{tn(langue, 'commun.lit', lits || 1)}</span>}
+      {l.noteMoyenne && <span class="carte__note"><Icone nom="star" taille={14} />{l.noteMoyenne.valeur.toLocaleString(langue)}</span>}
+    </div>
+    {C.tarifs.afficher_a_partir_de && (
+      <div class="carte__prix">
+        <span class="texte-doux">{t(langue, 'commun.a_partir_de')}</span>
+        {barre && <s>{prix(l.prixAPartirDe.plateforme, l.devise, langue)}</s>}
+        <strong>{prix(l.prixAPartirDe.direct, l.devise, langue)}</strong>
+        <span class="texte-doux">{t(langue, 'commun.par_nuit')}</span>
+      </div>
+    )}
+    <span class="carte__sejour" data-prix-sejour hidden></span>
+    {C.liste.comparateur && (
+      <label class="carte__comparer"><input type="checkbox" data-comparer={l.slug} /> {t(langue, 'liste.comparer')}</label>
+    )}
+  </div>
+</article>

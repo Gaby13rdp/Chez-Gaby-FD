@@ -1,0 +1,12 @@
+---
+// Mesure d'audience (désactivée par défaut). Seul GA4 nécessite un bandeau
+// de consentement ; les autres outils proposés n'utilisent pas de cookies.
+import { D, C } from '../lib/site';
+const s = C.statistiques;
+const actif = D.production || s.fournisseur === 'aucun' ? s.fournisseur : 'aucun';
+---
+{actif === 'plausible' && <script defer data-domain={s.plausible_domaine} src={s.plausible_script}></script>}
+{actif === 'umami' && <script defer src={s.umami_script} data-website-id={s.umami_id}></script>}
+{actif === 'goatcounter' && <script async data-goatcounter={`https://${s.goatcounter_code}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>}
+{actif === 'cloudflare' && <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: s.cloudflare_token })}></script>}
+{actif === 'ga4' && <script>import '../scripts/consentement';</script>}

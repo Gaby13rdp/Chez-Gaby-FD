@@ -1,0 +1,47 @@
+---
+// Pages de contenu : À propos, FAQ, Contact, pages légales, pages libres.
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import Faq from '../components/Faq.astro';
+import FormulaireDemande from '../components/FormulaireDemande.astro';
+import BlocContact from '../components/BlocContact.astro';
+import BarreContact from '../components/BarreContact.astro';
+import Avantages from '../components/Avantages.astro';
+import { D, C, t, lien, lienRoute, loc, htmlAvecBase, ogPhoto } from '../lib/site';
+import { filAriane, faq as faqLd, organisation } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const page = D.pages[route.id];
+const txt = loc(page, langue);
+const ariane = [{ nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) }, { nom: txt.titre, chemin: lien(route.chemin) }];
+const estFaq = route.id === 'faq';
+const estContact = route.id === 'contact';
+const jsonld = [filAriane(ariane), estFaq ? faqLd(txt.questions) : null, estContact || route.id === 'a-propos' ? organisation(langue) : null];
+const logementsListe = D.logements.map((l: any) => ({ slug: l.slug, nom: loc(l, langue).nom }));
+---
+<Base langue={langue} titre={txt.titre} description={txt.description || C.seo.description} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(page.image)} jsonld={jsonld}>
+  <div class="conteneur--etroit">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <header style="padding-block: var(--e-5) var(--e-4)">
+      <h1>{txt.titre}</h1>
+      {txt.sous_titre && <p class="chapeau">{txt.sous_titre}</p>}
+    </header>
+    {page.image && <figure style="margin: 0 0 var(--e-6)"><Photo photo={page.image} tailles="(min-width: 860px) 820px, 100vw" prioritaire largeurCible={1440} class="" /></figure>}
+    {txt.corpsHtml && <div class="prose" style="margin-bottom: var(--e-6)" set:html={htmlAvecBase(txt.corpsHtml)} />}
+    {estFaq && txt.questions?.length > 0 && <div style="margin-bottom: var(--e-7)"><Faq questions={txt.questions} grouper /></div>}
+    {estContact && (
+      <div style="display:grid; gap: var(--e-6); margin-bottom: var(--e-7)">
+        <div class="encart">
+          <h2 style="font-size:1.4rem">{t(langue, 'formulaire.titre_contact')}</h2>
+          <FormulaireDemande langue={langue} mode="contact" logements={logementsListe} id="formulaire-contact" />
+        </div>
+        <BlocContact langue={langue} titre={t(langue, 'formulaire.autres_moyens')} texte={C.contact.langues_parlees?.join(' · ') || ''} />
+      </div>
+    )}
+    {route.id === 'a-propos' && <div style="margin-block: var(--e-7)"><Avantages /></div>}
+    {route.id === 'mentions-legales' && <p class="texte-doux" style="font-size:.85rem">{D.site.url}</p>}
+  </div>
+  <BarreContact slot="fin" langue={langue} />
+</Base>

@@ -1,0 +1,148 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# SYNCHRONISER LES CALENDRIERS
+# • Automatique toutes les 30 minutes (GitHub peut retarder de quelques minutes).
+# • À la demande : Actions > « Synchroniser les calendriers » > Run workflow.
+# Les liens iCal sont lus dans les secrets du dépôt (jamais écrits dans les
+# fichiers). Seules les dates bloquées sont enregistrées.
+# Pour changer la fréquence : modifiez la 1re ligne « cron » ci-dessous
+# (ex. '*/15 * * * *' = toutes les 15 min, '0 * * * *' = toutes les heures).
+# ─────────────────────────────────────────────────────────────────────────────
+name: Synchroniser les calendriers
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+    # Chaque lundi : maintient les tâches planifiées actives (GitHub les met en
+    # pause après 60 jours sans activité sur un dépôt public).
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      forcer:
+        description: Republier le site même si rien n'a changé
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: synchro-calendriers
+  cancel-in-progress: false
+
+jobs:
+  synchroniser:
+    name: Lire les calendriers
+    if: github.event.schedule != '17 4 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      publier: ${{ steps.synchro.outputs.publier }}
+      alerte: ${{ steps.synchro.outputs.alerte }}
+      sha: ${{ steps.envoi.outputs.sha }}
+      hebergeur: ${{ steps.params.outputs.hebergeur }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Lire l'hébergeur choisi
+        id: params
+        run: |
+          hebergeur=$(grep -E '^hebergeur:' config/site.yml | sed -E 's/^hebergeur:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/"//g')
+          echo "hebergeur=${hebergeur:-github-pages}" >> "$GITHUB_OUTPUT"
+
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund --ignore-scripts
+
+      - name: Préparer les liens des calendriers
+        # Seuls les secrets dont le nom commence par ICAL_ sont extraits, dans un
+        # fichier temporaire hors du dépôt (les autres secrets ne sont jamais lus).
+        env:
+          TOUS_LES_SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          umask 077
+          printf '%s' "$TOUS_LES_SECRETS" | jq 'with_entries(select(.key | startswith("ICAL_")))' > "$RUNNER_TEMP/calendriers.json"
+          echo "$(jq 'length' "$RUNNER_TEMP/calendriers.json") lien(s) de calendrier enregistré(s) dans les secrets."
+
+      - name: Synchroniser
+        id: synchro
+        run: |
+          node scripts/synchro-calendriers.mjs $OPTION
+          rm -f "$SECRETS_FICHIER"
+        env:
+          SECRETS_FICHIER: ${{ runner.temp }}/calendriers.json
+          OPTION: ${{ (github.event_name == 'workflow_dispatch' && inputs.forcer) && '--forcer' || '' }}
+
+      - name: Enregistrer les disponibilités
+        id: envoi
+        if: steps.synchro.outputs.publier == 'oui'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPOT: ${{ github.repository }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${DEPOT}.git"
+          git add donnees/disponibilites.json
+          envoye=non
+          if git diff --cached --quiet; then
+            envoye=oui
+          else
+            git commit -m "Disponibilités mises à jour (synchronisation automatique)"
+            for essai in 1 2 3 4; do
+              if git pull --rebase --quiet origin main && git push --quiet origin HEAD:main; then envoye=oui; break; fi
+              git rebase --abort 2>/dev/null || true
+              echo "Nouvel essai d'envoi dans $((essai * 5)) s…"; sleep $((essai * 5))
+            done
+          fi
+          if [ "$envoye" != "oui" ]; then
+            echo "::error title=Disponibilités non enregistrées::Impossible d'enregistrer donnees/disponibilites.json (branche main protégée ou conflit). Le site n'a pas été mis à jour."
+            exit 1
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publier:
+    name: Republier le site
+    needs: synchroniser
+    # GitHub Pages et Cloudflare : publication par GitHub. Netlify : il reconstruit seul.
+    if: needs.synchroniser.outputs.publier == 'oui' && needs.synchroniser.outputs.hebergeur != 'netlify'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.synchroniser.outputs.sha }}
+    secrets: inherit
+
+  alerte:
+    name: Alerte calendrier en panne
+    needs: synchroniser
+    if: needs.synchroniser.outputs.alerte == 'oui'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prévenir le propriétaire
+        run: |
+          echo "::error title=Calendrier non synchronisé depuis plus de 24 h::Un ou plusieurs liens iCal ne répondent plus. Ouvrez l'étape « Synchroniser » pour le détail, puis docs/09-depannage.md."
+          exit 1
+
+  maintien:
+    name: Maintenir la synchronisation active
+    if: github.event.schedule == '17 4 * * 1'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Réactiver la tâche planifiée
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/sync-calendriers.yml/enable" && echo "Synchronisation maintenue active."
+        env:
+          GH_TOKEN: ${{ github.token }}

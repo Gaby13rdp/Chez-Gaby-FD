@@ -1,0 +1,31 @@
+---
+// Routeur unique : chaque page du site est décrite dans src/genere/donnees.json
+// (calculé par scripts/preparer.mjs) et rendue par le modèle correspondant.
+import { D } from '../lib/site';
+import PageAccueil from '../templates/PageAccueil.astro';
+import PageListe from '../templates/PageListe.astro';
+import PageDestination from '../templates/PageDestination.astro';
+import PageDestinations from '../templates/PageDestinations.astro';
+import PageEtablissement from '../templates/PageEtablissement.astro';
+import PageLogement from '../templates/PageLogement.astro';
+import PageContenu from '../templates/PageContenu.astro';
+import PageGuides from '../templates/PageGuides.astro';
+import PageGuide from '../templates/PageGuide.astro';
+import PagePaiement from '../templates/PagePaiement.astro';
+import PageMaintenance from '../templates/PageMaintenance.astro';
+
+export function getStaticPaths() {
+  return D.routes.map((route: any) => ({
+    params: { chemin: route.chemin.replace(/^\/|\/$/g, '') || undefined },
+    props: { route },
+  }));
+}
+const { route } = Astro.props;
+const modeles: Record<string, any> = {
+  accueil: PageAccueil, liste: PageListe, destination: PageDestination, destinations: PageDestinations,
+  etablissement: PageEtablissement, logement: PageLogement, page: PageContenu, guides: PageGuides, guide: PageGuide,
+  paiement: PagePaiement, 'paiement-merci': PagePaiement, 'paiement-annule': PagePaiement, maintenance: PageMaintenance,
+};
+const Modele = modeles[route.type];
+---
+<Modele route={route} />

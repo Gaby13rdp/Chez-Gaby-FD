@@ -1,0 +1,55 @@
+---
+// Galerie en mosaïque + visionneuse plein écran (glisser au doigt, flèches du clavier, Échap).
+import Icone from './Icone.astro';
+import Photo from './Photo.astro';
+import { t, tn, srcset, srcPhoto } from '../lib/site';
+interface Props { photos: any[]; nom: string; langue: string }
+const { photos, nom, langue } = Astro.props;
+const mosaique = photos.slice(0, 5);
+const total = photos.length;
+---
+<div class={`galerie ${total < 3 ? 'galerie--peu' : ''}`} data-galerie>
+  {mosaique.map((p, i) => (
+    <button type="button" class="galerie__item" data-ouvrir-photo={i} aria-label={`${t(langue, 'logement.photo_x_sur_y', { x: i + 1, y: total })} : ${p.alt}`}>
+      <Photo photo={p} prioritaire={i === 0} tailles={i === 0 ? '(min-width: 760px) 50vw, 100vw' : '(min-width: 760px) 25vw, 1px'} largeurCible={i === 0 ? 1440 : 480} />
+    </button>
+  ))}
+  <span class="galerie__compteur" aria-hidden="true">1 / {total}</span>
+  {total > 1 && (
+    <button type="button" class="bouton bouton--petit galerie__tout" data-ouvrir-photo="0">
+      <Icone nom="images" />{t(langue, 'logement.voir_photos', { n: total })}
+    </button>
+  )}
+</div>
+
+<dialog class="visionneuse" data-visionneuse aria-label={`${t(langue, 'logement.galerie')} — ${nom}`}>
+  <div class="visionneuse__haut">
+    <span data-compteur aria-live="polite">1 / {total}</span>
+    <button type="button" class="bouton bouton--icone" data-fermer-visionneuse>
+      <Icone nom="x" label={t(langue, 'commun.fermer')} taille={22} />
+    </button>
+  </div>
+  <div class="visionneuse__piste" data-piste tabindex="0">
+    {photos.map((p, i) => (
+      <figure data-index={i}>
+        <picture>
+          {p.avif && <source type="image/avif" srcset={srcset(p, 'avif')} sizes="100vw" />}
+          <source type="image/webp" srcset={srcset(p, 'webp')} sizes="100vw" />
+          <img src={srcPhoto(p, 1920)} alt={p.alt} width={p.largeur} height={p.hauteur} loading="lazy" decoding="async" />
+        </picture>
+        <figcaption>{p.alt}</figcaption>
+      </figure>
+    ))}
+  </div>
+  {total > 1 && (
+    <div class="visionneuse__nav">
+      <button type="button" class="bouton bouton--icone" data-precedent><Icone nom="chevron-left" label={t(langue, 'commun.precedent')} taille={24} /></button>
+      <button type="button" class="bouton bouton--icone" data-suivant><Icone nom="chevron-right" label={t(langue, 'commun.suivant')} taille={24} /></button>
+    </div>
+  )}
+</dialog>
+<p class="visuellement-cache">{tn(langue, 'commun.photo', total)}</p>
+
+<script>
+  import '../scripts/galerie';
+</script>

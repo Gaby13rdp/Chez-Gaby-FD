@@ -1,0 +1,18 @@
+# Hébergement du SITE sur Netlify (facultatif, déconseillé : voir docs/01).
+# À utiliser avec « hebergeur: netlify » dans config/site.yml.
+#
+# ATTENTION : sur l'offre gratuite de Netlify, chaque mise en ligne consomme
+# des crédits. La synchronisation des calendriers republie le site plusieurs
+# fois par jour : l'offre gratuite peut être épuisée en quelques jours.
+# Si vous choisissez Netlify, mettez « republier_toutes_les_heures: 0 » dans
+# config/site.yml et vérifiez votre consommation dans le tableau de bord.
+#
+# Netlify fournit lui-même l'adresse du site (variable URL) : rien à régler ici.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  NPM_FLAGS = "--no-audit --no-fund"

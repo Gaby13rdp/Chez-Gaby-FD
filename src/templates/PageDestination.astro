@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import CarteLogement from '../components/CarteLogement.astro';
+import Carte from '../components/Carte.astro';
+import Faq from '../components/Faq.astro';
+import BlocContact from '../components/BlocContact.astro';
+import BarreContact from '../components/BarreContact.astro';
+import { D, t, tn, lien, lienRoute, loc, logement, etablissement, htmlAvecBase, ogPhoto, urlAbsolue } from '../lib/site';
+import { listeLd, filAriane, faq as faqLd } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const d = D.destinations.find((x: any) => x.slug === route.id);
+const txt = loc(d, langue);
+const logements = d.logements.map((s: string) => logement(s));
+const etabs = d.etablissements.map((s: string) => etablissement(s));
+const photo = d.photos[0] || logements[0]?.photos[0];
+const ariane = [
+  { nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) },
+  { nom: t(langue, 'nav.logements'), chemin: lienRoute('liste', 'logements', langue) },
+  { nom: txt.nom, chemin: lien(route.chemin) },
+];
+const iconesVenir: Record<string, string> = { train: 'train-front', avion: 'plane', voiture: 'car', bus: 'bus', bateau: 'ship', autre: 'route' };
+const points = etabs.map((e: any) => ({ lat: e.carte.lat, lng: e.carte.lng, rayon: e.carte.rayon, titre: loc(e, langue).nom, url: e.aUnePage ? lienRoute('etablissement', e.slug, langue) : lien(logement(e.logements[0]).url[langue] ?? logement(e.logements[0]).url.fr) }));
+const titre = txt.seo?.titre || `${t(langue, 'nav.logements')} — ${txt.nom}`;
+const lieu = {
+  '@context': 'https://schema.org', '@type': 'TouristDestination', name: txt.nom, description: txt.resume, url: urlAbsolue(route.chemin),
+  ...(d.latitude != null ? { geo: { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude } } : {}),
+  ...(photo ? { image: urlAbsolue(`img/${photo.cle}/${photo.variantes.at(-1)}.webp`) } : {}),
+};
+---
+<Base langue={langue} titre={titre} description={txt.seo?.description || txt.resume} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(photo)} jsonld={[lieu, listeLd(logements, langue), filAriane(ariane), faqLd(txt.faq)]}>
+  <section class="heros-page">
+    <Photo photo={photo} tailles="100vw" prioritaire largeurCible={1920} alt="" />
+    <div class="conteneur">
+      <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+      {txt.accroche && <span class="surtitre" style="color: rgb(255 255 255 / .85)">{txt.accroche}</span>}
+      <h1>{txt.nom}</h1>
+      <p>{txt.resume}</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="t-logements">
+    <div class="conteneur">
+      <div class="entete-section"><div><h2 id="t-logements">{t(langue, 'liste.titre')}</h2><p class="texte-doux" style="margin:0">{tn(langue, 'commun.logement', logements.length)}</p></div></div>
+      <div class="grille">{logements.map((l: any, i: number) => <CarteLogement logement={l} langue={langue} />)}</div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="conteneur deux-colonnes">
+      <div>
+        {!txt.traduit && <p class="message">{t(langue, 'commun.traduction_absente')}</p>}
+        <div class="prose" set:html={htmlAvecBase(txt.corpsHtml)} />
+        {txt.meilleure_periode && <div class="encart" style="margin-top: var(--e-5); background: var(--surface)"><h3>{t(langue, 'destination.quand_venir')}</h3><p style="margin:0">{txt.meilleure_periode}</p></div>}
+      </div>
+      <div>
+        {txt.venir?.length > 0 && (
+          <>
+            <h2 style="font-size:1.5rem">{t(langue, 'destination.comment_venir')}</h2>
+            <ul class="venir">{txt.venir.map((v: any) => <li><Icone nom={iconesVenir[v.mode] || 'route'} /><div><strong>{t(langue, `venir.${v.mode}`)}</strong><p style="margin:0" class="texte-doux">{v.texte}</p></div></li>)}</ul>
+          </>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {txt.points_forts?.length > 0 && (
+    <section class="section">
+      <div class="conteneur">
+        <div class="points-forts">
+          {txt.points_forts.map((p: any) => <div class="avantage"><span class="avantage__icone"><Icone nom={p.icone} /></span><h3>{p.titre}</h3>{p.texte && <p>{p.texte}</p>}</div>)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section--compacte">
+    <div class="conteneur">
+      <h2>{t(langue, 'logement.emplacement')}</h2>
+      <Carte points={points} langue={langue} itineraire={points.length === 1} />
+    </div>
+  </section>
+
+  {txt.faq?.length > 0 && (
+    <section class="section">
+      <div class="conteneur"><h2>{t(langue, 'logement.faq')}</h2><Faq questions={txt.faq} /></div>
+    </section>
+  )}
+  <section class="section--compacte"><div class="conteneur"><BlocContact langue={langue} /></div></section>
+  <BarreContact slot="fin" langue={langue} />
+</Base>

@@ -1,0 +1,13 @@
+// Service Cloudflare FACULTATIF du site : paiement en ligne (niveau 2),
+// formulaire de demande (prestataire « worker ») et disponibilités en direct.
+// Déploiement : workflow GitHub « Déployer le service Cloudflare » (docs/07).
+// Les clés se règlent dans Cloudflare > Workers > paiement-worker >
+// Settings > Variables and Secrets (type « Secret »), JAMAIS ici.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "paiement-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "observability": { "enabled": true }
+}

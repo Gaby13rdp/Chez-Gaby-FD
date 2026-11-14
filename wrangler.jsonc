@@ -1,0 +1,19 @@
+// Hébergement du SITE sur Cloudflare (facultatif, à la place de GitHub Pages).
+// Utilisé uniquement si config/site.yml contient « hebergeur: cloudflare » :
+// le workflow « Publier le site » construit le site puis l'envoie sur
+// Cloudflare (secrets GitHub CLOUDFLARE_API_TOKEN et CLOUDFLARE_ACCOUNT_ID).
+// Les requêtes vers ces fichiers statiques sont gratuites et illimitées.
+// Adresse obtenue : https://<name>.<votre-sous-domaine>.workers.dev
+// (ou votre domaine, à relier dans Cloudflare > Workers > Settings > Domains).
+// Voir docs/01-mise-en-ligne.md. Le service de paiement facultatif a son
+// propre fichier : paiement-worker/wrangler.jsonc.
+{
+  "$schema": "https://unpkg.com/wrangler@4.156.0/config-schema.json",
+  "name": "site-locations",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

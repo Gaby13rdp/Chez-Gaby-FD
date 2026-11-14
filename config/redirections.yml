@@ -1,0 +1,6 @@
+# Redirections des pages supprimées (remplies automatiquement par le
+# workflow « Archiver ou supprimer un logement »). Exemple :
+# redirections:
+#   - de: /logements/le-mans/ancien-studio/
+#     vers: /logements/le-mans/residence-cathedrale/
+redirections: []

@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import { D, C, t, lien, lienRoute, dateLongue, htmlAvecBase, ogPhoto, urlAbsolue } from '../lib/site';
+import { filAriane } from '../lib/jsonld';
+const { route } = Astro.props;
+const langue = route.langue;
+const g = D.guides.find((x: any) => x.slug === route.id);
+const ariane = [{ nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) }, { nom: C.guides_locaux.titre, chemin: lienRoute('guides', 'guides', langue) }, { nom: g.titre, chemin: lien(route.chemin) }];
+const article = { '@context': 'https://schema.org', '@type': 'Article', headline: g.titre, description: g.resume, datePublished: g.date, url: urlAbsolue(route.chemin), author: { '@type': 'Organization', name: C.marque.nom }, ...(g.image ? { image: urlAbsolue(g.image.og || `img/${g.image.cle}/${g.image.variantes.at(-1)}.webp`) } : {}) };
+---
+<Base langue={langue} titre={g.seo?.titre || g.titre} description={g.seo?.description || g.resume} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(g.image)} typeOg="article" jsonld={[article, filAriane(ariane)]}>
+  <article class="conteneur--etroit" style="padding-bottom: var(--e-8)">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <header style="padding-block: var(--e-5) var(--e-4)">
+      <p class="texte-doux" style="margin:0 0 var(--e-2)"><time datetime={g.date}>{dateLongue(g.date, langue)}</time></p>
+      <h1>{g.titre}</h1>
+      <p class="chapeau">{g.resume}</p>
+    </header>
+    {g.image && <figure style="margin:0 0 var(--e-6)"><Photo photo={g.image} tailles="(min-width: 860px) 820px, 100vw" prioritaire largeurCible={1440} /></figure>}
+    <div class="prose" set:html={htmlAvecBase(g.corpsHtml)} />
+  </article>
+</Base>

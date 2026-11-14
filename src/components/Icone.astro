@@ -1,0 +1,13 @@
+---
+// Icône Lucide (SVG intégré, aucune requête réseau).
+import { ICONES } from '../lib/site';
+interface Props { nom: string; taille?: number; class?: string; label?: string; trait?: number }
+const { nom, taille = 20, class: classe = '', label, trait = 1.75 } = Astro.props;
+const contenu = ICONES[nom] ?? ICONES['circle-question-mark'] ?? '';
+---
+<svg
+  xmlns="http://www.w3.org/2000/svg" width={taille} height={taille} viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width={trait} stroke-linecap="round" stroke-linejoin="round"
+  class={`icone ${classe}`} aria-hidden={label ? undefined : 'true'} role={label ? 'img' : undefined} aria-label={label}
+  focusable="false" set:html={contenu}
+/>

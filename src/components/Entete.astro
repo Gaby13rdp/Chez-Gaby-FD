@@ -1,0 +1,76 @@
+---
+import Icone from './Icone.astro';
+import { D, C, t, lien, lienRoute, telLien, waNumero, emailMasque } from '../lib/site';
+interface Props { langue: string; cheminActuel: string; alternatives?: Record<string, string> }
+const { langue, cheminActuel, alternatives = {} } = Astro.props;
+const elements = [
+  { libelle: t(langue, 'nav.logements'), href: lienRoute('liste', 'logements', langue), actif: 'liste' },
+  { libelle: t(langue, 'nav.destinations'), href: lienRoute('destinations', 'destinations', langue) },
+  { libelle: t(langue, 'nav.guides'), href: lienRoute('guides', 'guides', langue) },
+  { libelle: t(langue, 'nav.a_propos'), href: lienRoute('page', 'a-propos', langue) },
+  { libelle: t(langue, 'nav.faq'), href: lienRoute('page', 'faq', langue) },
+  { libelle: t(langue, 'nav.contact'), href: lienRoute('page', 'contact', langue) },
+].filter((e) => e.href);
+const accueil = lienRoute('accueil', 'accueil', langue) ?? lien('/');
+const actuel = lien(cheminActuel);
+const estActif = (href: string) => href !== accueil && actuel.startsWith(href);
+const nomsLangues: Record<string, string> = { fr: 'Français', en: 'English', id: 'Indonesia' };
+const autresLangues = D.langues.length > 1 && C.langues.selecteur ? D.langues : [];
+const initiale = (C.marque.logo_texte || C.marque.nom || '?').trim().charAt(0).toUpperCase();
+const mail = emailMasque(C.contact.email);
+---
+<header class="entete" data-entete>
+  <div class="conteneur entete__barre">
+    <a class="logo" href={accueil}>
+      {C.marque.logo
+        ? <img src={lien(C.marque.logo)} alt={C.marque.logo_texte || C.marque.nom} width="160" height="40" />
+        : <><span class="logo__marque" aria-hidden="true">{initiale}</span><span>{C.marque.logo_texte || C.marque.nom}</span></>}
+      <span class="visuellement-cache"> — {t(langue, 'nav.accueil')}</span>
+    </a>
+    <nav class="nav" aria-label={t(langue, 'nav.principale')}>
+      <ul>
+        {elements.map((e) => <li><a href={e.href} aria-current={estActif(e.href) ? 'page' : undefined}>{e.libelle}</a></li>)}
+      </ul>
+    </nav>
+    <div class="entete__actions">
+      {autresLangues.length > 0 && (
+        <div class="langues">
+          <label class="visuellement-cache" for="choix-langue">{t(langue, 'nav.langue')}</label>
+          <select id="choix-langue" data-choix-langue>
+            {autresLangues.map((l: string) => (
+              <option value={lien(alternatives[l] ?? (l === D.langueDefaut ? '/' : `/${l}/`))} selected={l === langue} lang={l}>{nomsLangues[l]}</option>
+            ))}
+          </select>
+          <Icone nom="chevron-down" taille={16} />
+        </div>
+      )}
+      <button class="bouton bouton--icone bouton--fantome entete__burger" type="button" data-ouvrir-menu aria-haspopup="dialog" aria-controls="menu-mobile">
+        <Icone nom="menu" label={t(langue, 'nav.menu')} taille={22} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog class="menu-mobile" id="menu-mobile" aria-label={t(langue, 'nav.menu')}>
+  <div class="menu-mobile__haut">
+    <span class="logo"><span class="logo__marque" aria-hidden="true">{initiale}</span>{C.marque.logo_texte || C.marque.nom}</span>
+    <button class="bouton bouton--icone bouton--fantome" type="button" data-fermer-menu>
+      <Icone nom="x" label={t(langue, 'nav.fermer_menu')} taille={24} />
+    </button>
+  </div>
+  <nav aria-label={`${t(langue, 'nav.principale')} (${t(langue, 'nav.menu').toLowerCase()})`}>
+    <ul>
+      <li><a href={accueil}>{t(langue, 'nav.accueil')}</a></li>
+      {elements.map((e) => <li><a href={e.href} aria-current={estActif(e.href) ? 'page' : undefined}>{e.libelle}</a></li>)}
+    </ul>
+  </nav>
+  <div class="menu-mobile__contact">
+    {C.contact.telephone && C.contact.afficher_telephone && C.boutons_contact.appel && <a class="bouton" href={telLien(C.contact.telephone)}><Icone nom="phone" />{t(langue, 'commun.appeler')}</a>}
+    {C.contact.whatsapp && C.boutons_contact.whatsapp && <a class="bouton" href={`https://wa.me/${waNumero(C.contact.whatsapp)}`} rel="noopener noreferrer" target="_blank"><Icone nom="message-circle" />WhatsApp</a>}
+    {C.boutons_contact.email && <a class="bouton" href="#" data-email-u={mail.u} data-email-d={mail.d}><Icone nom="mail" />{t(langue, 'commun.ecrire')}</a>}
+  </div>
+</dialog>
+
+<script>
+  import '../scripts/entete';
+</script>

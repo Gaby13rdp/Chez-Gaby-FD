@@ -1,0 +1,107 @@
+---
+// Carte de réservation (collante sur ordinateur), barre fixe sur mobile,
+// et fenêtre de demande. Toute la logique est dans src/scripts/reservation.ts.
+import Icone from './Icone.astro';
+import FormulaireDemande from './FormulaireDemande.astro';
+import { D, C, ICONES, t, prix, telLien, waNumero, emailMasque, locale } from '../lib/site';
+interface Props { logement: any; etablissement: any; langue: string }
+const { logement: l, etablissement: e, langue } = Astro.props;
+const nom = l.i18n[langue]?.nom ?? l.i18n.fr.nom;
+const barre = C.tarifs.afficher_prix_plateforme && l.prixPlateformeVerifie;
+const remise = l.tarif.remisePct;
+const cles = ['arrivee', 'depart', 'choisir', 'selection_arrivee', 'selection_depart', 'verifier', 'envoyer_demande', 'demander_dispo',
+  'hebergement', 'hebergement_simple', 'remise_semaine', 'remise_mois', 'remise_anticipee', 'remise_derniere-minute', 'menage', 'supplement_voyageurs',
+  'frais_animaux', 'taxe_sejour', 'total', 'acompte', 'solde', 'caution', 'prix_plateforme', 'economie', 'disponible', 'indisponible', 'depart_possible',
+  'dispo_a_confirmer', 'non_synchronise', 'maj', 'dates_alternatives', 'aucune_alternative', 'erreur_nuits-min', 'erreur_nuits-max', 'erreur_jour-arrivee',
+  'erreur_jour-depart', 'erreur_trop-tot', 'erreur_trop-loin', 'erreur_capacite', 'erreur_animaux-refuses', 'erreur_indisponible', 'erreur_ferme',
+  'erreur_dates-invalides', 'erreur_depart-avant-arrivee', 'resume_sejour', 'a_partir_de', 'payer_acompte', 'taxe_incluse', 'detail_nuits', 'animaux', 'remise'];
+const textes: Record<string, string> = Object.fromEntries(cles.map((k) => [k, t(langue, `reservation.${k}`)]));
+for (const k of ['nuit_un', 'nuit_plusieurs', 'voyageur_un', 'voyageur_plusieurs']) textes[k] = t(langue, `commun.${k}`);
+textes.objet = t(langue, 'formulaire.objet_demande');
+textes.mention = C.tarifs.devis.mention;
+textes.paiementErreur = t(langue, 'paiement.erreur');
+textes.redirection = t(langue, 'paiement.redirection');
+const donnees = {
+  slug: l.slug, nom, langue, locale: locale(langue), devise: l.devise, fuseau: l.fuseau, capacite: l.capacite, animaux: l.regles.animaux,
+  tarif: l.tarif, regles: l.reglesSejour, dispo: l.disponibilites, fraicheurMax: C.calendrier.fraicheur_max_heures,
+  moisOrdi: C.calendrier.mois_affiches_ordinateur, moisMobile: C.calendrier.mois_affiches_mobile, premierJour: C.calendrier.premier_jour_semaine,
+  suggerer: C.calendrier.suggerer_dates_alternatives, tempsReel: C.calendrier.temps_reel.active ? C.calendrier.temps_reel.url : null,
+  devis: C.tarifs.devis.active, afficherPlateforme: barre, paiementNiveau: C.paiement.niveau, workerPaiement: C.paiement.worker_url || null,
+  whatsapp: C.contact.whatsapp && C.boutons_contact.whatsapp ? waNumero(C.contact.whatsapp) : null, messageWhatsapp: C.boutons_contact.message_whatsapp,
+  textes, formulaireId: 'formulaire-reservation', demo: D.demo,
+  icones: Object.fromEntries(Object.entries({ info: 'info', attention: 'triangle-alert', erreur: 'circle-alert', fleche: 'arrow-right' })
+    .map(([k, n]) => [k, `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONES[n] || ''}</svg>`])),
+};
+const mail = emailMasque(C.contact.email);
+const voyageursDefaut = Math.min(2, l.capacite);
+---
+<script type="application/json" id="donnees-reservation" set:html={JSON.stringify(donnees).replace(/</g, '\\u003c')}></script>
+
+<aside class="reservation" aria-labelledby="titre-reservation" data-reservation>
+  <h2 id="titre-reservation" class="visuellement-cache">{t(langue, 'reservation.titre')}</h2>
+  <div class="reservation__prix" data-prix-entete>
+    <span class="texte-doux">{t(langue, 'commun.a_partir_de')}</span>
+    {barre && <s>{prix(l.prixAPartirDe.plateforme, l.devise, langue)}</s>}
+    <strong>{prix(l.prixAPartirDe.direct, l.devise, langue)}</strong>
+    <span class="texte-doux">{t(langue, 'commun.par_nuit')}</span>
+    {remise > 0 && barre && <span class="reservation__remise">{t(langue, 'reservation.remise_directe', { pct: remise })}</span>}
+  </div>
+  <div class="dates-choix">
+    <button type="button" data-choisir="arrivee" aria-pressed="false"><span>{t(langue, 'reservation.arrivee')}</span><strong data-valeur-arrivee>{t(langue, 'reservation.choisir')}</strong></button>
+    <button type="button" data-choisir="depart" aria-pressed="false"><span>{t(langue, 'reservation.depart')}</span><strong data-valeur-depart>{t(langue, 'reservation.choisir')}</strong></button>
+  </div>
+  <details class="voyageurs-choix">
+    <summary>
+      <span><small>{t(langue, 'reservation.voyageurs')}</small><strong data-resume-voyageurs></strong></span>
+      <Icone nom="chevron-down" />
+    </summary>
+    <div class="voyageurs-choix__liste">
+      {[
+        ['adultes', t(langue, 'reservation.adultes'), t(langue, 'reservation.adultes_aide'), voyageursDefaut, 1],
+        ['enfants', t(langue, 'reservation.enfants'), t(langue, 'reservation.enfants_aide'), 0, 0],
+        ...(l.regles.animaux !== 'non' ? [['animaux', t(langue, 'reservation.animaux'), l.regles.animaux === 'sur-demande' ? t(langue, 'commun.sur_demande') : '', 0, 0]] : []),
+      ].map(([cle, libelle, aide, val, min]) => (
+        <div class="compteur" data-compteur={cle} data-min={min}>
+          <span><strong>{libelle}</strong>{aide && <small>{aide}</small>}</span>
+          <span class="compteur__boutons">
+            <button type="button" class="bouton bouton--icone" data-moins aria-label={`${t(langue, 'reservation.diminuer')} : ${libelle}`}><Icone nom="minus" taille={16} /></button>
+            <output aria-live="polite">{val}</output>
+            <button type="button" class="bouton bouton--icone" data-plus aria-label={`${t(langue, 'reservation.augmenter')} : ${libelle}`}><Icone nom="plus" taille={16} /></button>
+          </span>
+        </div>
+      ))}
+    </div>
+  </details>
+  <div class="reservation__messages" data-messages aria-live="polite"></div>
+  <div class="devis" data-devis hidden aria-live="polite"></div>
+  <button type="button" class="bouton bouton--primaire bouton--large" data-action-principale>{t(langue, 'reservation.verifier')}</button>
+  {C.paiement.niveau === 2 && C.paiement.worker_url && <button type="button" class="bouton bouton--large" data-payer hidden><Icone nom="credit-card" />{t(langue, 'reservation.payer_acompte')}</button>}
+  <p class="reservation__note">{t(langue, 'reservation.pas_de_paiement')}</p>
+  <div class="reservation__contacts">
+    {donnees.whatsapp && <a class="bouton bouton--petit bouton--fantome" href={`https://wa.me/${donnees.whatsapp}`} target="_blank" rel="noopener noreferrer" data-whatsapp><Icone nom="message-circle" />WhatsApp</a>}
+    {C.contact.telephone && C.contact.afficher_telephone && C.boutons_contact.appel && <a class="bouton bouton--petit bouton--fantome" href={telLien(C.contact.telephone)}><Icone nom="phone" />{t(langue, 'commun.appeler')}</a>}
+    {C.boutons_contact.email && <a class="bouton bouton--petit bouton--fantome" href="#" data-email-u={mail.u} data-email-d={mail.d}><Icone nom="mail" />{t(langue, 'commun.email')}</a>}
+  </div>
+</aside>
+
+<div class="barre-mobile ne-pas-imprimer" data-barre-mobile>
+  <div class="barre-mobile__prix">
+    <strong data-barre-prix>{prix(l.prixAPartirDe.direct, l.devise, langue)} <small class="texte-doux">{t(langue, 'commun.par_nuit')}</small></strong>
+    <span data-barre-dates>{t(langue, 'reservation.choisir_dates')}</span>
+  </div>
+  <button type="button" class="bouton bouton--primaire" data-action-mobile>{t(langue, 'reservation.verifier')}</button>
+</div>
+
+<dialog class="dialogue" id="dialogue-demande" aria-labelledby="titre-demande">
+  <div class="dialogue__haut">
+    <h2 id="titre-demande">{t(langue, 'formulaire.titre')}</h2>
+    <button type="button" class="bouton bouton--icone bouton--fantome" data-fermer-dialogue><Icone nom="x" label={t(langue, 'commun.fermer')} taille={22} /></button>
+  </div>
+  <div class="dialogue__corps">
+    <FormulaireDemande langue={langue} mode="reservation" id="formulaire-reservation" />
+  </div>
+</dialog>
+
+<script>
+  import '../scripts/reservation';
+</script>

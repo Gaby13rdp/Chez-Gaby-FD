@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+PRODID:-//Airbnb Inc//Hosting Calendar 1.0//EN
+CALSCALE:GREGORIAN
+VERSION:2.0
+BEGIN:VEVENT
+DTEND;VALUE=DATE:20991107
+DTSTART;VALUE=DATE:20991103
+UID:1418fb94e984-4ad5bb48c7b0b8d1f5b0de2b9f2d1c7e@airbnb.com
+DESCRIPTION:Reservation URL: https://www.airbnb.com/hosting/reservations/de
+ tails/HMXXXXXXXX\nPhone Number (Last 4 Digits): 1234
+SUMMARY:Reserved
+END:VEVENT
+BEGIN:VEVENT
+DTEND;VALUE=DATE:20991215
+DTSTART;VALUE=DATE:20991210
+UID:7f662ec65913-airbnb-not-available@airbnb.com
+SUMMARY:Airbnb (Not available)
+END:VEVENT
+END:VCALENDAR

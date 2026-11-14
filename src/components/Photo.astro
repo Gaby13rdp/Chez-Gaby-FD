@@ -1,0 +1,20 @@
+---
+// Image responsive : AVIF + WebP en plusieurs tailles, dimensions réservées
+// (pas de décalage de mise en page), chargement différé par défaut.
+import { srcset, srcPhoto } from '../lib/site';
+interface Props { photo: any; tailles?: string; prioritaire?: boolean; class?: string; alt?: string; largeurCible?: number }
+const { photo, tailles = '(min-width: 1024px) 33vw, 100vw', prioritaire = false, class: classe = '', alt, largeurCible = 960 } = Astro.props;
+const texteAlt = alt ?? photo?.alt ?? '';
+---
+{photo && (
+  <picture>
+    {photo.avif && <source type="image/avif" srcset={srcset(photo, 'avif')} sizes={tailles} />}
+    <source type="image/webp" srcset={srcset(photo, 'webp')} sizes={tailles} />
+    <img
+      src={srcPhoto(photo, largeurCible)} alt={texteAlt} width={photo.largeur} height={photo.hauteur}
+      loading={prioritaire ? 'eager' : 'lazy'} decoding={prioritaire ? 'sync' : 'async'}
+      fetchpriority={prioritaire ? 'high' : undefined} class={classe}
+      style={`background-color:${photo.couleur}`}
+    />
+  </picture>
+)}

@@ -1,0 +1,143 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CRÉER UN LOGEMENT (formulaire)
+# Actions > « Créer un logement » > Run workflow > remplir > Run workflow.
+# Crée le dossier du logement depuis le modèle (content/_modeles/logement),
+# avec une photo provisoire, puis met le site à jour. Voir docs/02.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Créer un logement
+
+on:
+  workflow_dispatch:
+    inputs:
+      nom:
+        description: "Nom du logement (ex. Studio Cathédrale)"
+        type: string
+        required: true
+      etablissement:
+        description: "Établissement : dossier existant (ex. residence-cathedrale) ou nom d'un NOUVEL établissement"
+        type: string
+        required: true
+      type:
+        description: "Type de logement"
+        type: choice
+        options: [studio, appartement, duplex, loft, maison, villa, chambre, gite, autre]
+        default: appartement
+      capacite:
+        description: "Nombre maximum de voyageurs"
+        type: number
+        default: 2
+      chambres:
+        description: "Nombre de chambres (0 pour un studio)"
+        type: number
+        default: 1
+      prix_nuit:
+        description: "Prix Booking par nuit (la remise directe est automatique)"
+        type: number
+        default: 100
+      publier:
+        description: "Publier tout de suite (sinon : masqué jusqu'à « publie: true »)"
+        type: boolean
+        default: false
+      destination:
+        description: "Nouvel établissement seulement : destination existante (ex. le-mans) ou nouvelle (ex. Annecy)"
+        type: string
+        required: false
+      ville:
+        description: "Nouvel établissement seulement : ville"
+        type: string
+        required: false
+      pays:
+        description: "Nouvel établissement seulement : pays (France, Indonésie…)"
+        type: string
+        default: France
+      latitude:
+        description: "Nouvel établissement : latitude (ex. 48.0072)"
+        type: string
+        required: false
+      longitude:
+        description: "Nouvel établissement : longitude (ex. 0.1975)"
+        type: string
+        required: false
+      confirmer_nouvel_etablissement:
+        description: "Nouvel établissement : je confirme qu'il n'existe pas déjà"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modification-contenu
+  cancel-in-progress: false
+
+jobs:
+  creer:
+    name: Créer le logement
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.envoi.outputs.sha }}
+      hebergeur: ${{ steps.params.outputs.hebergeur }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund --ignore-scripts
+      - name: Lire l'hébergeur choisi
+        id: params
+        run: |
+          hebergeur=$(grep -E '^hebergeur:' config/site.yml | sed -E 's/^hebergeur:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/"//g')
+          echo "hebergeur=${hebergeur:-github-pages}" >> "$GITHUB_OUTPUT"
+      # Les réponses passent par des variables d'environnement (jamais insérées
+      # directement dans une commande : protection contre l'injection).
+      - name: Créer les fichiers
+        id: creation
+        run: node scripts/nouveau-logement.mjs
+        env:
+          NOM: ${{ inputs.nom }}
+          ETABLISSEMENT: ${{ inputs.etablissement }}
+          TYPE: ${{ inputs.type }}
+          CAPACITE: ${{ inputs.capacite }}
+          CHAMBRES: ${{ inputs.chambres }}
+          PRIX_NUIT: ${{ inputs.prix_nuit }}
+          PUBLIER: ${{ inputs.publier }}
+          DESTINATION: ${{ inputs.destination }}
+          VILLE: ${{ inputs.ville }}
+          PAYS: ${{ inputs.pays }}
+          LATITUDE: ${{ inputs.latitude }}
+          LONGITUDE: ${{ inputs.longitude }}
+          CONFIRMER_NOUVEL_ETABLISSEMENT: ${{ inputs.confirmer_nouvel_etablissement }}
+      - name: Vérifier que le site reste valide
+        run: node scripts/preparer.mjs --validation-seule
+      - name: Enregistrer
+        id: envoi
+        env:
+          SLUG: ${{ steps.creation.outputs.slug }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content
+          git commit -m "Nouveau logement : $SLUG"
+          git pull --rebase --quiet origin main
+          git push --quiet origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publier:
+    name: Mettre le site à jour
+    needs: creer
+    if: needs.creer.outputs.hebergeur != 'netlify'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.creer.outputs.sha }}
+    secrets: inherit

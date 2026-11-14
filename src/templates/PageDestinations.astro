@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import BarreContact from '../components/BarreContact.astro';
+import { D, t, tn, lien, lienRoute, loc, logement } from '../lib/site';
+import { filAriane } from '../lib/jsonld';
+const { route } = Astro.props;
+const langue = route.langue;
+const ariane = [{ nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) }, { nom: t(langue, 'nav.destinations'), chemin: lien(route.chemin) }];
+---
+<Base langue={langue} titre={t(langue, 'accueil.destinations_titre')} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} jsonld={[filAriane(ariane)]}>
+  <div class="conteneur">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <h1 style="padding-top: var(--e-5)">{t(langue, 'accueil.destinations_titre')}</h1>
+    <div class="destinations" style="margin-block: var(--e-6) var(--e-8)">
+      {D.destinations.map((d: any) => {
+        const dt = loc(d, langue);
+        const ph = d.photos[0] || logement(d.logements[0])?.photos[0];
+        return (
+          <a class="tuile-destination" href={lienRoute('destination', d.slug, langue)}>
+            <Photo photo={ph} tailles="(min-width: 760px) 50vw, 100vw" alt="" />
+            <div class="tuile-destination__texte"><h2 style="color:#fff; margin:0">{dt.nom}</h2><p>{dt.accroche || ''} · {tn(langue, 'commun.logement', d.logements.length)}</p></div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+  <BarreContact slot="fin" langue={langue} />
+</Base>

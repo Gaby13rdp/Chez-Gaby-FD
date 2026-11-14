@@ -1,0 +1,12 @@
+---
+import { urlAbsolue } from '../lib/site';
+interface Props { elements: { nom: string; chemin?: string | null }[]; libelle: string }
+const { elements, libelle } = Astro.props;
+---
+<nav class="fil-ariane" aria-label={libelle}>
+  <ol>
+    {elements.map((e, i) => (
+      <li>{e.chemin && i < elements.length - 1 ? <a href={e.chemin}>{e.nom}</a> : <span aria-current={i === elements.length - 1 ? 'page' : undefined}>{e.nom}</span>}</li>
+    ))}
+  </ol>
+</nav>

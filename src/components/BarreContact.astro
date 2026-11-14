@@ -1,0 +1,16 @@
+---
+// Barre de contact fixe en bas d'écran (téléphone), hors pages logement.
+import Icone from './Icone.astro';
+import { C, t, telLien, waNumero, emailMasque } from '../lib/site';
+interface Props { langue: string }
+const { langue } = Astro.props;
+const mail = emailMasque(C.contact.email);
+const b = C.boutons_contact;
+---
+{b.barre_mobile && (
+  <nav class="barre-contact ne-pas-imprimer" aria-label={t(langue, 'nav.contact')}>
+    {C.contact.telephone && C.contact.afficher_telephone && b.appel && <a href={telLien(C.contact.telephone)}><Icone nom="phone" />{t(langue, 'commun.appeler')}</a>}
+    {C.contact.whatsapp && b.whatsapp && <a href={`https://wa.me/${waNumero(C.contact.whatsapp)}`} target="_blank" rel="noopener noreferrer"><Icone nom="message-circle" />WhatsApp</a>}
+    {b.email && <a href="#" data-email-u={mail.u} data-email-d={mail.d}><Icone nom="mail" />{t(langue, 'commun.email')}</a>}
+  </nav>
+)}

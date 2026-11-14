@@ -1,0 +1,24 @@
+---
+import Icone from './Icone.astro';
+import { t, dateLongue } from '../lib/site';
+interface Props { avis: any[]; langue: string }
+const { avis, langue } = Astro.props;
+const sources: Record<string, string> = { airbnb: 'Airbnb', booking: 'Booking.com', google: 'Google', direct: '', autre: '' };
+---
+<div class="avis-liste">
+  {avis.map((a) => (
+    <figure class={`avis ${a.exemple ? 'avis--exemple' : ''}`}>
+      {a.noteSur5 != null && (
+        <div class="avis__note" role="img" aria-label={t(langue, 'logement.avis_note', { note: a.note, sur: a.note_sur })}>
+          {[1, 2, 3, 4, 5].map((i) => <Icone nom="star" taille={16} class={i <= Math.round(a.noteSur5) ? 'plein' : ''} />)}
+        </div>
+      )}
+      <blockquote set:html={a.texteHtml} />
+      <figcaption>
+        <strong>{a.auteur}</strong> · {dateLongue(a.date, langue)}
+        {sources[a.source] && <> · {a.lien ? <a href={a.lien} target="_blank" rel="noopener noreferrer">{t(langue, 'logement.avis_source', { source: sources[a.source] })}</a> : t(langue, 'logement.avis_source', { source: sources[a.source] })}</>}
+        {a.exemple && <><br /><em>{t(langue, 'logement.avis_exemple')}</em></>}
+      </figcaption>
+    </figure>
+  ))}
+</div>

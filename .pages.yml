@@ -1,0 +1,1537 @@
+# ════════════════════════════════════════════════════════════════════════════
+# Configuration de Pages CMS (https://pagescms.org) — interface d’édition.
+# FICHIER GÉNÉRÉ AUTOMATIQUEMENT par « npm run cms » à partir de
+# scripts/lib/schemas.mjs : ne le modifiez pas à la main.
+# Mode d’emploi : docs/02-utilisation-quotidienne.md
+# ════════════════════════════════════════════════════════════════════════════
+media:
+  - name: logements
+    label: Photos des logements
+    input: content/logements
+    output: content/logements
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+    rename: safe
+  - name: etablissements
+    label: Photos des établissements
+    input: content/etablissements
+    output: content/etablissements
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+    rename: safe
+  - name: destinations
+    label: Photos des destinations
+    input: content/destinations
+    output: content/destinations
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+    rename: safe
+  - name: medias
+    label: Images du site
+    input: content/medias
+    output: medias
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+    rename: safe
+content:
+  - name: logements
+    label: Logements
+    type: collection
+    path: content/logements
+    filename: "{fields.nom}/index.md"
+    format: yaml-frontmatter
+    subfolders: true
+    exclude:
+      - photos.yml
+      - index.en.md
+      - index.id.md
+    view:
+      layout: tree
+      node:
+        filename: index.md
+        hideDirs: others
+      primary: nom
+      fields:
+        - nom
+        - publie
+        - capacite
+      search:
+        - nom
+    fields:
+      - name: nom
+        label: Nom du logement
+        required: true
+        type: string
+      - name: etablissement
+        label: Établissement
+        required: true
+        type: reference
+        options:
+          collection: etablissements
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+      - name: publie
+        label: Publié
+        description: false = masqué du site (sans rien supprimer)
+        default: true
+        type: boolean
+      - name: ordre
+        label: Ordre d'affichage
+        default: 100
+        type: number
+      - name: type
+        label: Type
+        default: appartement
+        type: select
+        options:
+          values:
+            - studio
+            - appartement
+            - duplex
+            - loft
+            - maison
+            - villa
+            - chambre
+            - gite
+            - autre
+      - name: resume
+        label: Résumé (1 à 2 phrases)
+        required: true
+        type: text
+      - name: capacite
+        label: Voyageurs maximum
+        required: true
+        type: number
+        options:
+          min: 1
+          max: 60
+      - name: chambres
+        label: Chambres
+        description: 0 pour un studio
+        default: 0
+        type: number
+        options:
+          min: 0
+      - name: lits
+        label: Lits
+        type: object
+        list: true
+        fields:
+          - name: type
+            label: Type de lit
+            default: double
+            type: select
+            options:
+              values:
+                - double
+                - queen
+                - king
+                - simple
+                - canape-lit
+                - superpose
+                - bebe
+          - name: nombre
+            label: Nombre
+            default: 1
+            type: number
+            options:
+              min: 1
+          - name: piece
+            label: Pièce
+            description: ex. Chambre 1
+            type: string
+      - name: salles_de_bain
+        label: Salles de bain
+        default: 1
+        type: number
+        options:
+          min: 0
+      - name: surface_m2
+        label: Surface (m²)
+        type: number
+        options:
+          min: 0
+      - name: etage
+        label: Étage
+        description: ex. 2 ou « rez-de-chaussée »
+        type: string
+      - name: ascenseur
+        label: Ascenseur
+        default: false
+        type: boolean
+      - name: equipements
+        label: Équipements (catalogue)
+        description: Clés du fichier config/equipements.yml
+        type: select
+        options:
+          values:
+            - value: wifi
+              label: Wi-Fi
+            - value: fibre
+              label: Internet très haut débit (fibre)
+            - value: climatisation
+              label: Climatisation
+            - value: chauffage
+              label: Chauffage
+            - value: ventilateur
+              label: Ventilateur
+            - value: cuisine-equipee
+              label: Cuisine équipée
+            - value: kitchenette
+              label: Coin cuisine
+            - value: refrigerateur
+              label: Réfrigérateur
+            - value: micro-ondes
+              label: Micro-ondes
+            - value: four
+              label: Four
+            - value: lave-vaisselle
+              label: Lave-vaisselle
+            - value: cafetiere
+              label: Cafetière
+            - value: lave-linge
+              label: Lave-linge
+            - value: seche-linge
+              label: Sèche-linge
+            - value: fer-a-repasser
+              label: Fer à repasser
+            - value: linge-fourni
+              label: Linge de lit et de toilette fourni
+            - value: seche-cheveux
+              label: Sèche-cheveux
+            - value: douche-italienne
+              label: Douche à l'italienne
+            - value: baignoire
+              label: Baignoire
+            - value: tv
+              label: Télévision
+            - value: streaming
+              label: TV connectée (streaming)
+            - value: livres-jeux
+              label: Livres et jeux de société
+            - value: bureau
+              label: Espace de travail
+            - value: lit-bebe
+              label: Lit bébé (sur demande)
+            - value: chaise-haute
+              label: Chaise haute
+            - value: parking
+              label: Parking privé
+            - value: parking-rue
+              label: Stationnement dans la rue
+            - value: borne-recharge
+              label: Borne de recharge électrique
+            - value: ascenseur
+              label: Ascenseur
+            - value: balcon
+              label: Balcon
+            - value: terrasse
+              label: Terrasse
+            - value: jardin
+              label: Jardin
+            - value: piscine
+              label: Piscine
+            - value: piscine-privee
+              label: Piscine privée
+            - value: barbecue
+              label: Barbecue
+            - value: vue-exceptionnelle
+              label: Vue exceptionnelle
+            - value: velos
+              label: Vélos à disposition
+            - value: arrivee-autonome
+              label: Arrivée autonome
+            - value: menage-inclus
+              label: Ménage de fin de séjour inclus
+            - value: petit-dejeuner
+              label: Petit-déjeuner (en option)
+            - value: personnel
+              label: Personnel sur place
+            - value: animaux-acceptes
+              label: Animaux acceptés
+            - value: non-fumeur
+              label: Logement non-fumeur
+            - value: detecteur-fumee
+              label: Détecteur de fumée
+            - value: extincteur
+              label: Extincteur
+            - value: trousse-secours
+              label: Trousse de premiers secours
+            - value: coffre-fort
+              label: Coffre-fort
+            - value: accessible-pmr
+              label: Accessible en fauteuil roulant
+            - value: moustiquaire
+              label: Moustiquaires
+            - value: generateur
+              label: Groupe électrogène de secours
+          multiple: true
+      - name: equipements_libres
+        label: Autres équipements (texte libre)
+        type: string
+        list: true
+      - name: regles
+        label: Règlement intérieur
+        type: object
+        fields:
+          - name: animaux
+            label: Animaux
+            default: non
+            type: select
+            options:
+              values:
+                - non
+                - oui
+                - sur-demande
+          - name: fumeurs
+            label: Fumeurs acceptés
+            default: false
+            type: boolean
+          - name: fetes
+            label: Fêtes et événements
+            default: false
+            type: boolean
+          - name: enfants
+            label: Enfants bienvenus
+            default: true
+            type: boolean
+          - name: silence_apres
+            label: Silence après
+            description: Format 16:00
+            type: string
+          - name: autres
+            label: Autres règles
+            type: string
+            list: true
+      - name: annulation
+        label: Politique d'annulation
+        type: object
+        fields:
+          - name: modele
+            label: Modèle
+            default: moderee
+            type: select
+            options:
+              values:
+                - flexible
+                - moderee
+                - stricte
+                - personnalisee
+          - name: texte
+            label: Texte personnalisé
+            description: Uniquement si « personnalisee »
+            type: text
+      - name: tarifs
+        label: Tarifs
+        type: object
+        fields:
+          - name: prix_nuit
+            label: Prix plateforme par nuit (Booking)
+            description: Le site applique la remise directe
+            required: true
+            type: number
+            options:
+              min: 0
+          - name: prix_plateforme_verifie
+            label: Prix plateforme vérifié et à jour
+            description: Nécessaire pour afficher le prix barré
+            default: false
+            type: boolean
+          - name: remise_directe_pct
+            label: Remise directe spécifique (%)
+            description: Vide = réglage général
+            type: number
+            options:
+              min: 0
+              max: 90
+          - name: frais_menage
+            label: Frais de ménage (par séjour)
+            default: 0
+            type: number
+            options:
+              min: 0
+          - name: voyageurs_inclus
+            label: Voyageurs inclus dans le prix
+            description: Vide = capacité maximale
+            type: number
+            options:
+              min: 1
+          - name: supplement_voyageur_nuit
+            label: Supplément par voyageur en plus, par nuit
+            default: 0
+            type: number
+            options:
+              min: 0
+          - name: supplement_weekend
+            label: Supplément week-end
+            type: object
+            fields:
+              - name: nuits
+                label: Nuits concernées
+                type: select
+                options:
+                  values:
+                    - lundi
+                    - mardi
+                    - mercredi
+                    - jeudi
+                    - vendredi
+                    - samedi
+                    - dimanche
+                  multiple: true
+              - name: montant
+                label: Montant par nuit
+                default: 0
+                type: number
+                options:
+                  min: 0
+              - name: pourcentage
+                label: ou pourcentage
+                default: 0
+                type: number
+                options:
+                  min: 0
+                  max: 200
+          - name: saisons
+            label: Saisons (chaque année ou dates précises)
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{nom}"
+            fields:
+              - name: nom
+                label: Nom
+                description: ex. Été, Noël, 24 Heures du Mans
+                required: true
+                type: string
+              - name: du
+                label: Du (inclus)
+                description: '"07-01" chaque année ou "2027-06-10"'
+                required: true
+                type: string
+              - name: au
+                label: Au (inclus, dernière nuit)
+                required: true
+                type: string
+              - name: prix_nuit
+                label: Prix plateforme par nuit
+                type: number
+                options:
+                  min: 0
+              - name: nuits_min
+                label: Nuits minimum
+                type: number
+                options:
+                  min: 1
+              - name: ferme
+                label: Fermé (non réservable)
+                default: false
+                type: boolean
+          - name: periodes_speciales
+            label: Dates spéciales (prioritaires)
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{nom}"
+            fields:
+              - name: nom
+                label: Nom
+                description: ex. Été, Noël, 24 Heures du Mans
+                required: true
+                type: string
+              - name: du
+                label: Du (inclus)
+                description: '"07-01" chaque année ou "2027-06-10"'
+                required: true
+                type: string
+              - name: au
+                label: Au (inclus, dernière nuit)
+                required: true
+                type: string
+              - name: prix_nuit
+                label: Prix plateforme par nuit
+                type: number
+                options:
+                  min: 0
+              - name: nuits_min
+                label: Nuits minimum
+                type: number
+                options:
+                  min: 1
+              - name: ferme
+                label: Fermé (non réservable)
+                default: false
+                type: boolean
+          - name: remises
+            label: Remises
+            type: object
+            fields:
+              - name: semaine_pct
+                label: 7 nuits et plus (%)
+                default: 0
+                type: number
+                options:
+                  min: 0
+                  max: 90
+              - name: mois_pct
+                label: 28 nuits et plus (%)
+                default: 0
+                type: number
+                options:
+                  min: 0
+                  max: 90
+              - name: anticipee_jours
+                label: "Réservation anticipée : au moins N jours avant"
+                default: 0
+                type: number
+                options:
+                  min: 0
+              - name: anticipee_pct
+                label: Réservation anticipée (%)
+                default: 0
+                type: number
+                options:
+                  min: 0
+                  max: 90
+              - name: derniere_minute_jours
+                label: "Dernière minute : au plus N jours avant"
+                default: 0
+                type: number
+                options:
+                  min: 0
+              - name: derniere_minute_pct
+                label: Dernière minute (%)
+                default: 0
+                type: number
+                options:
+                  min: 0
+                  max: 90
+          - name: frais_animal
+            label: Frais par animal (par séjour)
+            default: 0
+            type: number
+            options:
+              min: 0
+          - name: caution
+            label: Caution (dépôt de garantie, affichée)
+            default: 0
+            type: number
+            options:
+              min: 0
+      - name: sejour
+        label: Règles de séjour (vide = réglages généraux)
+        type: object
+        fields:
+          - name: nuits_min
+            label: Nuits minimum
+            type: number
+            options:
+              min: 1
+          - name: nuits_max
+            label: Nuits maximum
+            type: number
+            options:
+              min: 1
+          - name: jours_arrivee
+            label: Jours d'arrivée autorisés
+            type: select
+            options:
+              values:
+                - lundi
+                - mardi
+                - mercredi
+                - jeudi
+                - vendredi
+                - samedi
+                - dimanche
+              multiple: true
+          - name: jours_depart
+            label: Jours de départ autorisés
+            type: select
+            options:
+              values:
+                - lundi
+                - mardi
+                - mercredi
+                - jeudi
+                - vendredi
+                - samedi
+                - dimanche
+              multiple: true
+          - name: nuits_preparation
+            label: Nuits de préparation
+            type: number
+            options:
+              min: 0
+              max: 7
+          - name: delai_min_jours
+            label: Délai minimum avant arrivée (jours)
+            type: number
+            options:
+              min: 0
+      - name: calendriers
+        label: Calendriers synchronisés (iCal)
+        type: object
+        list: true
+        fields:
+          - name: nom
+            label: Nom
+            description: ex. Airbnb
+            required: true
+            type: string
+          - name: type
+            label: Type
+            default: autre
+            type: select
+            options:
+              values:
+                - airbnb
+                - booking
+                - google-agenda
+                - direct
+                - channel-manager
+                - autre
+          - name: secret
+            label: Nom du secret GitHub
+            description: Le lien iCal lui-même va dans GitHub > Settings > Secrets
+            type: string
+      - name: faq
+        label: Questions fréquentes
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{question}"
+        fields:
+          - name: question
+            label: Question
+            required: true
+            type: string
+          - name: reponse
+            label: Réponse
+            required: true
+            type: text
+      - name: video
+        label: Vidéo (YouTube ou Vimeo)
+        type: string
+      - name: visite_virtuelle
+        label: Visite virtuelle (Matterport, etc.)
+        type: string
+      - name: plan
+        label: Plan du logement
+        description: Image placée dans le dossier du logement, ex. plan.jpg
+        type: image
+        options:
+          media: medias
+      - name: labels
+        label: Étiquettes
+        description: ex. Coup de cœur, Nouveau
+        type: string
+        list: true
+      - name: mots_cles
+        label: Mots-clés SEO
+        type: string
+        list: true
+      - name: numero_enregistrement
+        label: Numéro d'enregistrement (France)
+        description: Numéro attribué par la mairie / le téléservice national
+        type: string
+      - name: classement
+        label: Classement meublé de tourisme
+        default: ""
+        type: select
+        options:
+          values:
+            - non-classe
+            - 1-etoile
+            - 2-etoiles
+            - 3-etoiles
+            - 4-etoiles
+            - 5-etoiles
+      - name: paiement
+        label: Paiement (option)
+        type: object
+        fields:
+          - name: lien_acompte
+            label: Lien de paiement de l'acompte
+            description: Stripe Payment Link, PayPal, Mollie…
+            type: string
+      - name: liens_externes
+        label: Liens externes (facultatif)
+        type: object
+        fields:
+          - name: airbnb
+            label: Annonce Airbnb
+            type: string
+          - name: booking
+            label: Annonce Booking.com
+            type: string
+          - name: google_business
+            label: Fiche Google
+            type: string
+          - name: apple_business
+            label: Fiche Apple Plans
+            type: string
+      - name: legendes_photos
+        label: "Photos : légendes et ordre"
+        description: "Facultatif : les photos du dossier « photos » sont toujours toutes affichées"
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{photo}"
+        fields:
+          - name: photo
+            label: Photo
+            type: image
+            options:
+              media: logements
+          - name: legende
+            label: Légende
+            type: string
+      - name: seo
+        label: Référencement (facultatif)
+        type: object
+        fields:
+          - name: titre
+            label: Titre pour Google
+            description: Vide = généré automatiquement
+            type: string
+          - name: description
+            label: Description pour Google
+            description: Vide = résumé
+            type: text
+      - name: body
+        label: Description
+        type: rich-text
+        options:
+          format: markdown
+  - name: etablissements
+    label: Établissements
+    type: collection
+    path: content/etablissements
+    filename: "{fields.nom}/index.md"
+    format: yaml-frontmatter
+    subfolders: true
+    exclude:
+      - photos.yml
+      - index.en.md
+      - index.id.md
+    view:
+      layout: tree
+      node:
+        filename: index.md
+        hideDirs: others
+      primary: nom
+      fields:
+        - nom
+        - ville
+        - publie
+    fields:
+      - name: nom
+        label: Nom
+        description: ex. Résidence Cathédrale
+        required: true
+        type: string
+      - name: publie
+        label: Publié
+        default: true
+        type: boolean
+      - name: ordre
+        label: Ordre d'affichage
+        description: Plus petit = affiché en premier
+        default: 100
+        type: number
+      - name: type
+        label: Type de lieu
+        default: immeuble
+        type: select
+        options:
+          values:
+            - immeuble
+            - residence
+            - maison
+            - villa
+            - appartement
+            - chalet
+            - autre
+      - name: destination
+        label: Destination
+        description: Ville ou région (dossier content/destinations)
+        required: true
+        type: reference
+        options:
+          collection: destinations
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+      - name: resume
+        label: Résumé (1 à 2 phrases)
+        type: text
+      - name: adresse
+        label: Adresse (rue)
+        description: Jamais affichée en entier si la carte est « approximative »
+        type: string
+      - name: code_postal
+        label: Code postal
+        type: string
+      - name: ville
+        label: Ville
+        required: true
+        type: string
+      - name: region
+        label: Région
+        type: string
+      - name: pays
+        label: Pays
+        required: true
+        default: France
+        type: string
+      - name: code_pays
+        label: Code pays (2 lettres)
+        default: FR
+        type: string
+      - name: latitude
+        label: Latitude
+        description: Clic droit sur Google Maps > copier les coordonnées
+        required: true
+        type: number
+        options:
+          min: -90
+          max: 90
+      - name: longitude
+        label: Longitude
+        required: true
+        type: number
+        options:
+          min: -180
+          max: 180
+      - name: fuseau_horaire
+        label: Fuseau horaire
+        description: Europe/Paris, Asia/Makassar (Bali)…
+        default: Europe/Paris
+        type: string
+      - name: devise
+        label: Devise
+        description: EUR, IDR…
+        default: EUR
+        type: string
+      - name: arrondi_prix
+        label: Arrondi des prix
+        description: 1 = à l’euro près ; 1000 pour les roupies
+        default: 1
+        type: number
+        options:
+          min: 0.01
+      - name: arrivee
+        label: Arrivée et départ
+        type: object
+        fields:
+          - name: heure_arrivee
+            label: Arrivée à partir de
+            default: 16:00
+            description: Format 16:00
+            type: string
+          - name: heure_arrivee_max
+            label: Arrivée jusqu'à
+            default: 22:00
+            description: Format 16:00
+            type: string
+          - name: heure_depart
+            label: Départ avant
+            default: 11:00
+            description: Format 16:00
+            type: string
+          - name: mode
+            label: Mode d'arrivée
+            description: ex. Arrivée autonome (boîte à clés) — sans le code !
+            type: string
+          - name: acces
+            label: Accès (public)
+            description: Jamais de code ni de mot de passe ici
+            type: text
+          - name: parking
+            label: Stationnement
+            type: text
+          - name: transports
+            label: Transports
+            type: text
+      - name: taxe_sejour
+        label: Taxe de séjour
+        type: object
+        fields:
+          - name: mode
+            label: Mode de calcul
+            description: fixe = montant par adulte et par nuit ; pourcentage = meublé non classé (France)
+            default: fixe
+            type: select
+            options:
+              values:
+                - aucune
+                - fixe
+                - pourcentage
+          - name: montant_par_adulte_nuit
+            label: Montant par adulte et par nuit
+            default: 0
+            type: number
+            options:
+              min: 0
+          - name: pourcentage
+            label: Taux (meublé non classé, %)
+            default: 0
+            type: number
+            options:
+              min: 0
+              max: 10
+          - name: plafond_par_adulte_nuit
+            label: Plafond par adulte et par nuit
+            description: 0 = sans plafond
+            default: 0
+            type: number
+            options:
+              min: 0
+          - name: taxe_additionnelle_pct
+            label: Taxe additionnelle (%)
+            description: ex. 10 (département), voir docs/05
+            default: 0
+            type: number
+            options:
+              min: 0
+              max: 300
+          - name: age_exoneration
+            label: Exonération en dessous de (âge)
+            default: 18
+            type: number
+            options:
+              min: 0
+              max: 25
+          - name: texte
+            label: Mention affichée
+            description: ex. Taxe de séjour de la ville du Mans
+            type: string
+      - name: contact
+        label: Contact spécifique (facultatif)
+        type: object
+        fields:
+          - name: nom
+            label: Nom
+            type: string
+          - name: telephone
+            label: Téléphone
+            type: string
+          - name: whatsapp
+            label: WhatsApp
+            type: string
+          - name: email
+            label: E-mail
+            type: string
+      - name: langues_accueil
+        label: Langues parlées à l'accueil
+        type: string
+        list: true
+      - name: a_proximite
+        label: À proximité
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{categorie}"
+        fields:
+          - name: categorie
+            label: Catégorie
+            default: autre
+            type: select
+            options:
+              values:
+                - transports
+                - commerces
+                - restaurants
+                - activites
+                - nature
+                - plages
+                - culture
+                - sante
+                - autre
+          - name: nom
+            label: Nom
+            required: true
+            type: string
+          - name: distance
+            label: Distance
+            description: ex. 5 min à pied
+            type: string
+          - name: description
+            label: Précision
+            type: string
+      - name: faq
+        label: Questions fréquentes
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{question}"
+        fields:
+          - name: question
+            label: Question
+            required: true
+            type: string
+          - name: reponse
+            label: Réponse
+            required: true
+            type: text
+      - name: liens_externes
+        label: Liens externes (facultatif)
+        type: object
+        fields:
+          - name: airbnb
+            label: Annonce Airbnb
+            type: string
+          - name: booking
+            label: Annonce Booking.com
+            type: string
+          - name: google_business
+            label: Fiche Google
+            type: string
+          - name: apple_business
+            label: Fiche Apple Plans
+            type: string
+      - name: legendes_photos
+        label: Légendes des photos
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{photo}"
+        fields:
+          - name: photo
+            label: Photo
+            type: image
+            options:
+              media: etablissements
+          - name: legende
+            label: Légende
+            type: string
+      - name: numero_enregistrement
+        label: Numéro d'enregistrement (si commun)
+        type: string
+      - name: seo
+        label: Référencement (facultatif)
+        type: object
+        fields:
+          - name: titre
+            label: Titre pour Google
+            description: Vide = généré automatiquement
+            type: string
+          - name: description
+            label: Description pour Google
+            description: Vide = résumé
+            type: text
+      - name: body
+        label: Description
+        type: rich-text
+        options:
+          format: markdown
+  - name: destinations
+    label: Destinations
+    type: collection
+    path: content/destinations
+    filename: "{fields.nom}/index.md"
+    format: yaml-frontmatter
+    subfolders: true
+    exclude:
+      - photos.yml
+      - index.en.md
+      - index.id.md
+    view:
+      layout: tree
+      node:
+        filename: index.md
+        hideDirs: others
+      primary: nom
+      fields:
+        - nom
+        - pays
+        - publie
+    fields:
+      - name: nom
+        label: Nom
+        description: ex. Le Mans
+        required: true
+        type: string
+      - name: publie
+        label: Publiée
+        default: true
+        type: boolean
+      - name: ordre
+        label: Ordre d'affichage
+        default: 100
+        type: number
+      - name: pays
+        label: Pays
+        required: true
+        type: string
+      - name: region
+        label: Région
+        type: string
+      - name: accroche
+        label: Accroche
+        type: string
+      - name: resume
+        label: Résumé
+        required: true
+        type: text
+      - name: latitude
+        label: Latitude
+        type: number
+        options:
+          min: -90
+          max: 90
+      - name: longitude
+        label: Longitude
+        type: number
+        options:
+          min: -180
+          max: 180
+      - name: points_forts
+        label: Points forts
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{icone}"
+        fields:
+          - name: icone
+            label: Icône (Lucide)
+            default: sparkles
+            description: Nom d’icône Lucide (https://lucide.dev/icons), ex. piggy-bank
+            type: string
+          - name: titre
+            label: Titre
+            required: true
+            type: string
+          - name: texte
+            label: Texte
+            type: text
+      - name: venir
+        label: Comment venir
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{mode}"
+        fields:
+          - name: mode
+            label: Mode
+            default: autre
+            type: select
+            options:
+              values:
+                - train
+                - avion
+                - voiture
+                - bus
+                - bateau
+                - autre
+          - name: texte
+            label: Détail
+            required: true
+            type: text
+      - name: meilleure_periode
+        label: Quand venir ?
+        type: text
+      - name: faq
+        label: Questions fréquentes
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{question}"
+        fields:
+          - name: question
+            label: Question
+            required: true
+            type: string
+          - name: reponse
+            label: Réponse
+            required: true
+            type: text
+      - name: seo
+        label: Référencement (facultatif)
+        type: object
+        fields:
+          - name: titre
+            label: Titre pour Google
+            description: Vide = généré automatiquement
+            type: string
+          - name: description
+            label: Description pour Google
+            description: Vide = résumé
+            type: text
+      - name: body
+        label: Présentation
+        type: rich-text
+        options:
+          format: markdown
+  - name: avis
+    label: Avis
+    type: collection
+    path: content/avis
+    filename: "{year}-{month}-{fields.auteur}.md"
+    format: yaml-frontmatter
+    subfolders: false
+    view:
+      primary: auteur
+      fields:
+        - auteur
+        - date
+        - source
+        - logement
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: auteur
+        label: Prénom du voyageur
+        description: Prénom ou initiale seulement
+        required: true
+        type: string
+      - name: date
+        label: Date du séjour ou de l’avis
+        required: true
+        type: date
+      - name: source
+        label: Source
+        default: direct
+        type: select
+        options:
+          values:
+            - airbnb
+            - booking
+            - google
+            - direct
+            - autre
+      - name: note
+        label: Note
+        type: number
+        options:
+          min: 0
+          max: 10
+      - name: note_sur
+        label: Note sur
+        default: "5"
+        type: select
+        options:
+          values:
+            - "5"
+            - "10"
+      - name: logement
+        label: Logement concerné
+        type: reference
+        options:
+          collection: logements
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+      - name: etablissement
+        label: Établissement concerné
+        type: reference
+        options:
+          collection: etablissements
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+      - name: langue
+        label: Langue
+        default: fr
+        type: select
+        options:
+          values:
+            - fr
+            - en
+            - id
+      - name: lien
+        label: Lien vers l'avis original
+        type: string
+      - name: publie
+        label: Publié
+        default: true
+        type: boolean
+      - name: exemple
+        label: Avis d’exemple (jamais publié en production)
+        hidden: true
+        default: false
+        type: boolean
+      - name: body
+        label: Texte de l'avis (recopié tel quel)
+        type: rich-text
+        options:
+          format: markdown
+  - name: accueil
+    label: Page d'accueil
+    type: file
+    path: content/pages/accueil.md
+    format: yaml-frontmatter
+    fields:
+      - name: titre
+        label: Grand titre
+        required: true
+        type: string
+      - name: sous_titre
+        label: Sous-titre
+        type: text
+      - name: image
+        label: Grande photo
+        description: Vide = photo de couverture du 1er logement
+        type: image
+        options:
+          media: medias
+      - name: image_legende
+        label: Texte alternatif de la grande photo
+        type: string
+      - name: logements_vedette
+        label: Logements en vedette
+        description: Vide = les premiers par ordre
+        type: reference
+        options:
+          collection: logements
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+          multiple: true
+      - name: nombre_vedette
+        label: Nombre de logements en vedette
+        default: 6
+        type: number
+        options:
+          min: 1
+          max: 12
+      - name: sections
+        label: Sections affichées
+        type: object
+        fields:
+          - name: destinations
+            label: Destinations
+            default: true
+            type: boolean
+          - name: vedette
+            label: Logements en vedette
+            default: true
+            type: boolean
+          - name: avantages
+            label: Pourquoi réserver en direct
+            default: true
+            type: boolean
+          - name: avis
+            label: Avis
+            default: true
+            type: boolean
+          - name: faq
+            label: FAQ courte
+            default: true
+            type: boolean
+          - name: contact
+            label: Contact
+            default: true
+            type: boolean
+      - name: faq_courte
+        label: FAQ courte
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{question}"
+        fields:
+          - name: question
+            label: Question
+            required: true
+            type: string
+          - name: reponse
+            label: Réponse
+            required: true
+            type: text
+      - name: seo
+        label: Référencement (facultatif)
+        type: object
+        fields:
+          - name: titre
+            label: Titre pour Google
+            description: Vide = généré automatiquement
+            type: string
+          - name: description
+            label: Description pour Google
+            description: Vide = résumé
+            type: text
+      - name: body
+        label: Texte d'introduction
+        type: rich-text
+        options:
+          format: markdown
+  - name: pages
+    label: Pages (À propos, FAQ, légal…)
+    type: collection
+    path: content/pages
+    filename: "{fields.titre}.md"
+    format: yaml-frontmatter
+    subfolders: false
+    exclude:
+      - accueil.md
+    view:
+      primary: titre
+      fields:
+        - titre
+    fields:
+      - name: titre
+        label: Titre
+        required: true
+        type: string
+      - name: description
+        label: Description (Google)
+        type: text
+      - name: sous_titre
+        label: Sous-titre
+        type: string
+      - name: noindex
+        label: Ne pas indexer
+        default: false
+        type: boolean
+      - name: image
+        label: Image
+        type: image
+        options:
+          media: medias
+      - name: image_legende
+        label: Texte alternatif de l'image
+        type: string
+      - name: questions
+        label: Questions (page FAQ)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{categorie}"
+        fields:
+          - name: categorie
+            label: Catégorie
+            type: string
+          - name: question
+            label: Question
+            required: true
+            type: string
+          - name: reponse
+            label: Réponse
+            required: true
+            type: text
+      - name: body
+        label: Contenu
+        type: rich-text
+        options:
+          format: markdown
+  - name: guides
+    label: Guides locaux
+    type: collection
+    path: content/guides-locaux
+    filename: "{fields.titre}.md"
+    format: yaml-frontmatter
+    subfolders: false
+    view:
+      primary: titre
+      fields:
+        - titre
+        - date
+        - publie
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: titre
+        label: Titre
+        required: true
+        type: string
+      - name: date
+        label: Date
+        required: true
+        type: date
+      - name: destination
+        label: Destination
+        type: reference
+        options:
+          collection: destinations
+          search: nom
+          value: "{parentPath}"
+          label: "{nom}"
+      - name: resume
+        label: Résumé
+        required: true
+        type: text
+      - name: image
+        label: Image
+        type: image
+        options:
+          media: medias
+      - name: image_legende
+        label: Texte alternatif de l'image
+        type: string
+      - name: publie
+        label: Publié
+        default: true
+        type: boolean
+      - name: langue
+        label: Langue
+        default: fr
+        type: select
+        options:
+          values:
+            - fr
+            - en
+            - id
+      - name: mots_cles
+        label: Mots-clés
+        type: string
+        list: true
+      - name: seo
+        label: Référencement (facultatif)
+        type: object
+        fields:
+          - name: titre
+            label: Titre pour Google
+            description: Vide = généré automatiquement
+            type: string
+          - name: description
+            label: Description pour Google
+            description: Vide = résumé
+            type: text
+      - name: body
+        label: Article
+        type: rich-text
+        options:
+          format: markdown
+  - name: reglages
+    label: Réglages du site (avancé)
+    type: file
+    path: config/site.yml
+    format: code
+  - name: catalogue
+    label: Catalogue des équipements (avancé)
+    type: file
+    path: config/equipements.yml
+    format: code
+  - name: redirections
+    label: Redirections (avancé)
+    type: file
+    path: config/redirections.yml
+    format: code

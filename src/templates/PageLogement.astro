@@ -1,0 +1,226 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import FilAriane from '../components/FilAriane.astro';
+import Galerie from '../components/Galerie.astro';
+import ReservationCarte from '../components/ReservationCarte.astro';
+import Calendrier from '../components/Calendrier.astro';
+import Carte from '../components/Carte.astro';
+import Avis from '../components/Avis.astro';
+import Faq from '../components/Faq.astro';
+import Video from '../components/Video.astro';
+import Photo from '../components/Photo.astro';
+import CarteLogement from '../components/CarteLogement.astro';
+import Avantages from '../components/Avantages.astro';
+import { D, C, t, tn, lien, lienRoute, loc, etablissement, destination, avisDe, prix, libelleType, htmlAvecBase, ogPhoto, urlAbsolue, telAffiche } from '../lib/site';
+import { logementLd, filAriane, faq as faqLd } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const l = D.logements.find((x: any) => x.slug === route.id);
+const e = etablissement(l.etablissement);
+const dest = destination(l.destination);
+const txt = loc(l, langue);
+const etx = loc(e, langue);
+const dtx = loc(dest, langue);
+const avis = avisDe(l.avis);
+const lits = (l.lits || []).reduce((s: number, x: any) => s + (x.nombre || 1), 0);
+const ariane = [
+  { nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) },
+  { nom: t(langue, 'nav.logements'), chemin: lienRoute('liste', 'logements', langue) },
+  { nom: dtx.nom, chemin: lienRoute('destination', dest.slug, langue) },
+  ...(e.aUnePage ? [{ nom: etx.nom, chemin: lienRoute('etablissement', e.slug, langue) }] : []),
+  { nom: txt.nom, chemin: lien(route.chemin) },
+];
+const titre = txt.seo?.titre || `${txt.nom} — ${libelleType(l.type, langue)} ${langue === 'fr' ? 'à' : langue === 'en' ? 'in' : 'di'} ${e.ville}`;
+const description = txt.seo?.description || txt.resume;
+const parCategorie = l.equipements.reduce((acc: Record<string, any[]>, q: any) => { (acc[q.categorie] ||= []).push(q); return acc; }, {});
+const principaux = l.equipements.slice(0, 10);
+const totalEquip = l.equipements.length + (txt.equipements_libres?.length || 0);
+const similaires = D.logements.filter((x: any) => x.slug !== l.slug && (x.destination === l.destination || Math.abs(x.capacite - l.capacite) <= 1)).slice(0, 3);
+const regles = [
+  { icone: 'paw-print', texte: `${t(langue, 'logement.animaux')} : ${l.regles.animaux === 'oui' ? t(langue, 'logement.accepte') : l.regles.animaux === 'sur-demande' ? t(langue, 'commun.sur_demande') : t(langue, 'logement.refuse')}` },
+  { icone: l.regles.fumeurs ? 'cigarette' : 'cigarette-off', texte: `${t(langue, 'logement.fumeurs')} : ${l.regles.fumeurs ? t(langue, 'logement.accepte') : t(langue, 'logement.refuse')}` },
+  { icone: 'party-popper', texte: `${t(langue, 'logement.fetes')} : ${l.regles.fetes ? t(langue, 'logement.accepte') : t(langue, 'logement.refuse')}` },
+  { icone: 'baby', texte: `${t(langue, 'logement.enfants')} : ${l.regles.enfants ? t(langue, 'commun.oui') : t(langue, 'commun.non')}` },
+  ...(l.regles.silence_apres ? [{ icone: 'volume-x', texte: t(langue, 'logement.silence', { h: l.regles.silence_apres }) }] : []),
+  ...(txt.regles_autres || []).map((r: string) => ({ icone: 'info', texte: r })),
+];
+const annulation = l.annulation.modele === 'personnalisee' && l.annulation.texte ? l.annulation.texte : t(langue, `annulation.${l.annulation.modele === 'personnalisee' ? 'moderee' : l.annulation.modele}`);
+const categoriesProx: Record<string, string> = { transports: 'tram-front', commerces: 'shopping-bag', restaurants: 'utensils', activites: 'compass', nature: 'trees', plages: 'waves-horizontal', culture: 'landmark', sante: 'heart-pulse', autre: 'map-pin' };
+const proximite = (e.a_proximite || []).reduce((acc: Record<string, any[]>, p: any) => { (acc[p.categorie] ||= []).push(p); return acc; }, {});
+const jsonld = [logementLd(l, langue, route.chemin), filAriane(ariane), faqLd(txt.faq)];
+const surfaceTxt = l.surface_m2 ? t(langue, 'commun.m2', { n: l.surface_m2 }) : null;
+const etageTxt = l.etage ? (/^\d+$/.test(l.etage) ? t(langue, 'commun.etage', { n: l.etage }) : l.etage) : null;
+---
+<Base langue={langue} titre={titre} description={description} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(l.photos[0])} jsonld={jsonld}>
+  <div class="conteneur">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <div class="titre-logement">
+      <h1>{txt.nom}</h1>
+      <div class="titre-logement__meta">
+        <span><Icone nom="map-pin" taille={16} />{e.ville}, {e.pays}</span>
+        {l.noteMoyenne && <span class="note-moyenne"><Icone nom="star" taille={16} />{l.noteMoyenne.valeur.toLocaleString(langue)} · {t(langue, 'logement.avis_moyenne', { note: l.noteMoyenne.valeur.toLocaleString(langue), n: l.noteMoyenne.nombre })}</span>}
+        {e.aUnePage && <span><Icone nom="building" taille={16} /><a href={lienRoute('etablissement', e.slug, langue)}>{t(langue, 'logement.dans_etablissement', { nom: etx.nom })}</a></span>}
+        {l.labels?.map((x: string) => <span class="etiquette">{x}</span>)}
+        <span class="titre-logement__actions ne-pas-imprimer">
+          <button type="button" class="bouton bouton--petit bouton--fantome" data-partager data-titre={txt.nom} data-copie={t(langue, 'commun.lien_copie')}><Icone nom="share-2" />{t(langue, 'commun.partager')}</button>
+          {C.impression.active && <button type="button" class="bouton bouton--petit bouton--fantome" data-imprimer><Icone nom="printer" />{t(langue, 'commun.imprimer')}</button>}
+        </span>
+      </div>
+    </div>
+    <Galerie photos={l.photos} nom={txt.nom} langue={langue} />
+
+    <div class="mise-en-page-logement">
+      <div>
+        <section class="bloc" aria-labelledby="titre-description">
+          <p class="chapeau">{txt.resume}</p>
+          <ul class="caracteristiques">
+            <li><Icone nom="users" />{tn(langue, 'commun.voyageur', l.capacite)}</li>
+            <li><Icone nom="door-open" />{l.chambres > 0 ? tn(langue, 'commun.chambre', l.chambres) : libelleType(l.type, langue)}</li>
+            <li><Icone nom="bed-double" />{tn(langue, 'commun.lit', lits || 1)}</li>
+            <li><Icone nom="bath" />{tn(langue, 'commun.sdb', l.salles_de_bain)}</li>
+            {surfaceTxt && <li><Icone nom="ruler" />{surfaceTxt}</li>}
+            {etageTxt && <li><Icone nom="building" />{etageTxt}{l.ascenseur ? ` · ${t(langue, 'commun.ascenseur')}` : ''}</li>}
+          </ul>
+          <h2 id="titre-description">{t(langue, 'logement.description')}</h2>
+          {!txt.traduit && <p class="message">{t(langue, 'commun.traduction_absente')}</p>}
+          <div class="prose" set:html={htmlAvecBase(txt.corpsHtml)} />
+          {l.lits?.length > 0 && (
+            <>
+              <h3 style="margin-top: var(--e-5)">{t(langue, 'logement.lits_detail')}</h3>
+              <ul class="liste-puces-icones">
+                {l.lits.map((b: any) => <li><Icone nom="bed-double" />{b.nombre} × {t(langue, `lits.${b.type}`)}{b.piece ? ` — ${b.piece}` : ''}</li>)}
+              </ul>
+            </>
+          )}
+        </section>
+
+        <section class="bloc" aria-labelledby="titre-equipements">
+          <h2 id="titre-equipements">{t(langue, 'logement.equipements')}</h2>
+          <ul class="equipements">
+            {principaux.map((q: any) => <li><Icone nom={q.icone} />{q.libelle[langue] || q.libelle.fr}</li>)}
+          </ul>
+          {totalEquip > principaux.length && (
+            <button type="button" class="bouton" data-ouvrir-dialogue="dialogue-equipements">{t(langue, 'logement.voir_equipements', { n: totalEquip })}</button>
+          )}
+          <dialog class="dialogue" id="dialogue-equipements" aria-labelledby="titre-dialogue-equipements">
+            <div class="dialogue__haut">
+              <h2 id="titre-dialogue-equipements">{t(langue, 'logement.equipements')}</h2>
+              <button type="button" class="bouton bouton--icone bouton--fantome" data-fermer-dialogue><Icone nom="x" label={t(langue, 'commun.fermer')} taille={22} /></button>
+            </div>
+            <div class="dialogue__corps">
+              {Object.entries(parCategorie).map(([cat, liste]) => (
+                <>
+                  <h3 class="equipements-categorie">{t(langue, `categories_equipements.${cat}`)}</h3>
+                  <ul class="equipements">{(liste as any[]).map((q) => <li><Icone nom={q.icone} />{q.libelle[langue] || q.libelle.fr}</li>)}</ul>
+                </>
+              ))}
+              {txt.equipements_libres?.length > 0 && (
+                <>
+                  <h3 class="equipements-categorie">{t(langue, 'logement.autres_equipements')}</h3>
+                  <ul class="equipements">{txt.equipements_libres.map((q: string) => <li><Icone nom="check" />{q}</li>)}</ul>
+                </>
+              )}
+            </div>
+          </dialog>
+        </section>
+
+        <section class="bloc" id="disponibilites" aria-labelledby="titre-dispo">
+          <h2 id="titre-dispo">{t(langue, 'logement.disponibilites')}</h2>
+          <Calendrier langue={langue} />
+        </section>
+
+        <section class="bloc" aria-labelledby="titre-infos">
+          <h2 id="titre-infos">{t(langue, 'logement.infos_pratiques')}</h2>
+          <div class="infos-arrivee">
+            <div><span class="texte-doux">{t(langue, 'reservation.arrivee')}</span><strong>{etx.arrivee.heure_arrivee} – {etx.arrivee.heure_arrivee_max}</strong></div>
+            <div><span class="texte-doux">{t(langue, 'reservation.depart')}</span><strong>{t(langue, 'logement.depart_avant', { h: etx.arrivee.heure_depart })}</strong></div>
+            {l.tarif.caution > 0 && <div><span class="texte-doux">{t(langue, 'reservation.caution')}</span><strong>{prix(l.tarif.caution, l.devise, langue)}</strong></div>}
+          </div>
+          <ul class="liste-puces-icones" style="margin-bottom: var(--e-5)">
+            {etx.arrivee.mode && <li><Icone nom="key-round" />{etx.arrivee.mode}</li>}
+            {etx.arrivee.acces && <li><Icone nom="door-open" />{etx.arrivee.acces}</li>}
+            {etx.arrivee.parking && <li><Icone nom="square-letter-p" />{etx.arrivee.parking}</li>}
+            {etx.arrivee.transports && <li><Icone nom="tram-front" />{etx.arrivee.transports}</li>}
+          </ul>
+          <h3>{t(langue, 'logement.regles')}</h3>
+          <ul class="regles">{regles.map((r) => <li><Icone nom={r.icone} />{r.texte}</li>)}</ul>
+          <h3>{t(langue, 'logement.annulation')}</h3>
+          <p>{annulation}</p>
+          {(l.numero_enregistrement || e.taxe_sejour?.texte) && (
+            <p class="texte-doux" style="font-size:.9rem">
+              {l.numero_enregistrement && <>{t(langue, 'logement.numero_enregistrement', { n: l.numero_enregistrement })}<br /></>}
+              {e.taxe_sejour?.texte}
+            </p>
+          )}
+        </section>
+
+        <section class="bloc" aria-labelledby="titre-emplacement">
+          <h2 id="titre-emplacement">{t(langue, 'logement.emplacement')}</h2>
+          <p>{C.carte.precision === 'exacte' && e.adresse ? `${e.adresse}, ${e.code_postal} ${e.ville}` : `${e.ville}${e.region ? `, ${e.region}` : ''}, ${e.pays}`}</p>
+          <Carte points={[{ lat: e.carte.lat, lng: e.carte.lng, rayon: e.carte.rayon, titre: txt.nom }]} langue={langue} />
+          {Object.keys(proximite).length > 0 && (
+            <>
+              <h3 style="margin-top: var(--e-6)">{t(langue, 'logement.a_proximite')}</h3>
+              <div class="proximite">
+                {Object.entries(proximite).map(([cat, liste]) => (
+                  <div>
+                    <h4 class="proximite__titre"><Icone nom={categoriesProx[cat] || 'map-pin'} />{t(langue, `proximite.${cat}`)}</h4>
+                    <ul>{(liste as any[]).map((p) => <li><span>{p.nom}{p.description && <><br /><small class="texte-doux">{p.description}</small></>}</span><span>{p.distance}</span></li>)}</ul>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+
+        {(l.video || l.visite_virtuelle || l.plan) && (
+          <section class="bloc" aria-labelledby="titre-medias">
+            <h2 id="titre-medias">{l.video ? t(langue, 'logement.video') : l.visite_virtuelle ? t(langue, 'logement.visite') : t(langue, 'logement.plan')}</h2>
+            {l.video && <Video url={l.video} titre={txt.nom} langue={langue} />}
+            {l.visite_virtuelle && <div style="margin-top: var(--e-4)"><Video url={l.visite_virtuelle} titre={`${t(langue, 'logement.visite')} — ${txt.nom}`} langue={langue} /></div>}
+            {l.plan && <figure style="margin: var(--e-4) 0 0"><Photo photo={l.plan} tailles="(min-width: 1024px) 700px, 100vw" /><figcaption class="texte-doux">{t(langue, 'logement.plan')}</figcaption></figure>}
+          </section>
+        )}
+
+        {avis.length > 0 && (
+          <section class="bloc" aria-labelledby="titre-avis">
+            <h2 id="titre-avis">{t(langue, 'logement.avis')}</h2>
+            {l.noteMoyenne && C.avis.afficher_note_moyenne && <p class="note-moyenne"><Icone nom="star" />{t(langue, 'logement.avis_moyenne', { note: l.noteMoyenne.valeur.toLocaleString(langue), n: l.noteMoyenne.nombre })}</p>}
+            <Avis avis={avis} langue={langue} />
+          </section>
+        )}
+
+        {txt.faq?.length > 0 && (
+          <section class="bloc" aria-labelledby="titre-faq">
+            <h2 id="titre-faq">{t(langue, 'logement.faq')}</h2>
+            <Faq questions={txt.faq} />
+          </section>
+        )}
+
+        <section class="bloc ne-pas-imprimer">
+          <Avantages />
+        </section>
+      </div>
+
+      <div class="colonne-reservation">
+        <ReservationCarte logement={l} etablissement={e} langue={langue} />
+      </div>
+    </div>
+
+    <div class="impression-seule">
+      <p><strong>{C.marque.nom}</strong> — {telAffiche(C.contact.telephone)} — {urlAbsolue(route.chemin)}</p>
+    </div>
+
+    {similaires.length > 0 && (
+      <section class="section--compacte similaires" aria-labelledby="titre-similaires">
+        <h2 id="titre-similaires">{t(langue, 'logement.similaires')}</h2>
+        <div class="grille">{similaires.map((x: any) => <CarteLogement logement={x} langue={langue} />)}</div>
+      </section>
+    )}
+  </div>
+  <script>
+    import '../scripts/page-logement';
+  </script>
+</Base>

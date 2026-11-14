@@ -1,0 +1,36 @@
+---
+// Pages de paiement (non indexées) : lien d'acompte (niveau 1) ou
+// retour de Stripe Checkout (niveau 2 : merci / annulé).
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Photo from '../components/Photo.astro';
+import BlocContact from '../components/BlocContact.astro';
+import { D, C, t, loc, lien, lienRoute } from '../lib/site';
+const { route } = Astro.props;
+const langue = route.langue;
+const l = route.type === 'paiement' ? D.logements.find((x: any) => x.slug === route.id) : null;
+const titre = route.type === 'paiement-merci' ? t(langue, 'paiement.merci_titre') : route.type === 'paiement-annule' ? t(langue, 'paiement.annule_titre') : t(langue, 'paiement.titre');
+---
+<Base langue={langue} titre={titre} chemin={route.chemin} alternatives={route.alternatives} noindex={true}>
+  <div class="page-centree">
+    <div>
+      {route.type === 'paiement-merci' && <><Icone nom="circle-check" taille={56} /><h1>{titre}</h1><p>{t(langue, 'paiement.merci_texte')}</p></>}
+      {route.type === 'paiement-annule' && <><Icone nom="info" taille={56} /><h1>{titre}</h1><p>{t(langue, 'paiement.annule_texte')}</p></>}
+      {l && (
+        <>
+          <div style="width:min(100%, 420px); border-radius: var(--rayon-l); overflow:hidden"><Photo photo={l.photos[0]} tailles="420px" prioritaire /></div>
+          <h1>{titre}</h1>
+          <p class="chapeau">{loc(l, langue).nom}</p>
+          <p>{t(langue, 'paiement.texte')}</p>
+          {l.lien_acompte
+            ? <a class="bouton bouton--primaire" href={l.lien_acompte} rel="noopener noreferrer"><Icone nom="credit-card" />{t(langue, 'paiement.bouton')}</a>
+            : C.paiement.niveau === 2
+              ? <a class="bouton bouton--primaire" href={lien(l.url[langue] ?? l.url.fr)}><Icone nom="calendar-days" />{t(langue, 'reservation.payer_acompte')}</a>
+              : <p class="message">{t(langue, 'paiement.indisponible')}</p>}
+        </>
+      )}
+      <a class="bouton bouton--fantome" href={lienRoute('accueil', 'accueil', langue)}>{t(langue, 'erreur404.retour')}</a>
+    </div>
+  </div>
+  <div class="conteneur"><BlocContact langue={langue} /></div>
+</Base>

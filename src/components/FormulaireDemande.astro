@@ -1,0 +1,100 @@
+---
+// Formulaire de demande (réservation) ou de contact. L'envoi est géré par
+// src/scripts/formulaire.ts selon le prestataire choisi (config/site.yml).
+import Icone from './Icone.astro';
+import { D, C, t, lienRoute, telLien, telAffiche, waNumero, emailMasque } from '../lib/site';
+interface Props { langue: string; mode: 'reservation' | 'contact'; logements?: { slug: string; nom: string }[]; id?: string }
+const { langue, mode, logements = [], id = `formulaire-${mode}` } = Astro.props;
+const f = D.formulaire;
+const heures = Array.from({ length: 16 }, (_, i) => `${String(8 + i).padStart(2, '0')}:00`);
+const mail = emailMasque(C.contact.email);
+const confidentialite = lienRoute('page', 'confidentialite', langue);
+const textes = {
+  envoi: t(langue, 'formulaire.envoi'), erreur: t(langue, 'formulaire.erreur'), erreurChamp: t(langue, 'formulaire.erreur_champ'),
+  erreurEmail: t(langue, 'formulaire.erreur_email'), erreurRequis: t(langue, 'formulaire.erreur_requis'), erreurConsentement: t(langue, 'formulaire.erreur_consentement'),
+  succesTitre: t(langue, 'formulaire.succes_titre'), succesTexte: t(langue, 'formulaire.succes_texte'), succesMessage: t(langue, 'formulaire.succes_message'),
+  mailtoInfo: t(langue, 'formulaire.mailto_info'), objetDemande: t(langue, 'formulaire.objet_demande'), objetContact: t(langue, 'formulaire.objet_contact'),
+  delai: C.contact.delai_reponse || '', nouvelle: t(langue, 'formulaire.nouvelle_demande'),
+};
+const configEnvoi = {
+  prestataire: f.prestataire, action: f.action, cle: f.cle || '', destinataire: [mail.u, mail.d], marque: C.marque.nom, langue,
+  turnstile: C.formulaire.turnstile.active && f.prestataire === 'worker' ? C.formulaire.turnstile.cle_site : '',
+};
+---
+<form class="formulaire" id={id} data-formulaire={mode} novalidate data-config={JSON.stringify(configEnvoi)} data-textes={JSON.stringify(textes)}>
+  {mode === 'reservation' && <div class="recapitulatif" data-recapitulatif aria-live="polite"></div>}
+  {mode === 'contact' && logements.length > 0 && (
+    <div class="champ">
+      <label for={`${id}-logement`}>{t(langue, 'nav.logements')}</label>
+      <select id={`${id}-logement`} name="logement">
+        <option value="">—</option>
+        {logements.map((l) => <option value={l.nom}>{l.nom}</option>)}
+      </select>
+    </div>
+  )}
+  <div class="champs-2">
+    <div class="champ">
+      <label for={`${id}-nom`}>{t(langue, 'formulaire.nom')} <span class="obligatoire" aria-hidden="true">*</span></label>
+      <input id={`${id}-nom`} name="nom" type="text" autocomplete="name" required maxlength="120" aria-describedby={`${id}-nom-err`} />
+      <span class="champ__erreur" id={`${id}-nom-err`} hidden></span>
+    </div>
+    <div class="champ">
+      <label for={`${id}-email`}>{t(langue, 'formulaire.email')} <span class="obligatoire" aria-hidden="true">*</span></label>
+      <input id={`${id}-email`} name="email" type="email" autocomplete="email" required maxlength="160" inputmode="email" aria-describedby={`${id}-email-err`} />
+      <span class="champ__erreur" id={`${id}-email-err`} hidden></span>
+    </div>
+  </div>
+  <div class="champs-2">
+    <div class="champ">
+      <label for={`${id}-tel`}>{t(langue, 'formulaire.telephone')} {C.formulaire.telephone_obligatoire && <span class="obligatoire" aria-hidden="true">*</span>}</label>
+      <input id={`${id}-tel`} name="telephone" type="tel" autocomplete="tel" maxlength="40" required={C.formulaire.telephone_obligatoire} aria-describedby={`${id}-tel-aide ${id}-tel-err`} />
+      <span class="aide" id={`${id}-tel-aide`}>{t(langue, 'formulaire.telephone_aide')}</span>
+      <span class="champ__erreur" id={`${id}-tel-err`} hidden></span>
+    </div>
+    {mode === 'reservation' && C.formulaire.demander_heure_arrivee && (
+      <div class="champ">
+        <label for={`${id}-heure`}>{t(langue, 'formulaire.heure_arrivee')}</label>
+        <select id={`${id}-heure`} name="heure_arrivee">
+          <option value="">{t(langue, 'formulaire.heure_inconnue')}</option>
+          {heures.map((h) => <option value={h}>{h}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+  <div class="champ">
+    <label for={`${id}-message`}>{t(langue, 'formulaire.message')}{mode === 'contact' && <span class="obligatoire" aria-hidden="true"> *</span>}</label>
+    <textarea id={`${id}-message`} name="message" rows="4" maxlength="3000" required={mode === 'contact'} aria-describedby={`${id}-message-aide ${id}-message-err`}></textarea>
+    <span class="aide" id={`${id}-message-aide`}>{t(langue, 'formulaire.message_aide')}</span>
+    <span class="champ__erreur" id={`${id}-message-err`} hidden></span>
+  </div>
+  <div class="piege" aria-hidden="true">
+    <label for={`${id}-site`}>{t(langue, 'formulaire.anti_spam')}</label>
+    <input id={`${id}-site`} name="site_web" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <div class="champ">
+    <label class="case">
+      <input type="checkbox" name="consentement" required aria-describedby={`${id}-consentement-err`} />
+      <span>{t(langue, 'formulaire.consentement')} {confidentialite && <a href={confidentialite} target="_blank">{t(langue, 'pied.confidentialite')}</a>}</span>
+    </label>
+    <span class="champ__erreur" id={`${id}-consentement-err`} hidden></span>
+  </div>
+  {configEnvoi.turnstile && <div data-turnstile></div>}
+  <div class="reservation__messages" data-messages-formulaire aria-live="assertive"></div>
+  <button type="submit" class="bouton bouton--primaire bouton--large">
+    <Icone nom="send" />{mode === 'reservation' ? t(langue, 'formulaire.envoyer') : t(langue, 'formulaire.envoyer_message')}
+  </button>
+  {mode === 'reservation' && <p class="devis__mention" style="text-align:center">{t(langue, 'reservation.mention_demande')}</p>}
+  <div class="reservation__contacts" data-autres-moyens hidden>
+    {C.contact.whatsapp && <a class="bouton bouton--petit" href={`https://wa.me/${waNumero(C.contact.whatsapp)}`} target="_blank" rel="noopener noreferrer" data-lien-whatsapp><Icone nom="message-circle" />WhatsApp</a>}
+    {C.contact.telephone && C.contact.afficher_telephone && <a class="bouton bouton--petit" href={telLien(C.contact.telephone)}><Icone nom="phone" />{telAffiche(C.contact.telephone)}</a>}
+    <a class="bouton bouton--petit" href="#" data-email-u={mail.u} data-email-d={mail.d}><Icone nom="mail" />{t(langue, 'commun.email')}</a>
+  </div>
+</form>
+<div class="succes" data-succes={id} hidden tabindex="-1">
+  <Icone nom="circle-check" taille={56} />
+  <h3 data-succes-titre>{mode === 'reservation' ? t(langue, 'formulaire.succes_titre') : t(langue, 'formulaire.succes_message')}</h3>
+  <p data-succes-texte></p>
+</div>
+<script>
+  import '../scripts/formulaire';
+</script>

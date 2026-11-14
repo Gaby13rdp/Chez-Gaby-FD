@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import { D, C, t, lienRoute } from '../lib/site';
+const langue = D.langueDefaut;
+---
+<Base langue={langue} titre={t(langue, 'erreur404.titre')} chemin="/404.html" noindex={true}>
+  <div class="page-centree">
+    <div>
+      <span class="grand-chiffre">404</span>
+      <h1>{t(langue, 'erreur404.titre')}</h1>
+      <p class="chapeau">{C.maintenance.active ? C.maintenance.message : t(langue, 'erreur404.texte')}</p>
+      <div style="display:flex; gap: var(--e-3); flex-wrap: wrap; justify-content: center">
+        <a class="bouton bouton--primaire" href={lienRoute('accueil', 'accueil', langue)}>{t(langue, 'erreur404.retour')}</a>
+        {lienRoute('liste', 'logements', langue) && <a class="bouton" href={lienRoute('liste', 'logements', langue)}><Icone nom="layout-grid" />{t(langue, 'erreur404.voir_logements')}</a>}
+      </div>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,99 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTRÔLE QUALITÉ
+# Tests automatiques, validation du contenu, construction, liens internes,
+# HTML, absence de secrets, et audit Lighthouse (mobile) : performance,
+# accessibilité, bonnes pratiques et référencement.
+# Se lance quand le code change (pas pour une simple modification de contenu),
+# sur les propositions de modification (pull requests), ou à la main.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Contrôle qualité
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'paiement-worker/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'astro.config.mjs'
+      - 'lighthouserc.json'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  controle:
+    name: Tests, construction et audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Récupérer les photos déjà optimisées
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: public/img
+          key: photos-v3-${{ hashFiles('content/**/*.jpg', 'content/**/*.jpeg', 'content/**/*.png', 'content/**/*.webp', 'content/**/*.JPG', 'content/**/*.JPEG', 'content/**/*.PNG', 'scripts/lib/images.mjs') }}
+          restore-keys: photos-v3-
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Aucun lien iCal ni clé secrète dans le dépôt
+        run: |
+          if grep -rIEn --exclude-dir={node_modules,.git,dist,tests} \
+            -e 'airbnb\.[a-z.]+/calendar/ical/[^ "]+' \
+            -e 'admin\.booking\.com/hotel/hoteladmin/ical' \
+            -e 'ical\.booking\.com/v1/export[^ "]*' \
+            -e '(vrbo|abritel|homeaway)\.[a-z.]+/icalendar/[^ "]+' \
+            -e 'calendar\.google\.com/calendar/ical/[^ "]*private' \
+            -e 'sk_(live|test)_[A-Za-z0-9]{10,}' -e 'whsec_[A-Za-z0-9]{10,}' -e 'xnd_(production|development)_[A-Za-z0-9]{10,}' . ; then
+            echo "::error::Un lien iCal privé ou une clé secrète est écrit dans un fichier du dépôt. Retirez-le et utilisez un secret GitHub (docs/04)."
+            exit 1
+          fi
+          echo "Aucune donnée secrète trouvée."
+
+      - name: Tests automatiques (iCal, tarifs, disponibilités, validation, service de paiement)
+        run: npm test
+
+      - name: Formulaire Pages CMS à jour
+        run: |
+          node scripts/generer-pages-cms.mjs
+          if ! git diff --quiet -- .pages.yml; then
+            echo "::error::.pages.yml n'est plus à jour : lancez « npm run cms » et enregistrez le résultat."
+            git diff -- .pages.yml | head -50
+            exit 1
+          fi
+
+      - name: Construire le site
+        # Adresse locale : l'audit sert le site à la racine, quel que soit
+        # le chemin réel (ex. /mon-depot/ sur GitHub Pages).
+        env:
+          SITE_URL: http://localhost
+        run: npm run build
+
+      - name: Valider le HTML
+        run: npx --no-install html-validate "dist/**/*.html"
+
+      - name: Audit Lighthouse (mobile)
+        # Seuils dans lighthouserc.json (objectif : 95 partout ; l'audit
+        # échoue sous 85 en performance et sous 95 ailleurs, car les mesures
+        # varient d'une machine à l'autre). Le lien vers le rapport détaillé
+        # s'affiche à la fin de cette étape. « is-crawlable » est ignoré :
+        # en mode démonstration le site est volontairement non indexé.
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=lighthouserc.json

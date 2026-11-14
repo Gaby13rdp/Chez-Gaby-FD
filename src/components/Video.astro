@@ -1,0 +1,44 @@
+---
+// Vidéo YouTube (mode sans cookies) ou Vimeo, chargée uniquement au clic.
+import Icone from './Icone.astro';
+import { t } from '../lib/site';
+interface Props { url: string; titre: string; langue: string }
+const { url, titre, langue } = Astro.props;
+let source = '', fournisseur = '';
+try {
+  const u = new URL(url);
+  if (/youtube\.com|youtu\.be/.test(u.hostname)) {
+    const id = u.hostname.includes('youtu.be') ? u.pathname.slice(1) : (u.searchParams.get('v') || u.pathname.split('/').pop());
+    source = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    fournisseur = 'YouTube';
+  } else if (/vimeo\.com/.test(u.hostname)) {
+    const id = u.pathname.split('/').filter(Boolean).pop();
+    source = `https://player.vimeo.com/video/${id}?autoplay=1&dnt=1`;
+    fournisseur = 'Vimeo';
+  } else {
+    source = url; fournisseur = u.hostname;
+  }
+} catch { /* adresse invalide : rien n'est affiché */ }
+---
+{source && (
+  <div class="video" data-video={source} data-titre={titre}>
+    <button type="button">
+      <Icone nom="play" taille={64} />
+      <strong>{t(langue, 'logement.lecture_video')}</strong>
+      <small>{t(langue, 'logement.video_consentement', { fournisseur })}</small>
+    </button>
+  </div>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-video]').forEach((v) => {
+    v.querySelector('button')?.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = v.dataset.video || '';
+      f.title = v.dataset.titre || 'Vidéo';
+      f.allow = 'autoplay; fullscreen; picture-in-picture';
+      f.allowFullscreen = true;
+      v.innerHTML = '';
+      v.appendChild(f);
+    });
+  });
+</script>

@@ -1,0 +1,20 @@
+---
+import Icone from './Icone.astro';
+import { C, t, lienRoute, telLien, telAffiche, waNumero, emailMasque } from '../lib/site';
+interface Props { langue: string; titre?: string; texte?: string }
+const { langue, titre = t(langue, 'accueil.contact_titre'), texte = t(langue, 'accueil.contact_texte') } = Astro.props;
+const mail = emailMasque(C.contact.email);
+const contact = lienRoute('page', 'contact', langue);
+---
+<div class="contact-bloc">
+  <div>
+    <h2>{titre}</h2>
+    <p class="chapeau" style="margin:0">{texte} {C.contact.delai_reponse && <span>{C.contact.delai_reponse}.</span>}</p>
+  </div>
+  <div class="contact-boutons">
+    {C.contact.whatsapp && C.boutons_contact.whatsapp && <a class="bouton bouton--primaire" href={`https://wa.me/${waNumero(C.contact.whatsapp)}`} target="_blank" rel="noopener noreferrer"><Icone nom="message-circle" />WhatsApp</a>}
+    {C.contact.telephone && C.contact.afficher_telephone && C.boutons_contact.appel && <a class="bouton" href={telLien(C.contact.telephone)}><Icone nom="phone" />{telAffiche(C.contact.telephone)}</a>}
+    {C.boutons_contact.email && <a class="bouton" href="#" data-email-u={mail.u} data-email-d={mail.d}><Icone nom="mail" />{t(langue, 'commun.email')}</a>}
+    {contact && <a class="bouton bouton--fantome" href={contact}>{t(langue, 'nav.contact')}<Icone nom="arrow-right" /></a>}
+  </div>
+</div>

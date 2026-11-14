@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import BlocContact from '../components/BlocContact.astro';
+import { C, t } from '../lib/site';
+const { route } = Astro.props;
+const langue = route.langue;
+---
+<Base langue={langue} titre={t(langue, 'demo.maintenance_titre')} chemin={route.chemin} alternatives={route.alternatives} noindex={true}>
+  <div class="page-centree">
+    <div>
+      <Icone nom="sparkles" taille={48} />
+      <h1>{t(langue, 'demo.maintenance_titre')}</h1>
+      <p class="chapeau">{C.maintenance.message}</p>
+    </div>
+  </div>
+  <div class="conteneur" style="margin-bottom: var(--e-8)"><BlocContact langue={langue} /></div>
+</Base>

@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import CarteLogement from '../components/CarteLogement.astro';
+import Carte from '../components/Carte.astro';
+import Faq from '../components/Faq.astro';
+import Avis from '../components/Avis.astro';
+import BlocContact from '../components/BlocContact.astro';
+import BarreContact from '../components/BarreContact.astro';
+import { D, t, tn, lien, lienRoute, loc, logement, destination, htmlAvecBase, ogPhoto } from '../lib/site';
+import { etablissementLd, listeLd, filAriane, faq as faqLd } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const e = D.etablissements.find((x: any) => x.slug === route.id);
+const txt = loc(e, langue);
+const dest = destination(e.destination);
+const logements = e.logements.map((s: string) => logement(s));
+const photo = e.photos[0] || logements[0]?.photos[0];
+const avis = D.avis.filter((a: any) => a.etablissement === e.slug || e.logements.includes(a.logement));
+const ariane = [
+  { nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) },
+  { nom: t(langue, 'nav.logements'), chemin: lienRoute('liste', 'logements', langue) },
+  { nom: loc(dest, langue).nom, chemin: lienRoute('destination', dest.slug, langue) },
+  { nom: txt.nom, chemin: lien(route.chemin) },
+];
+const categoriesProx: Record<string, string> = { transports: 'tram-front', commerces: 'shopping-bag', restaurants: 'utensils', activites: 'compass', nature: 'trees', plages: 'waves-horizontal', culture: 'landmark', sante: 'heart-pulse', autre: 'map-pin' };
+const proximite = (e.a_proximite || []).reduce((acc: Record<string, any[]>, p: any) => { (acc[p.categorie] ||= []).push(p); return acc; }, {});
+---
+<Base langue={langue} titre={txt.seo?.titre || `${txt.nom} — ${e.ville}`} description={txt.seo?.description || txt.resume} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(photo)} jsonld={[etablissementLd(e, langue, route.chemin), listeLd(logements, langue), filAriane(ariane), faqLd(txt.faq)]}>
+  <section class="heros-page">
+    <Photo photo={photo} tailles="100vw" prioritaire largeurCible={1920} alt="" />
+    <div class="conteneur">
+      <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+      <span class="surtitre" style="color: rgb(255 255 255 / .85)">{t(langue, `types.${e.type}`)} · {e.ville}</span>
+      <h1>{txt.nom}</h1>
+      {txt.resume && <p>{txt.resume}</p>}
+    </div>
+  </section>
+  <section class="section" aria-labelledby="t-logements">
+    <div class="conteneur">
+      <div class="entete-section"><div><h2 id="t-logements">{t(langue, 'logement.logements_etablissement', { nom: txt.nom })}</h2><p class="texte-doux" style="margin:0">{tn(langue, 'commun.logement', logements.length)}</p></div></div>
+      <div class="grille">{logements.map((l: any) => <CarteLogement logement={l} langue={langue} />)}</div>
+    </div>
+  </section>
+  <section class="section section--alt">
+    <div class="conteneur deux-colonnes">
+      <div>
+        <div class="prose" set:html={htmlAvecBase(txt.corpsHtml)} />
+        {e.photos.length > 1 && <div class="grille" style="margin-top: var(--e-5); grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))">{e.photos.slice(1, 7).map((p: any) => <Photo photo={p} tailles="300px" class="" />)}</div>}
+      </div>
+      <div>
+        <h2 style="font-size:1.5rem">{t(langue, 'logement.infos_pratiques')}</h2>
+        <div class="infos-arrivee">
+          <div><span class="texte-doux">{t(langue, 'reservation.arrivee')}</span><strong>{txt.arrivee.heure_arrivee} – {txt.arrivee.heure_arrivee_max}</strong></div>
+          <div><span class="texte-doux">{t(langue, 'reservation.depart')}</span><strong>{t(langue, 'logement.depart_avant', { h: txt.arrivee.heure_depart })}</strong></div>
+        </div>
+        <ul class="liste-puces-icones">
+          {txt.arrivee.mode && <li><Icone nom="key-round" />{txt.arrivee.mode}</li>}
+          {txt.arrivee.acces && <li><Icone nom="door-open" />{txt.arrivee.acces}</li>}
+          {txt.arrivee.parking && <li><Icone nom="square-letter-p" />{txt.arrivee.parking}</li>}
+          {txt.arrivee.transports && <li><Icone nom="tram-front" />{txt.arrivee.transports}</li>}
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="section--compacte">
+    <div class="conteneur">
+      <h2>{t(langue, 'logement.emplacement')}</h2>
+      <Carte points={[{ lat: e.carte.lat, lng: e.carte.lng, rayon: e.carte.rayon, titre: txt.nom }]} langue={langue} />
+      {Object.keys(proximite).length > 0 && (
+        <div class="proximite" style="margin-top: var(--e-6)">
+          {Object.entries(proximite).map(([cat, liste]) => (
+            <div><h3><Icone nom={categoriesProx[cat] || 'map-pin'} />{t(langue, `proximite.${cat}`)}</h3>
+              <ul>{(liste as any[]).map((p) => <li><span>{p.nom}</span><span>{p.distance}</span></li>)}</ul></div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+  {avis.length > 0 && <section class="section"><div class="conteneur"><h2>{t(langue, 'logement.avis')}</h2><Avis avis={avis} langue={langue} /></div></section>}
+  {txt.faq?.length > 0 && <section class="section"><div class="conteneur"><h2>{t(langue, 'logement.faq')}</h2><Faq questions={txt.faq} /></div></section>}
+  <section class="section--compacte"><div class="conteneur"><BlocContact langue={langue} /></div></section>
+  <BarreContact slot="fin" langue={langue} />
+</Base>

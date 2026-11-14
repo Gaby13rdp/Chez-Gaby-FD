@@ -1,0 +1,139 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import FilAriane from '../components/FilAriane.astro';
+import CarteLogement from '../components/CarteLogement.astro';
+import BarreContact from '../components/BarreContact.astro';
+import { D, C, t, tn, lien, lienRoute, loc, fichier, locale, prix } from '../lib/site';
+import { listeLd, filAriane } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const F = C.liste.filtres;
+const logements = D.logements;
+const ariane = [{ nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) }, { nom: t(langue, 'liste.titre'), chemin: lien(route.chemin) }];
+const filtrables = Object.entries(D.equipements).filter(([k, e]: any) => e.filtre && logements.some((l: any) => l.equipements.some((q: any) => q.cle === k)));
+const capaciteMax = Math.max(...logements.map((l: any) => l.capacite));
+const devises = [...new Set(logements.map((l: any) => l.devise))];
+const donneesListe = {
+  langue, locale: locale(langue), dispo: fichier('donnees/disponibilites.json'), tri: C.liste.tri_par_defaut,
+  favoris: C.liste.favoris, comparateur: C.liste.comparateur,
+  logements: Object.fromEntries(logements.map((l: any) => [l.slug, { tarif: l.tarif, regles: l.reglesSejour, capacite: l.capacite, fuseau: l.fuseau, devise: l.devise, animaux: l.regles.animaux, nom: loc(l, langue).nom, url: lien(l.url[langue] ?? l.url.fr), type: t(langue, `types.${l.type}`), chambres: l.chambres, surface: l.surface_m2, prix: l.prixAPartirDe.direct, note: l.noteMoyenne?.valeur ?? null, equipements: l.equipements.map((q: any) => q.libelle[langue] || q.libelle.fr) }])),
+  textes: {
+    resultats_un: t(langue, 'liste.resultats_un'), resultats_plusieurs: t(langue, 'liste.resultats_plusieurs'), pour_sejour: t(langue, 'liste.pour_sejour'),
+    indisponible: t(langue, 'liste.indisponible_dates'), nuit_un: t(langue, 'commun.nuit_un'), nuit_plusieurs: t(langue, 'commun.nuit_plusieurs'),
+    chargement: t(langue, 'liste.chargement_dispo'), ajouter: t(langue, 'liste.ajouter_favori'), retirer: t(langue, 'liste.retirer_favori'),
+    comparer_max: t(langue, 'liste.comparer_max'), comparateur: t(langue, 'liste.comparateur'), capacite: t(langue, 'liste.capacite'),
+    a_partir_de: t(langue, 'commun.a_partir_de'), equipements: t(langue, 'liste.equipements'), type: t(langue, 'liste.tri'), note: t(langue, 'logement.avis'),
+  },
+};
+---
+<Base langue={langue} titre={t(langue, 'liste.titre')} description={t(langue, 'liste.description')} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} jsonld={[listeLd(logements, langue), filAriane(ariane)]}>
+  <div class="conteneur">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <header style="padding-block: var(--e-5) var(--e-4)">
+      <h1>{t(langue, 'liste.titre')}</h1>
+      <p class="chapeau">{t(langue, 'liste.description')}</p>
+    </header>
+  </div>
+
+  {F.active && (
+    <div class="barre-filtres">
+      <form class="conteneur barre-filtres__ligne" data-filtres method="get" action={lien(route.chemin)} aria-label={t(langue, 'liste.filtres')}>
+        {F.dates && (
+          <>
+            <label class="puce"><Icone nom="calendar-days" /><span class="visuellement-cache">{t(langue, 'reservation.arrivee')}</span><input type="date" name="arrivee" data-f="arrivee" style="border:0;background:transparent;min-width:9.5rem" aria-label={t(langue, 'reservation.arrivee')} /></label>
+            <label class="puce"><span class="visuellement-cache">{t(langue, 'reservation.depart')}</span><input type="date" name="depart" data-f="depart" style="border:0;background:transparent;min-width:9.5rem" aria-label={t(langue, 'reservation.depart')} /></label>
+          </>
+        )}
+        {F.capacite && (
+          <label class="puce"><Icone nom="users" /><span class="visuellement-cache">{t(langue, 'liste.capacite')}</span>
+            <select name="voyageurs" data-f="voyageurs" style="border:0;background:transparent" aria-label={t(langue, 'liste.capacite')}>
+              {Array.from({ length: capaciteMax }, (_, i) => <option value={i + 1}>{tn(langue, 'commun.voyageur', i + 1)}</option>)}
+            </select>
+          </label>
+        )}
+        {F.destination && D.destinations.length > 1 && (
+          <>
+            <button type="button" class="puce" data-destination="" aria-pressed="true">{t(langue, 'liste.tous')}</button>
+            {D.destinations.map((d: any) => <button type="button" class="puce" data-destination={d.slug} aria-pressed="false">{loc(d, langue).nom}</button>)}
+            <input type="hidden" name="destination" data-f="destination" />
+          </>
+        )}
+        {(F.equipements && filtrables.length > 0) || F.prix ? (
+          <button type="button" class="puce" data-ouvrir-filtres><Icone nom="sliders-horizontal" />{t(langue, 'liste.filtres')}<span data-nb-filtres></span></button>
+        ) : null}
+        {C.liste.favoris && <button type="button" class="puce" data-filtre-favoris aria-pressed="false"><Icone nom="heart" />{t(langue, 'liste.favoris')}</button>}
+        <noscript><button class="puce" type="submit">{t(langue, 'liste.filtrer')}</button></noscript>
+      </form>
+    </div>
+  )}
+
+  <div class="conteneur">
+    <div class="resultats-entete">
+      <p role="status" aria-live="polite" data-compte style="margin:0; font-weight:600">{tn(langue, 'liste.resultats', logements.length)}</p>
+      <label style="display:flex; gap:.5rem; align-items:center; font-size:.92rem">{t(langue, 'liste.tri')}
+        <select data-tri>
+          <option value="recommande">{t(langue, 'liste.tri_recommande')}</option>
+          {devises.length === 1 && <option value="prix-croissant">{t(langue, 'liste.tri_prix_croissant')}</option>}
+          {devises.length === 1 && <option value="prix-decroissant">{t(langue, 'liste.tri_prix_decroissant')}</option>}
+          <option value="capacite">{t(langue, 'liste.tri_capacite')}</option>
+        </select>
+      </label>
+    </div>
+    <div class="grille" data-grille>
+      {logements.map((l: any, i: number) => <CarteLogement logement={l} langue={langue} prioritaire={i < 2} titreNiveau="h2" />)}
+    </div>
+    <div class="vide" data-vide hidden>
+      <p style="font-size:1.15rem; color: var(--texte)">{t(langue, 'liste.aucun')}</p>
+      <p>{t(langue, 'liste.aucun_conseil')}</p>
+      <button type="button" class="bouton" data-reinitialiser>{t(langue, 'liste.reinitialiser')}</button>
+    </div>
+  </div>
+
+  <dialog class="dialogue" id="dialogue-filtres" aria-labelledby="t-filtres">
+    <div class="dialogue__haut">
+      <h2 id="t-filtres">{t(langue, 'liste.filtres')}</h2>
+      <button type="button" class="bouton bouton--icone bouton--fantome" data-fermer-filtres><Icone nom="x" label={t(langue, 'commun.fermer')} taille={22} /></button>
+    </div>
+    <div class="dialogue__corps filtres-panneau">
+      {F.prix && devises.length === 1 && (
+        <fieldset>
+          <legend>{t(langue, 'liste.budget')}</legend>
+          <div class="champ"><input type="number" min="0" step={devises[0] === 'IDR' ? 100000 : 10} data-f="budget" inputmode="numeric" aria-label={t(langue, 'liste.budget')} placeholder={prix(Math.max(...logements.map((l: any) => l.prixAPartirDe.direct)), devises[0] as string, langue)} /></div>
+        </fieldset>
+      )}
+      {F.equipements && filtrables.length > 0 && (
+        <fieldset>
+          <legend>{t(langue, 'liste.equipements')}</legend>
+          <div class="cases-equipements">
+            {filtrables.map(([k, e]: any) => <label class="case"><input type="checkbox" value={k} data-equipement /><span>{e[langue] || e.fr}</span></label>)}
+          </div>
+        </fieldset>
+      )}
+      <div style="display:flex; justify-content: space-between; gap: var(--e-3)">
+        <button type="button" class="bouton bouton--fantome" data-reinitialiser>{t(langue, 'liste.reinitialiser')}</button>
+        <button type="button" class="bouton bouton--primaire" data-appliquer-filtres>{t(langue, 'liste.afficher_resultats')}</button>
+      </div>
+    </div>
+  </dialog>
+
+  {C.liste.comparateur && (
+    <>
+      <div class="comparateur-barre" data-barre-comparateur hidden>
+        <span data-nb-comparer></span>
+        <button type="button" class="bouton bouton--petit bouton--primaire" data-ouvrir-comparateur>{t(langue, 'liste.comparer')}</button>
+        <button type="button" class="bouton bouton--petit" data-vider-comparateur style="--b-fond: transparent; --b-texte: inherit">{t(langue, 'liste.vider')}</button>
+      </div>
+      <dialog class="dialogue" id="dialogue-comparateur" style="width:min(100% - 2rem, 980px)" aria-labelledby="t-comparateur">
+        <div class="dialogue__haut"><h2 id="t-comparateur">{t(langue, 'liste.comparateur')}</h2><button type="button" class="bouton bouton--icone bouton--fantome" data-fermer-comparateur><Icone nom="x" label={t(langue, 'commun.fermer')} taille={22} /></button></div>
+        <div class="dialogue__corps" data-contenu-comparateur></div>
+      </dialog>
+    </>
+  )}
+  <script type="application/json" id="donnees-liste" set:html={JSON.stringify(donneesListe).replace(/</g, '\\u003c')}></script>
+  <BarreContact slot="fin" langue={langue} />
+  <script>
+    import '../scripts/liste';
+  </script>
+</Base>

@@ -1,0 +1,22 @@
+# Dépendances et fichiers générés (recréés à chaque build)
+node_modules/
+dist/
+.astro/
+src/genere/
+public/img/
+public/donnees/
+.cache/
+.wrangler/
+paiement-worker/.wrangler/
+paiement-worker/node_modules/
+.lighthouseci/
+
+# Systèmes
+.DS_Store
+Thumbs.db
+*.log
+
+# Secrets locaux (ne jamais publier)
+.env
+.env.*
+.dev.vars

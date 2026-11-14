@@ -1,0 +1,126 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PUBLIER LE SITE (GitHub Pages ou Cloudflare)
+# Se lance tout seul à chaque modification de la branche main, ou à la main
+# (onglet Actions > « Publier le site » > Run workflow).
+# config/site.yml > hebergeur :
+#   github-pages (défaut) : construit et publie sur GitHub Pages ;
+#   cloudflare : construit ici (photos en cache) et publie sur Cloudflare avec
+#                les secrets CLOUDFLARE_API_TOKEN et CLOUDFLARE_ACCOUNT_ID ;
+#   netlify    : ne fait rien (Netlify construit lui-même, voir netlify.toml).
+# Versions des actions épinglées par empreinte (SHA) ; Dependabot les met à jour.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Publier le site
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'paiement-worker/**'
+      - '.github/dependabot.yml'
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit à publier
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  construire:
+    name: Construire le site
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Une seule construction à la fois ; la plus récente en attente remplace les autres.
+    concurrency:
+      group: construction-site
+      cancel-in-progress: false
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - name: Lire l'hébergeur choisi
+        id: params
+        run: |
+          hebergeur=$(grep -E '^hebergeur:' config/site.yml | sed -E 's/^hebergeur:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/"//g')
+          echo "hebergeur=${hebergeur:-github-pages}" >> "$GITHUB_OUTPUT"
+          echo "Hébergeur : ${hebergeur:-github-pages}"
+
+      - name: Installer Node.js
+        if: steps.params.outputs.hebergeur != 'netlify'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Configurer GitHub Pages
+        if: steps.params.outputs.hebergeur == 'github-pages'
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Récupérer les photos déjà optimisées
+        if: steps.params.outputs.hebergeur != 'netlify'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: public/img
+          key: photos-v3-${{ hashFiles('content/**/*.jpg', 'content/**/*.jpeg', 'content/**/*.png', 'content/**/*.webp', 'content/**/*.JPG', 'content/**/*.JPEG', 'content/**/*.PNG', 'scripts/lib/images.mjs') }}
+          restore-keys: photos-v3-
+
+      - name: Installer les dépendances
+        if: steps.params.outputs.hebergeur != 'netlify'
+        run: npm ci --no-audit --no-fund
+
+      - name: Vérifier le contenu et construire le site
+        if: steps.params.outputs.hebergeur != 'netlify'
+        run: npm run build
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+
+      - name: Préparer la publication (GitHub Pages)
+        if: steps.params.outputs.hebergeur == 'github-pages'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+      - name: Publier sur Cloudflare
+        if: steps.params.outputs.hebergeur == 'cloudflare'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error title=Secrets Cloudflare manquants::Ajoutez CLOUDFLARE_API_TOKEN et CLOUDFLARE_ACCOUNT_ID dans Settings > Secrets and variables > Actions (docs/01-mise-en-ligne.md, partie Cloudflare)."
+            exit 1
+          fi
+          npx --yes wrangler@4.156.0 deploy
+
+    outputs:
+      hebergeur: ${{ steps.params.outputs.hebergeur }}
+
+  publier:
+    name: Mettre en ligne
+    needs: construire
+    if: needs.construire.outputs.hebergeur == 'github-pages'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: publication-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - name: Publier sur GitHub Pages
+        id: deploiement
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

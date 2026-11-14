@@ -1,0 +1,62 @@
+# ============================================================================
+#  CATALOGUE DES ÉQUIPEMENTS
+#  Dans un logement, on liste les CLÉS (à gauche), ex. :
+#      equipements: [wifi, cuisine-equipee, lave-linge]
+#  Vous pouvez ajouter vos propres équipements à la fin de ce fichier.
+#   • icone : nom d'icône Lucide (https://lucide.dev/icons)
+#   • categorie : essentiels | cuisine | chambre | salle-de-bain | loisirs |
+#                 exterieur | famille | securite | services | travail
+#   • fr / en / id : libellés en français, anglais, indonésien
+#   • filtre : true = proposé dans les filtres de recherche
+# ============================================================================
+
+wifi:              { icone: wifi, categorie: essentiels, fr: "Wi-Fi", en: "Wi-Fi", id: "Wi-Fi", filtre: true }
+fibre:             { icone: zap, categorie: essentiels, fr: "Internet très haut débit (fibre)", en: "High-speed fibre internet", id: "Internet fiber cepat" }
+climatisation:     { icone: air-vent, categorie: essentiels, fr: "Climatisation", en: "Air conditioning", id: "AC", filtre: true }
+chauffage:         { icone: heater, categorie: essentiels, fr: "Chauffage", en: "Heating", id: "Pemanas" }
+ventilateur:       { icone: fan, categorie: essentiels, fr: "Ventilateur", en: "Fan", id: "Kipas angin" }
+cuisine-equipee:   { icone: cooking-pot, categorie: cuisine, fr: "Cuisine équipée", en: "Fully equipped kitchen", id: "Dapur lengkap", filtre: true }
+kitchenette:       { icone: utensils, categorie: cuisine, fr: "Coin cuisine", en: "Kitchenette", id: "Dapur kecil" }
+refrigerateur:     { icone: refrigerator, categorie: cuisine, fr: "Réfrigérateur", en: "Fridge", id: "Kulkas" }
+micro-ondes:       { icone: microwave, categorie: cuisine, fr: "Micro-ondes", en: "Microwave", id: "Microwave" }
+four:              { icone: flame, categorie: cuisine, fr: "Four", en: "Oven", id: "Oven" }
+lave-vaisselle:    { icone: utensils-crossed, categorie: cuisine, fr: "Lave-vaisselle", en: "Dishwasher", id: "Mesin cuci piring", filtre: true }
+cafetiere:         { icone: coffee, categorie: cuisine, fr: "Cafetière", en: "Coffee maker", id: "Mesin kopi" }
+lave-linge:        { icone: washing-machine, categorie: essentiels, fr: "Lave-linge", en: "Washing machine", id: "Mesin cuci", filtre: true }
+seche-linge:       { icone: wind, categorie: essentiels, fr: "Sèche-linge", en: "Tumble dryer", id: "Pengering pakaian" }
+fer-a-repasser:    { icone: shirt, categorie: essentiels, fr: "Fer à repasser", en: "Iron", id: "Setrika" }
+linge-fourni:      { icone: bed-double, categorie: chambre, fr: "Linge de lit et de toilette fourni", en: "Bed linen and towels provided", id: "Seprai dan handuk disediakan" }
+seche-cheveux:     { icone: wind, categorie: salle-de-bain, fr: "Sèche-cheveux", en: "Hair dryer", id: "Pengering rambut" }
+douche-italienne:  { icone: shower-head, categorie: salle-de-bain, fr: "Douche à l'italienne", en: "Walk-in shower", id: "Shower walk-in" }
+baignoire:         { icone: bath, categorie: salle-de-bain, fr: "Baignoire", en: "Bathtub", id: "Bak mandi" }
+tv:                { icone: tv, categorie: loisirs, fr: "Télévision", en: "TV", id: "TV" }
+streaming:         { icone: monitor, categorie: loisirs, fr: "TV connectée (streaming)", en: "Smart TV (streaming)", id: "Smart TV" }
+livres-jeux:       { icone: book-open, categorie: loisirs, fr: "Livres et jeux de société", en: "Books and board games", id: "Buku dan permainan" }
+bureau:            { icone: laptop, categorie: travail, fr: "Espace de travail", en: "Dedicated workspace", id: "Ruang kerja", filtre: true }
+lit-bebe:          { icone: baby, categorie: famille, fr: "Lit bébé (sur demande)", en: "Baby cot (on request)", id: "Tempat tidur bayi (atas permintaan)" }
+chaise-haute:      { icone: baby, categorie: famille, fr: "Chaise haute", en: "High chair", id: "Kursi makan bayi" }
+parking:           { icone: square-letter-p, categorie: exterieur, fr: "Parking privé", en: "Private parking", id: "Parkir pribadi", filtre: true }
+parking-rue:       { icone: car, categorie: exterieur, fr: "Stationnement dans la rue", en: "Street parking", id: "Parkir di jalan" }
+borne-recharge:    { icone: ev-charger, categorie: exterieur, fr: "Borne de recharge électrique", en: "EV charger", id: "Pengisi daya mobil listrik" }
+ascenseur:         { icone: arrow-up-down, categorie: essentiels, fr: "Ascenseur", en: "Lift", id: "Lift" }
+balcon:            { icone: fence, categorie: exterieur, fr: "Balcon", en: "Balcony", id: "Balkon" }
+terrasse:          { icone: armchair, categorie: exterieur, fr: "Terrasse", en: "Terrace", id: "Teras", filtre: true }
+jardin:            { icone: flower-2, categorie: exterieur, fr: "Jardin", en: "Garden", id: "Taman" }
+piscine:           { icone: waves-ladder, categorie: exterieur, fr: "Piscine", en: "Swimming pool", id: "Kolam renang", filtre: true }
+piscine-privee:    { icone: waves-ladder, categorie: exterieur, fr: "Piscine privée", en: "Private pool", id: "Kolam renang pribadi", filtre: true }
+barbecue:          { icone: flame, categorie: exterieur, fr: "Barbecue", en: "Barbecue", id: "Barbeque" }
+vue-exceptionnelle: { icone: mountain, categorie: exterieur, fr: "Vue exceptionnelle", en: "Stunning view", id: "Pemandangan indah" }
+velos:             { icone: bike, categorie: loisirs, fr: "Vélos à disposition", en: "Bikes available", id: "Sepeda tersedia" }
+arrivee-autonome:  { icone: key-round, categorie: services, fr: "Arrivée autonome", en: "Self check-in", id: "Check-in mandiri", filtre: true }
+menage-inclus:     { icone: sparkles, categorie: services, fr: "Ménage de fin de séjour inclus", en: "Final cleaning included", id: "Termasuk pembersihan akhir" }
+petit-dejeuner:    { icone: croissant, categorie: services, fr: "Petit-déjeuner (en option)", en: "Breakfast (optional)", id: "Sarapan (opsional)" }
+personnel:         { icone: concierge-bell, categorie: services, fr: "Personnel sur place", en: "On-site staff", id: "Staf di tempat" }
+animaux-acceptes:  { icone: paw-print, categorie: famille, fr: "Animaux acceptés", en: "Pets allowed", id: "Hewan peliharaan diizinkan", filtre: true }
+non-fumeur:        { icone: cigarette-off, categorie: securite, fr: "Logement non-fumeur", en: "Non-smoking", id: "Bebas asap rokok" }
+detecteur-fumee:   { icone: alarm-smoke, categorie: securite, fr: "Détecteur de fumée", en: "Smoke alarm", id: "Detektor asap" }
+extincteur:        { icone: fire-extinguisher, categorie: securite, fr: "Extincteur", en: "Fire extinguisher", id: "Alat pemadam api" }
+trousse-secours:   { icone: cross, categorie: securite, fr: "Trousse de premiers secours", en: "First aid kit", id: "Kotak P3K" }
+coffre-fort:       { icone: vault, categorie: securite, fr: "Coffre-fort", en: "Safe", id: "Brankas" }
+accessible-pmr:    { icone: accessibility, categorie: essentiels, fr: "Accessible en fauteuil roulant", en: "Wheelchair accessible", id: "Akses kursi roda", filtre: true }
+moustiquaire:      { icone: blinds, categorie: essentiels, fr: "Moustiquaires", en: "Mosquito nets", id: "Kelambu" }
+generateur:        { icone: plug-zap, categorie: essentiels, fr: "Groupe électrogène de secours", en: "Backup generator", id: "Genset cadangan" }

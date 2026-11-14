@@ -1,0 +1,374 @@
+# ============================================================================
+#  RÉGLAGES DU SITE — toutes les options sont dans ce fichier.
+#
+#  Mode d'emploi rapide :
+#   • Modifiez uniquement ce qui se trouve APRÈS les deux-points « : ».
+#   • Gardez les espaces en début de ligne : ils indiquent l'imbrication.
+#   • Les textes peuvent contenir des accents ; mettez-les entre guillemets "…".
+#   • true = oui / activé, false = non / désactivé.
+#   • Une ligne qui commence par # est un commentaire (ignoré par le site).
+#   • Après un enregistrement (« Commit changes »), le site se met à jour
+#     en 2 à 5 minutes. En cas d'erreur, un message en français s'affiche
+#     dans l'onglet « Actions » de GitHub (voir docs/09-depannage.md).
+#
+#  Les valeurs marquées EXEMPLE sont à personnaliser (liste complète dans
+#  README.md, rubrique « À personnaliser »).
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+# 1. MISE EN LIGNE
+# ----------------------------------------------------------------------------
+
+# false = site de démonstration : bandeau « Site de démonstration » visible
+#         et pages invisibles pour Google (noindex). Les erreurs bloquantes
+#         sont seulement signalées.
+# true  = site réel : bandeau retiré, pages indexables. Le site refuse alors
+#         de se publier s'il reste des données d'exemple importantes.
+production: false
+
+# Adresse publique du site (avec https://).
+# • Sur GitHub Pages : laissez vide, l'adresse est détectée automatiquement
+#   (y compris avec un nom de domaine personnalisé).
+# • Sur Cloudflare ou Netlify : indiquez-la, ex. "https://www.mes-locations.fr"
+# C'est le SEUL réglage d'adresse : le reste du site s'adapte tout seul.
+url: ""
+
+# Hébergeur utilisé : github-pages (défaut), cloudflare ou netlify.
+# github-pages et cloudflare : le site est construit et publié par GitHub
+# (workflow « Publier le site »). netlify : Netlify construit lui-même.
+# Voir docs/01-mise-en-ligne.md.
+hebergeur: github-pages
+
+
+# ----------------------------------------------------------------------------
+# 2. MARQUE ET COORDONNÉES
+# ----------------------------------------------------------------------------
+
+marque:
+  nom: "Séjours en Direct (EXEMPLE)"          # nom affiché partout
+  slogan: "Locations de vacances en direct, sans commission"
+  # Logo : chemin d'une image placée dans le dossier public/ (ex. "logo.svg").
+  # Laisser vide pour un logo texte élégant généré automatiquement.
+  logo: ""
+  logo_texte: "Séjours en Direct"             # texte du logo si pas d'image
+  # Favicon (icône d'onglet) : vide = icône générée avec l'initiale du nom.
+  favicon: ""
+
+contact:
+  nom: "Jean EXEMPLE"                         # votre prénom et nom
+  email: "contact@exemple.fr"                 # EXEMPLE — adresse qui reçoit les demandes
+  telephone: "+33 6 00 00 00 00"              # EXEMPLE — format international conseillé
+  whatsapp: "+33600000000"                    # EXEMPLE — vide = pas de bouton WhatsApp
+  afficher_telephone: true                    # afficher le numéro sur le site
+  delai_reponse: "Réponse en moins de 24 h"
+  langues_parlees: ["Français", "English"]
+  # Ville affichée dans le pied de page (facultatif)
+  ville: "Le Mans"
+
+reseaux_sociaux:                              # laisser vide ce que vous n'utilisez pas
+  instagram: ""
+  facebook: ""
+  youtube: ""
+  tiktok: ""
+  linkedin: ""
+
+# Liens vers vos fiches sur d'autres plateformes (facultatifs, pied de page).
+# Chaque logement peut aussi avoir ses propres liens (rubrique liens_externes).
+liens_externes:
+  google_business: ""                         # lien de votre fiche Google
+  apple_business: ""                          # lien Apple Plans
+  airbnb: ""                                  # page profil hôte Airbnb
+  booking: ""                                 # page établissement Booking.com
+  afficher_dans_pied_de_page: false
+
+
+# ----------------------------------------------------------------------------
+# 3. APPARENCE
+# ----------------------------------------------------------------------------
+
+theme:
+  # Préréglage : lumineux | chaleureux | sombre-elegant
+  preset: chaleureux
+  # Couleur d'accent (boutons, liens). Vide = couleur du préréglage.
+  # Format "#RRGGBB", ex. "#B4532A" (terre cuite), "#2F6F62" (vert d'eau).
+  # Le site vérifie le contraste et adapte le texte des boutons si besoin.
+  couleur_accent: ""
+  police_titres: fraunces                     # fraunces | playfair | cormorant
+  police_texte: inter                         # inter | systeme
+  arrondi: moyen                              # aucun | petit | moyen | grand
+  mode_sombre_auto: true                      # suit le réglage clair/sombre du téléphone
+  animations: true                            # animations discrètes (coupées si l'appareil le demande)
+
+# Bandeau d'annonce en haut de toutes les pages (promo, fermeture, travaux…)
+annonce:
+  active: false
+  texte: "-10 % sur les séjours de 7 nuits et plus cet hiver"
+  lien: ""                                    # facultatif, ex. "/logements/"
+  style: promo                                # info | promo | alerte
+
+# Mode maintenance : remplace tout le site par une page d'attente.
+maintenance:
+  active: false
+  message: "Le site fait peau neuve. Pour réserver, contactez-nous par téléphone ou WhatsApp."
+
+langues:
+  defaut: fr
+  # Langues publiées. Ajoutez en (anglais) et/ou id (indonésien).
+  # Les textes non traduits s'affichent en français avec une mention.
+  actives: [fr]
+  selecteur: true                             # menu de choix de la langue
+  # Rediriger automatiquement vers la langue du navigateur (première visite)
+  detecter_langue_navigateur: false
+
+
+# ----------------------------------------------------------------------------
+# 4. LOGEMENTS ET CALENDRIER
+# ----------------------------------------------------------------------------
+
+calendrier:
+  mois_affiches_ordinateur: 2
+  mois_affiches_mobile: 1
+  premier_jour_semaine: lundi                 # lundi | dimanche
+  legende: true
+  # Au-delà de ce délai sans synchronisation réussie, le site affiche
+  # « Disponibilités à confirmer ».
+  fraicheur_max_heures: 6
+  # Proposer d'autres dates si la période choisie est prise
+  suggerer_dates_alternatives: true
+  # Mode temps réel (avancé) : interroge le service Cloudflare facultatif
+  # (dossier paiement-worker/) à chaque visite. Voir docs/04 et docs/07.
+  temps_reel:
+    active: false
+    url: ""                                   # ex. "https://mon-service.mon-compte.workers.dev"
+
+synchronisation:
+  # Fréquence de la vérification automatique (minutes). GitHub peut retarder
+  # les exécutions de plusieurs minutes. Minimum 5, conseillé 30.
+  # ⚠ Si vous changez cette valeur, modifiez aussi la ligne « cron » de
+  #   .github/workflows/sync-calendriers.yml (voir docs/04).
+  intervalle_minutes: 30
+  # Republier au moins toutes les N heures même sans changement, pour que
+  # l'indicateur de fraîcheur reste à jour. 0 = seulement en cas de changement.
+  # Doit rester inférieur à calendrier.fraicheur_max_heures.
+  republier_toutes_les_heures: 4
+
+# Règles de séjour par défaut (chaque logement peut les remplacer)
+sejour:
+  nuits_min: 2
+  nuits_max: 28
+  # Jours d'arrivée / de départ autorisés. Vide = tous les jours.
+  # Valeurs : lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche
+  jours_arrivee: []
+  jours_depart: []
+  nuits_preparation: 0                        # nuits bloquées avant/après chaque séjour
+  delai_min_jours: 1                          # arrivée au plus tôt dans N jours (0 = aujourd'hui)
+  horizon_mois: 18                            # réservable jusqu'à N mois à l'avance
+
+# Page « Logements » (liste)
+liste:
+  filtres:
+    active: true
+    dates: true
+    destination: true
+    capacite: true
+    equipements: true
+    prix: true
+  tri_par_defaut: recommande                  # recommande | prix-croissant | prix-decroissant | capacite
+  favoris: false                              # cœur « favori » mémorisé sur l'appareil du visiteur
+  comparateur: false                          # comparer jusqu'à 3 logements côte à côte
+
+
+# ----------------------------------------------------------------------------
+# 5. TARIFS
+# ----------------------------------------------------------------------------
+# Dans chaque logement, vous saisissez le PRIX PLATEFORME (Booking) par nuit.
+# Le site calcule automatiquement le prix direct = prix plateforme − remise.
+
+tarifs:
+  remise_directe_pct: 15                      # % de remise par rapport à Booking
+  # Afficher le prix plateforme barré et l'économie réalisée.
+  # N'activez QUE si les prix plateforme saisis sont exacts et à jour
+  # (obligation de loyauté envers le client). Le logement doit aussi avoir
+  # « prix_plateforme_verifie: true ».
+  afficher_prix_plateforme: false
+  afficher_a_partir_de: true                  # « à partir de X € / nuit » sur les cartes
+  # Les remises (longue durée, réservation anticipée, dernière minute)
+  # se cumulent-elles ? false = seule la plus avantageuse s'applique.
+  remises_cumulables: false
+  devis:
+    active: true                              # devis automatique sur la page logement
+    mention: "Devis indicatif et non contractuel. Le prix définitif vous est confirmé par écrit avec la réservation."
+
+
+# ----------------------------------------------------------------------------
+# 6. DEMANDES DE RÉSERVATION ET CONTACT
+# ----------------------------------------------------------------------------
+
+formulaire:
+  # Service qui vous transmet les demandes par e-mail :
+  #  web3forms (conseillé, gratuit, 250 demandes/mois) | formspree | getform
+  #  worker (votre service Cloudflare, dossier paiement-worker/) | mailto (ouvre la messagerie du visiteur)
+  # Tant que la clé n'est pas renseignée, le site utilise automatiquement « mailto ».
+  prestataire: web3forms
+  web3forms_cle: ""                           # « Access Key » reçue par e-mail (clé publique, sans risque)
+  formspree_id: ""                            # ex. "xyzabcde" (fin de l'adresse formspree.io/f/…)
+  getform_id: ""                              # ex. "abcd1234" (fin de l'adresse getform.io/f/…)
+  worker_url: ""                              # ex. "https://mon-service.mon-compte.workers.dev"
+  telephone_obligatoire: false
+  demander_heure_arrivee: true
+  # Anti-spam : un champ piège invisible est toujours actif. Cloudflare
+  # Turnstile ajoute une vérification invisible (uniquement avec « worker »).
+  turnstile:
+    active: false
+    cle_site: ""                              # clé publique « Site Key »
+  # Notification instantanée (Telegram, ntfy, Discord) : se règle dans le
+  # service Cloudflare (clés secrètes), voir docs/07 et paiement-worker/README.md.
+
+boutons_contact:
+  appel: true
+  whatsapp: true
+  email: true
+  barre_mobile: true                          # barre fixe en bas d'écran sur téléphone
+  # Message WhatsApp prérempli ({logement}, {arrivee}, {depart}, {voyageurs})
+  message_whatsapp: "Bonjour, je suis intéressé(e) par {logement} du {arrivee} au {depart} pour {voyageurs}. Est-ce disponible ?"
+
+
+# ----------------------------------------------------------------------------
+# 7. CONTENU ET CONFIANCE
+# ----------------------------------------------------------------------------
+
+avis:
+  active: true
+  afficher_note_moyenne: true                 # uniquement calculée sur de VRAIS avis
+  nombre_accueil: 3                           # avis affichés sur la page d'accueil
+
+# Arguments « Pourquoi réserver en direct » (accueil et pages logement).
+# icone : nom d'icône Lucide (https://lucide.dev/icons), ex. piggy-bank
+pourquoi_reserver_en_direct:
+  active: true
+  titre: "Pourquoi réserver en direct ?"
+  arguments:
+    - icone: piggy-bank
+      titre: "Le meilleur prix"
+      texte: "Pas de frais de service : vous payez moins cher que sur les plateformes."
+    - icone: message-circle
+      titre: "Un contact direct"
+      texte: "Vous échangez avec le propriétaire, pas avec un centre d'appels."
+    - icone: calendar-check
+      titre: "Des conditions souples"
+      texte: "Dates, horaires, demandes particulières : on s'arrange ensemble."
+    - icone: shield-check
+      titre: "En toute confiance"
+      texte: "Les mêmes logements que sur Airbnb et Booking, avec leurs avis."
+
+# Badges affichés sous le titre de l'accueil (facultatif)
+badges: []
+#  - icone: award
+#    texte: "Superhôte Airbnb"
+
+guides_locaux:
+  active: false                               # rubrique « Guides » (blog local)
+  titre: "Guides locaux"
+
+# Page d'informations voyageurs non listée (/infos-voyageurs/).
+# ⚠ Cette page n'est PAS protégée : toute personne qui a le lien peut la
+#   lire. N'y mettez JAMAIS de code d'accès, de boîte à clés ou d'alarme.
+infos_voyageurs:
+  active: false
+
+newsletter:
+  active: false
+  prestataire: buttondown                     # buttondown | mailchimp
+  url_formulaire: ""                          # adresse d'inscription fournie par le service
+  texte: "Recevez nos offres et disponibilités de dernière minute (2 e-mails par an maximum)."
+
+video:
+  # YouTube s'affiche en mode « sans cookies » (youtube-nocookie.com) et
+  # seulement après un clic du visiteur.
+  chargement_au_clic: true
+
+impression:
+  active: true                                # bouton « Imprimer la fiche »
+
+
+# ----------------------------------------------------------------------------
+# 8. CARTE, ITINÉRAIRES ET STATISTIQUES
+# ----------------------------------------------------------------------------
+
+carte:
+  # osm = OpenStreetMap (sans cookies, conseillé)
+  # google-au-clic = Google Maps chargé seulement si le visiteur clique
+  fournisseur: osm
+  google_cle_api: ""                          # facultatif pour google-au-clic
+  # approximative = cercle d'environ 300 m (adresse exacte envoyée après confirmation)
+  # exacte = point précis et adresse complète
+  precision: approximative
+  rayon_approximatif_m: 300
+  boutons_itineraire: true                    # Google Maps, Apple Plans, Waze
+
+statistiques:
+  # aucun (défaut) | plausible | umami | goatcounter | cloudflare | ga4
+  # ga4 (Google Analytics) déclenche un bandeau de consentement cookies.
+  fournisseur: aucun
+  plausible_domaine: ""                       # ex. "mes-locations.fr"
+  plausible_script: "https://plausible.io/js/script.js"
+  umami_script: ""                            # ex. "https://cloud.umami.is/script.js"
+  umami_id: ""
+  goatcounter_code: ""                        # ex. "meslocations" (meslocations.goatcounter.com)
+  cloudflare_token: ""
+  ga4_id: ""                                  # ex. "G-XXXXXXX"
+
+
+# ----------------------------------------------------------------------------
+# 9. PAIEMENT (désactivé par défaut — voir docs/07-paiement-option.md)
+# ----------------------------------------------------------------------------
+
+paiement:
+  # 0 = confirmation manuelle par e-mail/téléphone (défaut, recommandé)
+  # 1 = lien de paiement externe (Stripe Payment Links, PayPal, Mollie…)
+  #     saisi dans chaque logement (« lien_acompte »)
+  # 2 = paiement en ligne de l'acompte (service Cloudflare + Stripe Checkout,
+  #     ou Xendit pour l'Indonésie). Voir docs/07.
+  niveau: 0
+  acompte_pct: 30                             # acompte demandé (% du total)
+  solde_jours_avant_arrivee: 30               # solde à régler N jours avant l'arrivée
+  # Niveau 2 uniquement : adresse du service Cloudflare (…workers.dev)
+  worker_url: ""
+  # Vos coordonnées bancaires ne sont JAMAIS publiées sur le site.
+
+
+# ----------------------------------------------------------------------------
+# 10. RÉFÉRENCEMENT (SEO)
+# ----------------------------------------------------------------------------
+
+seo:
+  description: "Studios au cœur du Mans et villa à Bali : réservez en direct auprès du propriétaire, sans frais de service. (EXEMPLE)"
+  # Mots-clés principaux (servent aux textes et données structurées)
+  mots_cles: ["location saisonnière Le Mans", "studio Le Mans centre", "villa Bali piscine"]
+  # Codes de vérification (copiés depuis Google Search Console / Bing Webmaster Tools)
+  google_site_verification: ""
+  bing_site_verification: ""
+  # Image de partage par défaut (réseaux sociaux) : vide = photo de couverture
+  # du premier logement.
+  image_partage: ""
+
+
+# ----------------------------------------------------------------------------
+# 11. INFORMATIONS LÉGALES (utilisées par les pages légales)
+# ----------------------------------------------------------------------------
+# ⚠ Les pages légales fournies sont des MODÈLES à faire valider.
+
+legal:
+  editeur_nom: "À COMPLÉTER"                  # nom et prénom (ou raison sociale)
+  editeur_statut: "Particulier — loueur en meublé non professionnel"   # À VÉRIFIER
+  editeur_adresse: "À COMPLÉTER"
+  siret: ""                                   # si vous en avez un
+  directeur_publication: "À COMPLÉTER"
+  # Hébergeur : rempli automatiquement selon « hebergeur » ci-dessus,
+  # sauf si vous indiquez un texte ici.
+  hebergeur_texte: ""
+  # Médiateur de la consommation : obligatoire pour un loueur « professionnel »
+  # au sens du Code de la consommation. Indiquez son nom et son site, ou
+  # "aucun" si vous louez en simple particulier (voir docs/08).
+  mediateur_consommation: ""

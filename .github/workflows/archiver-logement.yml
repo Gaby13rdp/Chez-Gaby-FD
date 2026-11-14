@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ARCHIVER OU SUPPRIMER UN LOGEMENT (formulaire)
+# • masquer   : le logement disparaît du site, rien n'est effacé (réversible).
+# • supprimer : efface définitivement le dossier — tapez SUPPRIMER pour confirmer.
+# L'ancienne adresse peut rediriger vers l'établissement ou la destination.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Archiver ou supprimer un logement
+
+on:
+  workflow_dispatch:
+    inputs:
+      logement:
+        description: "Nom du dossier du logement (ex. studio-tesse)"
+        type: string
+        required: true
+      action:
+        description: "masquer (réversible) ou supprimer (définitif)"
+        type: choice
+        options: [masquer, supprimer]
+        default: masquer
+      confirmation:
+        description: "Pour supprimer : tapez SUPPRIMER en majuscules"
+        type: string
+        required: false
+      rediriger:
+        description: "Rediriger l'ancienne adresse vers l'établissement ou la destination"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modification-contenu
+  cancel-in-progress: false
+
+jobs:
+  archiver:
+    name: Archiver ou supprimer
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.envoi.outputs.sha }}
+      hebergeur: ${{ steps.params.outputs.hebergeur }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund --ignore-scripts
+      - name: Lire l'hébergeur choisi
+        id: params
+        run: |
+          hebergeur=$(grep -E '^hebergeur:' config/site.yml | sed -E 's/^hebergeur:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/"//g')
+          echo "hebergeur=${hebergeur:-github-pages}" >> "$GITHUB_OUTPUT"
+      - name: Appliquer
+        run: node scripts/archiver-logement.mjs
+        env:
+          LOGEMENT: ${{ inputs.logement }}
+          ACTION: ${{ inputs.action }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          REDIRIGER: ${{ inputs.rediriger }}
+      - name: Vérifier que le site reste valide
+        run: node scripts/preparer.mjs --validation-seule
+      - name: Enregistrer
+        id: envoi
+        env:
+          LOGEMENT: ${{ inputs.logement }}
+          ACTION: ${{ inputs.action }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A content config/redirections.yml
+          git commit -m "Logement $LOGEMENT : $ACTION"
+          git pull --rebase --quiet origin main
+          git push --quiet origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publier:
+    name: Mettre le site à jour
+    needs: archiver
+    if: needs.archiver.outputs.hebergeur != 'netlify'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.archiver.outputs.sha }}
+    secrets: inherit

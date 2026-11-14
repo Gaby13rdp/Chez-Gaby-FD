@@ -1,0 +1,70 @@
+---
+import Icone from './Icone.astro';
+import { D, C, t, lienRoute, telLien, telAffiche, waNumero, emailMasque } from '../lib/site';
+interface Props { langue: string }
+const { langue } = Astro.props;
+const mail = emailMasque(C.contact.email);
+const liens = [
+  [t(langue, 'nav.logements'), lienRoute('liste', 'logements', langue)],
+  ...D.destinations.map((d: any) => [d.i18n[langue]?.nom ?? d.i18n[D.langueDefaut].nom, lienRoute('destination', d.slug, langue)]),
+  [t(langue, 'nav.a_propos'), lienRoute('page', 'a-propos', langue)],
+  [t(langue, 'nav.faq'), lienRoute('page', 'faq', langue)],
+  [t(langue, 'nav.guides'), lienRoute('guides', 'guides', langue)],
+  [t(langue, 'nav.contact'), lienRoute('page', 'contact', langue)],
+].filter(([, h]) => h);
+const legaux = [
+  [t(langue, 'pied.mentions_legales'), lienRoute('page', 'mentions-legales', langue)],
+  [t(langue, 'pied.conditions'), lienRoute('page', 'conditions-de-reservation', langue)],
+  [t(langue, 'pied.confidentialite'), lienRoute('page', 'confidentialite', langue)],
+].filter(([, h]) => h);
+const reseaux = Object.entries(C.reseaux_sociaux).filter(([, v]) => v);
+const noms: Record<string, string> = { instagram: 'Instagram', facebook: 'Facebook', youtube: 'YouTube', tiktok: 'TikTok', linkedin: 'LinkedIn' };
+const plateformes = C.liens_externes.afficher_dans_pied_de_page
+  ? [['Google', C.liens_externes.google_business], ['Apple Plans', C.liens_externes.apple_business], ['Airbnb', C.liens_externes.airbnb], ['Booking.com', C.liens_externes.booking]].filter(([, v]) => v)
+  : [];
+const annee = new Date().getFullYear();
+---
+<footer class="pied">
+  <div class="conteneur">
+    <div class="pied__grille">
+      <div>
+        <p class="logo" style="margin-bottom: var(--e-3)">{C.marque.logo_texte || C.marque.nom}</p>
+        {C.marque.slogan && <p class="pied__slogan">{C.marque.slogan}</p>}
+        {C.contact.delai_reponse && <p class="texte-doux" style="font-size:.88rem">{C.contact.delai_reponse}</p>}
+      </div>
+      <div>
+        <h2>{t(langue, 'pied.liens_utiles')}</h2>
+        <ul>{liens.map(([l, h]) => <li><a href={h}>{l}</a></li>)}</ul>
+      </div>
+      <div>
+        <h2>{t(langue, 'pied.contact')}</h2>
+        <ul>
+          {C.contact.telephone && C.contact.afficher_telephone && <li><a href={telLien(C.contact.telephone)}>{telAffiche(C.contact.telephone)}</a></li>}
+          {C.contact.whatsapp && C.boutons_contact.whatsapp && <li><a href={`https://wa.me/${waNumero(C.contact.whatsapp)}`} target="_blank" rel="noopener noreferrer">WhatsApp <span class="visuellement-cache">{t(langue, 'commun.nouvel_onglet')}</span></a></li>}
+          {C.boutons_contact.email && <li><a href="#" data-email-u={mail.u} data-email-d={mail.d}><span data-email-texte>{t(langue, 'commun.ecrire')}</span></a></li>}
+          {C.contact.ville && <li class="texte-doux">{C.contact.ville}</li>}
+        </ul>
+      </div>
+      {(reseaux.length > 0 || plateformes.length > 0) && (
+        <div>
+          {reseaux.length > 0 && <><h2>{t(langue, 'pied.suivez_nous')}</h2><ul>{reseaux.map(([k, v]) => <li><a href={v as string} target="_blank" rel="noopener noreferrer me">{noms[k]}</a></li>)}</ul></>}
+          {plateformes.length > 0 && <><h2 style="margin-top: var(--e-5)">{t(langue, 'pied.aussi_sur')}</h2><ul>{plateformes.map(([k, v]) => <li><a href={v} target="_blank" rel="noopener noreferrer">{k}</a></li>)}</ul></>}
+        </div>
+      )}
+      {C.newsletter.active && C.newsletter.url_formulaire && (
+        <div>
+          <h2>{t(langue, 'pied.newsletter')}</h2>
+          <p class="texte-doux" style="font-size:.9rem">{C.newsletter.texte}</p>
+          <a class="bouton bouton--petit" href={C.newsletter.url_formulaire} target="_blank" rel="noopener noreferrer"><Icone nom="mail" />{t(langue, 'pied.inscription')}</a>
+        </div>
+      )}
+    </div>
+    <div class="pied__bas">
+      <span>© {annee} {C.marque.nom}. {t(langue, 'pied.droits')}</span>
+      <span style="display:flex; gap: var(--e-4); flex-wrap: wrap">
+        {legaux.map(([l, h]) => <a href={h}>{l}</a>)}
+        {C.statistiques.fournisseur === 'ga4' && <button type="button" class="bouton-texte" data-gerer-cookies>{t(langue, 'consentement.personnaliser')}</button>}
+      </span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,45 @@
+---
+// Carte OpenStreetMap (chargée quand elle devient visible, sans cookies) ou
+// Google Maps (chargée seulement au clic). En mode « approximatif », un
+// cercle indique la zone sans révéler l'adresse exacte.
+import Icone from './Icone.astro';
+import { C, t, lienItineraire } from '../lib/site';
+interface Point { lat: number; lng: number; rayon?: number; titre: string; url?: string | null }
+interface Props { points: Point[]; langue: string; itineraire?: boolean; zoom?: number }
+const { points, langue, itineraire = true, zoom } = Astro.props;
+const fournisseur = C.carte.fournisseur;
+const p0 = points[0];
+const liens = p0 ? lienItineraire(p0.lat, p0.lng) : null;
+const approx = points.some((p) => p.rayon);
+const cleGoogle = C.carte.google_cle_api;
+const urlGoogle = p0 ? (cleGoogle
+  ? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(cleGoogle)}&q=${p0.lat},${p0.lng}&zoom=${zoom ?? (approx ? 14 : 15)}`
+  : `https://maps.google.com/maps?q=${p0.lat},${p0.lng}&z=${zoom ?? (approx ? 14 : 15)}&output=embed`) : '';
+---
+{p0 && (
+  <div>
+    <div class="carte-geo" data-carte-geo data-fournisseur={fournisseur} data-points={JSON.stringify(points)} data-zoom={zoom ?? ''} data-google={urlGoogle}
+      data-titre-iframe={t(langue, 'logement.carte_titre')}>
+      <div class="carte-geo__fond">
+        <Icone nom="map-pin" />
+        {fournisseur === 'osm'
+          ? <button type="button" class="bouton bouton--petit" data-charger-carte>{t(langue, 'logement.afficher_carte')}</button>
+          : <>
+              <button type="button" class="bouton bouton--petit" data-charger-carte>{t(langue, 'logement.charger_google')}</button>
+              <small>{t(langue, 'logement.google_consentement')}</small>
+            </>}
+      </div>
+    </div>
+    {approx && <p class="texte-doux" style="font-size:.9rem; margin-top: var(--e-3)"><Icone nom="info" taille={16} class="" /> {t(langue, 'logement.zone_approx')}</p>}
+    {itineraire && C.carte.boutons_itineraire && liens && (
+      <div class="itineraires ne-pas-imprimer">
+        <a class="bouton bouton--petit" href={liens.google} target="_blank" rel="noopener noreferrer"><Icone nom="navigation" />Google Maps</a>
+        <a class="bouton bouton--petit" href={liens.apple} target="_blank" rel="noopener noreferrer"><Icone nom="navigation" />Apple Plans</a>
+        <a class="bouton bouton--petit" href={liens.waze} target="_blank" rel="noopener noreferrer"><Icone nom="navigation" />Waze</a>
+      </div>
+    )}
+  </div>
+)}
+<script>
+  import '../scripts/carte';
+</script>

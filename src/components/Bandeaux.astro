@@ -1,0 +1,12 @@
+---
+import { D, C, t, lien } from '../lib/site';
+interface Props { langue: string }
+const { langue } = Astro.props;
+const a = C.annonce;
+---
+{D.demo && <div class="bandeau bandeau--demo" role="note">{t(langue, 'demo.bandeau')}</div>}
+{a.active && a.texte && (
+  <div class={`bandeau bandeau--${a.style}`} role="note">
+    {a.lien ? <a href={a.lien.startsWith('/') ? lien(a.lien) : a.lien}>{a.texte}</a> : a.texte}
+  </div>
+)}

@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import FilAriane from '../components/FilAriane.astro';
+import { D, C, t, lien, lienRoute, dateLongue } from '../lib/site';
+import { filAriane } from '../lib/jsonld';
+const { route } = Astro.props;
+const langue = route.langue;
+const ariane = [{ nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) }, { nom: C.guides_locaux.titre, chemin: lien(route.chemin) }];
+---
+<Base langue={langue} titre={C.guides_locaux.titre} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} jsonld={[filAriane(ariane)]}>
+  <div class="conteneur">
+    <FilAriane elements={ariane} libelle={t(langue, 'nav.fil_ariane')} />
+    <h1 style="padding-top: var(--e-5)">{C.guides_locaux.titre}</h1>
+    <div class="grille" style="margin-block: var(--e-6) var(--e-8)">
+      {D.guides.map((g: any) => (
+        <article class="carte">
+          {g.image && <div class="carte__visuel"><Photo photo={g.image} tailles="(min-width: 760px) 33vw, 100vw" alt="" /></div>}
+          <div class="carte__corps">
+            <span class="carte__lieu">{dateLongue(g.date, langue)}</span>
+            <h2 class="carte__titre"><a href={lienRoute('guide', g.slug, langue)}>{g.titre}</a></h2>
+            <p class="texte-doux" style="margin:0">{g.resume}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</Base>

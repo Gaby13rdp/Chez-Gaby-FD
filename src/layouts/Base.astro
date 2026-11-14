@@ -1,0 +1,83 @@
+---
+// Squelette commun à toutes les pages : <head> (SEO, partage, thème),
+// en-tête, bandeaux, pied de page, mesure d'audience.
+import '../styles/global.css';
+import '../styles/impression.css';
+import Entete from '../components/Entete.astro';
+import PiedDePage from '../components/PiedDePage.astro';
+import Bandeaux from '../components/Bandeaux.astro';
+import Statistiques from '../components/Statistiques.astro';
+import { D, C, t, lien, urlAbsolue, locale, imageParDefaut } from '../lib/site';
+import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
+import playfairLatin from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url';
+import cormorantLatin from '@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2?url';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+
+interface Props {
+  langue: string; titre: string; description?: string; chemin: string; alternatives?: Record<string, string>;
+  noindex?: boolean; image?: string | null; typeOg?: string; jsonld?: any[]; sansPied?: boolean;
+}
+const { langue, titre, description = C.seo.description, chemin, alternatives = {}, noindex = false, image, typeOg = 'website', jsonld = [], sansPied = false } = Astro.props;
+const th = D.theme;
+const titreComplet = titre && titre !== C.marque.nom ? `${titre} | ${C.marque.nom}` : C.marque.nom;
+const canonique = urlAbsolue(chemin);
+const imagePartage = image || imageParDefaut();
+const robots = noindex || D.demo ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
+const vars = (p: any) => `--fond:${p.fond};--fond-alt:${p.fondAlt};--surface:${p.surface};--texte:${p.texte};--texte-doux:${p.texteDoux};--bordure:${p.bordure};--accent:${p.accent};--lien:${p.lien};--sur-accent:${p.surAccent};`;
+const styleTheme = `:root{${vars(th)}--police-titres:${th.polices.titres};--police-texte:${th.polices.texte};--rayon-s:${th.rayons[0]};--rayon-m:${th.rayons[1]};--rayon-l:${th.rayons[2]};color-scheme:${th.sombre ? 'dark' : 'light'}}`
+  + (th.sombreAuto ? `@media (prefers-color-scheme: dark){:root{${vars(th.sombreAuto)}color-scheme:dark}}` : '');
+const preload = { fraunces: frauncesLatin, playfair: playfairLatin, cormorant: cormorantLatin }[th.policeTitres as string];
+const ogLocale = locale(langue).replace('-', '_');
+const favicon = C.marque.favicon ? lien(C.marque.favicon) : lien('favicon.svg');
+---
+<!doctype html>
+<html lang={langue} class={th.animations ? '' : 'pas-d-animation'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titreComplet}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonique} />
+    {Object.entries(alternatives).length > 1 && Object.entries(alternatives).map(([l, c]) => <link rel="alternate" hreflang={l} href={urlAbsolue(c)} />)}
+    {Object.entries(alternatives).length > 1 && alternatives[D.langueDefaut] && <link rel="alternate" hreflang="x-default" href={urlAbsolue(alternatives[D.langueDefaut])} />}
+    <link rel="icon" href={favicon} type="image/svg+xml" />
+    <meta name="theme-color" content={th.fond} />
+    {preload && <link rel="preload" href={preload} as="font" type="font/woff2" crossorigin />}
+    {th.policeTexte === 'inter' && <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />}
+    <meta property="og:site_name" content={C.marque.nom} />
+    <meta property="og:title" content={titre || C.marque.nom} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={typeOg} />
+    <meta property="og:url" content={canonique} />
+    <meta property="og:locale" content={ogLocale} />
+    {imagePartage && <meta property="og:image" content={imagePartage} />}
+    {imagePartage && <meta property="og:image:width" content="1200" />}
+    {imagePartage && <meta property="og:image:height" content="630" />}
+    <meta name="twitter:card" content={imagePartage ? 'summary_large_image' : 'summary'} />
+    {C.seo.google_site_verification && <meta name="google-site-verification" content={C.seo.google_site_verification} />}
+    {C.seo.bing_site_verification && <meta name="msvalidate.01" content={C.seo.bing_site_verification} />}
+    <style set:html={styleTheme}></style>
+    {jsonld.filter(Boolean).map((j) => <script type="application/ld+json" set:html={JSON.stringify(j).replace(/</g, '\\u003c')} />)}
+    <Statistiques />
+  </head>
+  <body>
+    <a class="lien-evitement" href="#contenu">{t(langue, 'nav.aller_contenu')}</a>
+    <Bandeaux langue={langue} />
+    <Entete langue={langue} cheminActuel={chemin} alternatives={alternatives} />
+    <main id="contenu" tabindex="-1">
+      <slot />
+    </main>
+    {!sansPied && <PiedDePage langue={langue} />}
+    <slot name="fin" />
+    {C.statistiques.fournisseur === 'ga4' && (
+      <div class="consentement" data-consentement hidden role="dialog" aria-live="polite" aria-label={t(langue, 'consentement.personnaliser')}>
+        <p>{t(langue, 'consentement.texte')} <a href={lien(D.routes.find((r: any) => r.id === 'confidentialite' && r.langue === langue)?.chemin ?? '/confidentialite/')}>{t(langue, 'pied.confidentialite')}</a></p>
+        <div class="consentement__boutons">
+          <button type="button" class="bouton" data-refuser>{t(langue, 'consentement.refuser')}</button>
+          <button type="button" class="bouton bouton--primaire" data-accepter data-ga={C.statistiques.ga4_id}>{t(langue, 'consentement.accepter')}</button>
+        </div>
+      </div>
+    )}
+  </body>
+</html>

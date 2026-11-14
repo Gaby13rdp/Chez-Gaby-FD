@@ -1,0 +1,22 @@
+---
+import Icone from './Icone.astro';
+import { htmlAvecBase } from '../lib/site';
+interface Props { questions: { question: string; reponseHtml: string; categorie?: string }[]; grouper?: boolean }
+const { questions, grouper = false } = Astro.props;
+const groupes = grouper
+  ? questions.reduce((acc: Record<string, any[]>, q) => { (acc[q.categorie || ''] ||= []).push(q); return acc; }, {})
+  : { '': questions };
+---
+{Object.entries(groupes).map(([categorie, liste]) => (
+  <>
+    {categorie && <h2 class="faq__categorie">{categorie}</h2>}
+    <div class="faq">
+      {liste.map((q) => (
+        <details>
+          <summary>{q.question}<Icone nom="chevron-down" /></summary>
+          <div class="faq__reponse prose" set:html={htmlAvecBase(q.reponseHtml)} />
+        </details>
+      ))}
+    </div>
+  </>
+))}

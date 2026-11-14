@@ -1,0 +1,24 @@
+/* Fiche imprimable (bouton « Imprimer la fiche » ou Ctrl+P). */
+@media print {
+  @page { margin: 14mm 12mm; }
+  :root { --fond: #fff; --fond-alt: #f5f5f5; --surface: #fff; --texte: #111; --texte-doux: #444; --bordure: #ccc; }
+  body { font-size: 10.5pt; line-height: 1.45; padding: 0 !important; background: #fff; }
+  .entete, .pied, .barre-mobile, .barre-contact, .bandeau--promo, .bandeau--info, .bandeau--alerte,
+  .colonne-reservation, .galerie__tout, .galerie__compteur, .titre-logement__actions, .fil-ariane,
+  .carte-geo, .itineraires, .video, dialog, .consentement, .comparateur-barre, .ne-pas-imprimer, .similaires { display: none !important; }
+  .bandeau--demo { display: block !important; border: 1px solid #999; background: #fff !important; color: #111 !important; }
+  .mise-en-page-logement { display: block; padding: 0; }
+  .galerie { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; aspect-ratio: auto !important; gap: 4px; border-radius: 0; }
+  .galerie__item { display: block !important; aspect-ratio: 4 / 3 !important; break-inside: avoid; }
+  .galerie__item:nth-child(n + 7) { display: none !important; }
+  .bloc { padding-bottom: 6mm; margin-bottom: 6mm; break-inside: auto; }
+  .bloc > h2 { break-after: avoid; font-size: 14pt; }
+  h1 { font-size: 22pt; }
+  a { color: #111; text-decoration: none; }
+  .prose a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 8.5pt; color: #555; }
+  .equipements, .regles { grid-template-columns: repeat(3, 1fr) !important; }
+  .faq details { border: 0; }
+  .faq details > *:not(summary) { display: block !important; }
+  .impression-seule { display: block !important; }
+}
+.impression-seule { display: none; }

@@ -1,0 +1,29 @@
+---
+// Calendrier des disponibilités (rempli par src/scripts/reservation.ts).
+import Icone from './Icone.astro';
+import { C, t } from '../lib/site';
+interface Props { langue: string }
+const { langue } = Astro.props;
+---
+<div class="calendrier" data-calendrier data-mois-ordi={C.calendrier.mois_affiches_ordinateur}>
+  <div class="calendrier__nav">
+    <button type="button" class="bouton bouton--icone bouton--petit" data-mois-precedent><Icone nom="chevron-left" label={t(langue, 'reservation.mois_precedent')} /></button>
+    <p class="texte-doux" data-consigne aria-live="polite" style="margin:0; text-align:center; font-size:.92rem">{t(langue, 'reservation.selection_arrivee')}</p>
+    <button type="button" class="bouton bouton--icone bouton--petit" data-mois-suivant><Icone nom="chevron-right" label={t(langue, 'reservation.mois_suivant')} /></button>
+  </div>
+  <div class="calendrier__mois-liste" data-mois-liste>
+    <noscript><p class="message">{t(langue, 'reservation.non_synchronise')}</p></noscript>
+  </div>
+  {C.calendrier.legende && (
+    <ul class="calendrier__legende">
+      <li><span class="pastille"></span>{t(langue, 'reservation.legende_libre')}</li>
+      <li><span class="pastille pastille--bloque"></span>{t(langue, 'reservation.legende_bloque')}</li>
+      <li><span class="pastille pastille--depart"></span>{t(langue, 'reservation.legende_depart')}</li>
+      <li><span class="pastille pastille--selection"></span>{t(langue, 'reservation.legende_selection')}</li>
+    </ul>
+  )}
+  <div style="display:flex; justify-content: space-between; align-items: center; gap: var(--e-3); flex-wrap: wrap">
+    <p class="calendrier__etat" data-etat-calendrier></p>
+    <button type="button" class="bouton-texte" data-effacer-dates hidden>{t(langue, 'reservation.effacer_dates')}</button>
+  </div>
+</div>

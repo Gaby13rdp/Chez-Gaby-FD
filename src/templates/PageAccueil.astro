@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Photo from '../components/Photo.astro';
+import CarteLogement from '../components/CarteLogement.astro';
+import Avantages from '../components/Avantages.astro';
+import Avis from '../components/Avis.astro';
+import Faq from '../components/Faq.astro';
+import BlocContact from '../components/BlocContact.astro';
+import BarreContact from '../components/BarreContact.astro';
+import { D, C, t, tn, lienRoute, loc, logement, htmlAvecBase, ogPhoto } from '../lib/site';
+import { organisation, listeLd, faq as faqLd } from '../lib/jsonld';
+
+const { route } = Astro.props;
+const langue = route.langue;
+const a = D.accueil;
+const txt = loc(a, langue);
+const heros = a.image || D.logements[0]?.photos[0];
+const vedette = a.vedette.map((s: string) => logement(s)).filter(Boolean);
+const avis = D.avis.slice(0, C.avis.nombre_accueil);
+const liste = lienRoute('liste', 'logements', langue);
+const capaciteMax = Math.max(...D.logements.map((l: any) => l.capacite));
+const jsonld = [organisation(langue), listeLd(vedette, langue), txt.faq?.length ? faqLd(txt.faq) : null];
+---
+<Base langue={langue} titre={txt.seo?.titre || ''} description={txt.seo?.description || C.seo.description} chemin={route.chemin} alternatives={route.alternatives} noindex={route.noindex} image={ogPhoto(heros)} jsonld={jsonld}>
+  <section class="heros">
+    <div class="heros__image"><Photo photo={heros} tailles="100vw" prioritaire largeurCible={1920} /></div>
+    <div class="conteneur heros__contenu">
+      {C.badges.length > 0 && <div class="badges">{C.badges.map((b: any) => <span class="badge"><Icone nom={b.icone} />{b.texte}</span>)}</div>}
+      <h1 class="apparition">{txt.titre}</h1>
+      {txt.sous_titre && <p class="heros__sous-titre apparition">{txt.sous_titre}</p>}
+      <form class="recherche apparition" action={liste} method="get" role="search" aria-label={t(langue, 'accueil.rechercher')}>
+        {D.destinations.length > 1 && (
+          <div class="recherche__champ">
+            <label for="r-destination">{t(langue, 'accueil.destination')}</label>
+            <select id="r-destination" name="destination">
+              <option value="">{t(langue, 'accueil.toutes_destinations')}</option>
+              {D.destinations.map((d: any) => <option value={d.slug}>{loc(d, langue).nom}</option>)}
+            </select>
+          </div>
+        )}
+        <div class="recherche__champ">
+          <label for="r-arrivee">{t(langue, 'reservation.arrivee')}</label>
+          <input id="r-arrivee" name="arrivee" type="date" data-date-min />
+        </div>
+        <div class="recherche__champ">
+          <label for="r-depart">{t(langue, 'reservation.depart')}</label>
+          <input id="r-depart" name="depart" type="date" data-date-min />
+        </div>
+        <div class="recherche__champ">
+          <label for="r-voyageurs">{t(langue, 'reservation.voyageurs')}</label>
+          <select id="r-voyageurs" name="voyageurs">
+            {Array.from({ length: capaciteMax }, (_, i) => <option value={i + 1} selected={i === 1}>{tn(langue, 'commun.voyageur', i + 1)}</option>)}
+          </select>
+        </div>
+        <button class="bouton bouton--primaire" type="submit"><Icone nom="search" />{t(langue, 'accueil.rechercher')}</button>
+      </form>
+    </div>
+  </section>
+
+  {txt.corpsHtml && (
+    <section class="section--compacte">
+      <div class="conteneur--etroit prose" style="text-align:center; margin-inline:auto; font-size: 1.1rem" set:html={htmlAvecBase(txt.corpsHtml)} />
+    </section>
+  )}
+
+  {a.sections.destinations && D.destinations.length > 1 && (
+    <section class="section section--alt" aria-labelledby="t-destinations">
+      <div class="conteneur">
+        <div class="entete-section"><div><span class="surtitre">{t(langue, 'nav.destinations')}</span><h2 id="t-destinations">{t(langue, 'accueil.destinations_titre')}</h2></div></div>
+        <div class="destinations">
+          {D.destinations.map((d: any) => {
+            const dt = loc(d, langue);
+            const ph = d.photos[0] || logement(d.logements[0])?.photos[0];
+            return (
+              <a class="tuile-destination" href={lienRoute('destination', d.slug, langue)}>
+                <Photo photo={ph} tailles="(min-width: 760px) 50vw, 100vw" alt="" />
+                <div class="tuile-destination__texte"><h3>{dt.nom}</h3><p>{dt.accroche || tn(langue, 'commun.logement', d.logements.length)}</p></div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {a.sections.vedette && vedette.length > 0 && (
+    <section class="section" aria-labelledby="t-vedette">
+      <div class="conteneur">
+        <div class="entete-section">
+          <div><span class="surtitre">{t(langue, 'accueil.vedette_sous_titre')}</span><h2 id="t-vedette">{t(langue, 'accueil.vedette_titre')}</h2></div>
+          <a class="bouton" href={liste}>{t(langue, 'commun.voir_tout')}<Icone nom="arrow-right" /></a>
+        </div>
+        <div class="grille">{vedette.map((l: any, i: number) => <CarteLogement logement={l} langue={langue} prioritaire={false} />)}</div>
+      </div>
+    </section>
+  )}
+
+  {a.sections.avantages && C.pourquoi_reserver_en_direct.active && (
+    <section class="section section--alt"><div class="conteneur"><Avantages /></div></section>
+  )}
+
+  {a.sections.avis && avis.length > 0 && (
+    <section class="section" aria-labelledby="t-avis">
+      <div class="conteneur">
+        <div class="entete-section"><div><h2 id="t-avis">{t(langue, 'accueil.avis_titre')}</h2></div></div>
+        <Avis avis={avis} langue={langue} />
+      </div>
+    </section>
+  )}
+
+  {a.sections.faq && txt.faq?.length > 0 && (
+    <section class="section section--compacte" aria-labelledby="t-faq">
+      <div class="conteneur">
+        <div class="entete-section"><div><h2 id="t-faq">{t(langue, 'accueil.faq_titre')}</h2></div>
+          {lienRoute('page', 'faq', langue) && <a class="bouton" href={lienRoute('page', 'faq', langue)}>{t(langue, 'nav.faq')}<Icone nom="arrow-right" /></a>}
+        </div>
+        <Faq questions={txt.faq} />
+      </div>
+    </section>
+  )}
+
+  {a.sections.contact && (
+    <section class="section"><div class="conteneur"><BlocContact langue={langue} /></div></section>
+  )}
+  <BarreContact slot="fin" langue={langue} />
+  <script>
+    // Dates minimales (aujourd'hui) et départ après l'arrivée
+    const aujourd = new Date().toISOString().slice(0, 10);
+    const arr = document.getElementById('r-arrivee') as HTMLInputElement | null;
+    const dep = document.getElementById('r-depart') as HTMLInputElement | null;
+    document.querySelectorAll<HTMLInputElement>('[data-date-min]').forEach((i) => { i.min = aujourd; });
+    arr?.addEventListener('change', () => {
+      if (!dep || !arr.value) return;
+      const lendemain = new Date(Date.parse(arr.value) + 86400000).toISOString().slice(0, 10);
+      dep.min = lendemain;
+      if (!dep.value || dep.value <= arr.value) dep.value = lendemain;
+    });
+  </script>
+</Base>
