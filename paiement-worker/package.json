@@ -10,7 +10,7 @@
     "deployer": "wrangler deploy --keep-vars"
   },
   "devDependencies": {
-    "wrangler": "4.156.0"
+    "wrangler": "4.160.0"
   },
   "engines": {
     "node": ">=22"
