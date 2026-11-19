@@ -35,9 +35,11 @@ Conseil : faites réaliser un DPE pour chaque logement et anticipez les travaux 
 ### 4. Taxe de séjour (réservations directes)
 
 - Pour les réservations **directes**, c'est **vous** qui collectez la taxe auprès du voyageur, la déclarez et la reversez. Pour les réservations Airbnb et Booking (qui encaissent le paiement), ce sont les plateformes qui la collectent et la reversent ; vous déclarez ces séjours avec l'option « location via tiers collecteur » sur le portail de Le Mans Métropole.
-- **Tarif Le Mans Métropole, meublé non classé** (guide 2025 de la collectivité) : **2,5 %** du prix de la nuitée par personne (tous les occupants comptés, mineurs compris), **plafonné à 4 €**, multiplié par le nombre de personnes assujetties, **+ 10 %** de taxe additionnelle départementale. Exonérés : les mineurs, et quelques cas particuliers (saisonniers sous contrat, hébergement d'urgence, prix inférieur à 5 € par nuit et par personne).
-  - Exemple : 2 adultes, 100 € la nuit → 1,25 € par adulte et par nuit + 10 % ≈ 1,38 €.
-  - Une nouvelle grille s'applique au **1er janvier 2027** (délibération du 25 juin 2026) : **À VÉRIFIER** sur [taxedesejour.lemansmetropole.fr](https://taxedesejour.lemansmetropole.fr/) (contact : taxedesejour@lemansmetropole.fr, 02 43 47 37 27) et mettez à jour la rubrique **Taxe de séjour** de l'établissement.
+- **Tarif Le Mans Métropole au 1er janvier 2027, meublé non classé ou en attente de classement** (délibération n° 37 du conseil communautaire du 25 juin 2026, article 6) : **5 %** du coût de la nuitée par personne (tous les occupants comptés, mineurs compris), **coût plafonné à 4 €**, multiplié par le nombre de personnes assujetties, **majoré de 10 %** de taxe additionnelle départementale. Exonérés : les mineurs, les saisonniers sous contrat de travail dans la métropole, les personnes en hébergement d'urgence ou relogement temporaire, et les nuitées à moins de 5 € par personne.
+  - Exemple : 2 adultes, 100 € la nuit → 50 € × 5 % = 2,50 € par adulte et par nuit, + 10 % = 2,75 €.
+  - Ce réglage est déjà en place dans les fiches `le-84` et `le-47` (rubrique **Taxe de séjour**). Jusqu'au 31 décembre 2026, l'ancienne grille (2,5 %) s'applique encore.
+  - Meublé classé : tarif fixe par catégorie (ex. 3 étoiles : 1,50 € + 10 % = 1,65 € par personne et par nuit).
+  - Contact : taxedesejour@lemansmetropole.fr, 02 43 47 37 27 ; portail [taxedesejour.lemansmetropole.fr](https://taxedesejour.lemansmetropole.fr/).
 - **Déclaration et paiement trimestriels** auprès de Le Mans Métropole : avant le 20 avril, le 20 juillet, le 20 octobre et le 20 janvier.
 - La taxe doit apparaître **à part** sur la facture ou la confirmation ; le site l'affiche séparément dans le devis.
 - Sanctions : taxation d'office, intérêts de retard, et amende de 750 € à 2 500 € par manquement à la collecte.
@@ -92,10 +94,11 @@ Proposer sur votre site un prix inférieur à celui des plateformes est légal. 
 - **Un étranger ne peut pas obtenir de NIB à titre personnel** (réservé aux citoyens indonésiens). Deux voies : une société à capitaux étrangers (**PT PMA**, coûteuse ; Bali a fermé en mai 2026 une partie des activités aux nouvelles PT PMA) ou un **exploitant indonésien licencié** (société de gestion de villas) qui exploite la villa. Les montages avec prête-nom sont illégaux.
 - Depuis mai 2026, le ministère du Tourisme impose aux plateformes (Airbnb, Booking.com, Agoda, Expedia, Traveloka…) de vérifier le NIB et le code KBLI ; **les annonces non conformes sont retirées depuis le 1er août 2026**.
 - Codes KBLI : renumérotés en 2026 (KBLI 2025) ; la question de l'ouverture du code « villa » aux étrangers est contradictoire selon les sources. **À VÉRIFIER** avec un cabinet local.
+- **Villa Sagara** : l'annonce Airbnb affiche **NIB 2104260244305, KBLI 55110** (enregistrement de l'exploitant). Ce numéro est repris sur la page de la villa. Vérifiez avec la société de gestion qu'il couvre aussi les réservations prises en direct.
 
 ### 2. Taxe locale sur l'hébergement (PBJT)
 
-À Gianyar (Ubud), les villas sont soumises à la **PBJT de 10 %** du montant payé par le client (règlement régional n° 7/2023), y compris pour les réservations directes. L'exploitant s'inscrit auprès de l'administration fiscale locale (NPWPD), déclare chaque mois et paie. Les locations de plus d'un mois en sont exclues. Dans l'exemple fourni, la taxe est incluse dans le prix affiché.
+Dans la régence de **Badung** (Balangan), comme dans les autres régences de Bali, les hébergements sont soumis à la **PBJT de 10 %** du montant payé par le client, y compris pour les réservations directes. L'exploitant (ici, la société de gestion) s'inscrit auprès de l'administration fiscale locale, déclare chaque mois et paie. Sur le site, la taxe est considérée comme **incluse dans le prix** de la villa (`taxe_sejour: mode: aucune`) : **À VÉRIFIER** avec la société de gestion.
 
 ### 3. Taxe touristique de Bali
 

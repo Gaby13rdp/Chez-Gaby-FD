@@ -28,7 +28,7 @@ Rien à configurer. Le montant de l'acompte et la date du solde viennent de `aco
 2. Dans le logement : rubrique **Paiement** › `lien_acompte: "https://buy.stripe.com/…"`.
 3. Dans `config/site.yml` : `paiement: niveau: 1`.
 
-Après votre confirmation par e-mail, envoyez au voyageur l'adresse de la page de paiement du logement (`/paiement/studio-cathedrale/`, non référencée par Google) ou directement le lien. Le devis du site affiche alors aussi le montant de l'acompte.
+Après votre confirmation par e-mail, envoyez au voyageur l'adresse de la page de paiement du logement (`/paiement/le-84-studio/`, non référencée par Google) ou directement le lien. Le devis du site affiche alors aussi le montant de l'acompte.
 
 ---
 
@@ -95,7 +95,7 @@ Les clés des étapes suivantes s'ajoutent dans Cloudflare : **Workers & Pages �
 3. **IAM et administration › Comptes de service › Créer un compte de service** (nom : « site-reservations ») › **OK** (aucun rôle à ajouter).
 4. Ouvrez ce compte › onglet **Clés** › **Ajouter une clé › Créer une clé › JSON** : un fichier se télécharge. Copiez **tout son contenu** dans le secret Cloudflare `GOOGLE_SERVICE_ACCOUNT`, puis supprimez le fichier de votre ordinateur.
 5. Dans Google Agenda, pour chaque agenda « direct » : **Paramètres et partage › Partager avec des personnes › Ajouter** › l'adresse du compte de service (`site-reservations@….iam.gserviceaccount.com`) › autorisation **Apporter des modifications aux événements**.
-6. Toujours dans les paramètres : **Intégrer l'agenda › ID de l'agenda** → secret Cloudflare `GCAL_<LOGEMENT>` (ex. `GCAL_STUDIO_CATHEDRALE`, nom du dossier en majuscules, tirets remplacés par `_`).
+6. Toujours dans les paramètres : **Intégrer l'agenda › ID de l'agenda** → secret Cloudflare `GCAL_<LOGEMENT>` (ex. `GCAL_LE_84_STUDIO`, nom du dossier en majuscules, tirets remplacés par `_`).
 
 Sans cette étape, le paiement fonctionne quand même, mais l'e-mail vous demande de **bloquer les dates vous-même**.
 

@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { ajouterJours, aujourdhui } from '../src/lib/partage/dates.js';
+import { siteTemporaire } from './site-temporaire.mjs';
 
 const executer = promisify(execFile);
 const auj = aujourdhui('Europe/Paris');
@@ -23,9 +24,12 @@ const serveur = createServer((req, res) => {
   else { res.writeHead(500); res.end('erreur'); }
 });
 
+// Contenus fictifs (tests/fixtures/contenu) : le test ne dépend pas de vos vrais logements.
+const site = siteTemporaire();
+
 async function synchro(secrets, fichier) {
   const env = { ...process.env, SYNCHRO_FICHIER: fichier, SECRETS_JSON: JSON.stringify(secrets), GITHUB_ACTIONS: '', GITHUB_OUTPUT: '', GITHUB_STEP_SUMMARY: '' };
-  const { stdout } = await executer(process.execPath, ['scripts/synchro-calendriers.mjs'], { cwd: new URL('..', import.meta.url).pathname, env, timeout: 120000 });
+  const { stdout } = await executer(process.execPath, ['scripts/synchro-calendriers.mjs'], { cwd: site.dossier, env, timeout: 120000 });
   return { sortie: stdout, donnees: existsSync(fichier) ? JSON.parse(readFileSync(fichier, 'utf8')) : null };
 }
 
@@ -35,35 +39,37 @@ test('synchronisation : fusion, panne partielle, conservation des dernières don
   const fichier = join(mkdtempSync(join(tmpdir(), 'synchro-')), 'disponibilites.json');
   try {
     // 1. Airbnb et Booking répondent, le calendrier direct est en panne -> « partiel »
-    let r = await synchro({ ICAL_STUDIO_CATHEDRALE_AIRBNB: url('airbnb.ics'), ICAL_STUDIO_CATHEDRALE_BOOKING: url('booking.ics'), ICAL_STUDIO_CATHEDRALE_DIRECT: url('panne.ics') }, fichier);
-    let s = r.donnees.logements['studio-cathedrale'];
+    let r = await synchro({ ICAL_IMMEUBLE_TEST_STUDIO_1_AIRBNB: url('airbnb.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_BOOKING: url('booking.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_DIRECT: url('panne.ics') }, fichier);
+    let s = r.donnees.logements['immeuble-test-studio-1'];
     assert.equal(s.statut, 'partiel');
     assert.deepEqual(s.plages, [[ajouterJours(auj, 10), ajouterJours(auj, 17)]]);
-    assert.equal(r.donnees.logements['studio-plantagenet'].statut, 'non-configure');
+    assert.equal(r.donnees.logements['immeuble-test-studio-2'].statut, 'non-configure');
+    assert.equal(r.donnees.logements['maison-test-villa'].statut, 'sur-demande');
     const texte = readFileSync(fichier, 'utf8');
     for (const interdit of ['Reserved', 'Marie', 'Martin', '06 12', 'abc@exemple', '127.0.0.1']) assert.ok(!texte.includes(interdit), `fuite : ${interdit}`);
     assert.ok(!r.sortie.includes('127.0.0.1'), 'les liens iCal ne doivent jamais apparaître dans les journaux');
 
     // 2. Tous répondent -> « ok » avec date de vérification
-    r = await synchro({ ICAL_STUDIO_CATHEDRALE_AIRBNB: url('airbnb.ics'), ICAL_STUDIO_CATHEDRALE_BOOKING: url('booking.ics'), ICAL_STUDIO_CATHEDRALE_DIRECT: url('vide.ics') }, fichier);
-    s = r.donnees.logements['studio-cathedrale'];
+    r = await synchro({ ICAL_IMMEUBLE_TEST_STUDIO_1_AIRBNB: url('airbnb.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_BOOKING: url('booking.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_DIRECT: url('vide.ics') }, fichier);
+    s = r.donnees.logements['immeuble-test-studio-1'];
     assert.equal(s.statut, 'ok');
     assert.ok(Date.now() - Date.parse(s.verifieLe) < 120000);
     const verifie = s.verifieLe;
 
     // 3. Plus rien ne répond -> « erreur », on garde les dates connues et l'ancienne vérification
-    r = await synchro({ ICAL_STUDIO_CATHEDRALE_AIRBNB: url('introuvable.ics'), ICAL_STUDIO_CATHEDRALE_BOOKING: url('panne.ics'), ICAL_STUDIO_CATHEDRALE_DIRECT: url('panne.ics') }, fichier);
-    s = r.donnees.logements['studio-cathedrale'];
+    r = await synchro({ ICAL_IMMEUBLE_TEST_STUDIO_1_AIRBNB: url('introuvable.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_BOOKING: url('panne.ics'), ICAL_IMMEUBLE_TEST_STUDIO_1_DIRECT: url('panne.ics') }, fichier);
+    s = r.donnees.logements['immeuble-test-studio-1'];
     assert.equal(s.statut, 'erreur');
     assert.deepEqual(s.plages, [[ajouterJours(auj, 10), ajouterJours(auj, 17)]]);
     assert.equal(s.verifieLe, verifie);
     assert.match(r.sortie, /n'existe plus \(HTTP 404\)/);
 
     // 4. Secret absent : calendrier simplement ignoré
-    r = await synchro({ ICAL_STUDIO_CATHEDRALE_AIRBNB: url('airbnb.ics') }, fichier);
-    assert.equal(r.donnees.logements['studio-cathedrale'].statut, 'ok');
-    assert.match(r.sortie, /secret ICAL_STUDIO_CATHEDRALE_BOOKING absent/);
+    r = await synchro({ ICAL_IMMEUBLE_TEST_STUDIO_1_AIRBNB: url('airbnb.ics') }, fichier);
+    assert.equal(r.donnees.logements['immeuble-test-studio-1'].statut, 'ok');
+    assert.match(r.sortie, /secret ICAL_IMMEUBLE_TEST_STUDIO_1_BOOKING absent/);
   } finally {
     serveur.close();
+    site.nettoyer();
   }
 });

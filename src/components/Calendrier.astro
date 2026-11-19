@@ -2,8 +2,10 @@
 // Calendrier des disponibilités (rempli par src/scripts/reservation.ts).
 import Icone from './Icone.astro';
 import { C, t } from '../lib/site';
-interface Props { langue: string }
-const { langue } = Astro.props;
+interface Props { langue: string; surDemande?: boolean }
+// surDemande : réservation « sur demande » (pas de calendrier en ligne) : le
+// calendrier sert seulement à choisir des dates souhaitées.
+const { langue, surDemande = false } = Astro.props;
 ---
 <div class="calendrier" data-calendrier data-mois-ordi={C.calendrier.mois_affiches_ordinateur}>
   <div class="calendrier__nav">
@@ -12,9 +14,9 @@ const { langue } = Astro.props;
     <button type="button" class="bouton bouton--icone bouton--petit" data-mois-suivant><Icone nom="chevron-right" label={t(langue, 'reservation.mois_suivant')} /></button>
   </div>
   <div class="calendrier__mois-liste" data-mois-liste>
-    <noscript><p class="message">{t(langue, 'reservation.non_synchronise')}</p></noscript>
+    <noscript><p class="message">{t(langue, surDemande ? 'reservation.sur_demande_texte' : 'reservation.non_synchronise')}</p></noscript>
   </div>
-  {C.calendrier.legende && (
+  {C.calendrier.legende && !surDemande && (
     <ul class="calendrier__legende">
       <li><span class="pastille"></span>{t(langue, 'reservation.legende_libre')}</li>
       <li><span class="pastille pastille--bloque"></span>{t(langue, 'reservation.legende_bloque')}</li>

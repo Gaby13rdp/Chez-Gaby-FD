@@ -1,0 +1,83 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# IMPORTER LES PHOTOS
+# Actions > « Importer les photos » > Run workflow.
+# Télécharge les photos listées dans config/photos-a-importer.yml (Booking,
+# Airbnb) dans les dossiers des adresses et des logements, les enregistre dans
+# le dépôt, puis met le site à jour. Les photos déjà présentes ne sont jamais
+# re-téléchargées : relancez sans crainte après chaque ajout. Voir docs/03.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Importer les photos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modification-contenu
+  cancel-in-progress: false
+
+jobs:
+  importer:
+    name: Télécharger les photos
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.envoi.outputs.sha }}
+      hebergeur: ${{ steps.params.outputs.hebergeur }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Installer Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+      - name: Lire l'hébergeur choisi
+        id: params
+        run: |
+          hebergeur=$(grep -E '^hebergeur:' config/site.yml | sed -E 's/^hebergeur:[[:space:]]*//; s/[[:space:]]*(#.*)?$//; s/"//g')
+          echo "hebergeur=${hebergeur:-github-pages}" >> "$GITHUB_OUTPUT"
+      - name: Télécharger les photos de la liste
+        id: import
+        run: node scripts/importer-photos.mjs
+      # Les photos réussies sont enregistrées même si d'autres ont échoué :
+      # il suffira de relancer pour les suivantes.
+      - name: Enregistrer les photos dans le dépôt
+        id: envoi
+        if: steps.import.outputs.nouvelles != '0'
+        env:
+          NOUVELLES: ${{ steps.import.outputs.nouvelles }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content
+          git commit -m "Photos importées : $NOUVELLES nouvelle(s)"
+          git pull --rebase --quiet origin main
+          git push --quiet origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Signaler les photos en échec
+        if: steps.import.outputs.echecs != '0'
+        env:
+          ECHECS: ${{ steps.import.outputs.echecs }}
+        run: echo "::warning::$ECHECS photo(s) en échec (détail dans le résumé ci-dessus). Relancez « Importer les photos » plus tard, ou utilisez le script Windows (docs/03)."
+
+  # Un enregistrement fait par un workflow ne relance pas « Publier le site » :
+  # la publication est donc lancée ici, dans la même exécution.
+  publier:
+    name: Mettre le site à jour
+    needs: importer
+    if: needs.importer.outputs.sha != '' && needs.importer.outputs.hebergeur != 'netlify'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.importer.outputs.sha }}
+    secrets: inherit

@@ -74,10 +74,12 @@
     "appeler": "Telepon",
     "ecrire": "Kirim email",
     "itineraire": "Petunjuk arah",
-    "fermer_fenetre": "Tutup jendela"
+    "fermer_fenetre": "Tutup jendela",
+    "voyageurs_plage": "{min} sampai {max} tamu",
+    "reservation_sur_demande": "Pemesanan atas permintaan"
   },
   "demo": {
-    "bandeau": "Situs demo: penginapan, harga, dan ulasan yang ditampilkan adalah contoh.",
+    "bandeau": "Situs dalam persiapan: harga, ketersediaan, dan informasi belum final.",
     "maintenance_titre": "Situs sedang dalam pemeliharaan"
   },
   "accueil": {
@@ -90,7 +92,9 @@
     "avis_titre": "Kata tamu kami",
     "faq_titre": "Pertanyaan Anda",
     "contact_titre": "Ada pertanyaan? Hubungi kami",
-    "contact_texte": "Kami menjawab langsung, dalam bahasa Inggris atau Prancis."
+    "contact_texte": "Kami menjawab langsung, dalam bahasa Inggris atau Prancis.",
+    "adresses_titre": "Properti kami",
+    "adresses_sous_titre": "Tempat menginap"
   },
   "liste": {
     "titre": "Penginapan kami",
@@ -169,8 +173,8 @@
     "avis_moyenne": "Nilai rata-rata {note}/5 dari {n} ulasan",
     "avis_exemple": "Contoh ulasan (mode demo)",
     "voir_sur": "Lihat di {plateforme}",
-    "logements_etablissement": "Penginapan di {nom}",
-    "dans_etablissement": "Bagian dari {nom}"
+    "logements_etablissement": "Penginapan di alamat ini",
+    "dans_etablissement": "Alamat: {nom}"
   },
   "lits": {
     "double": "Tempat tidur double",
@@ -309,7 +313,11 @@
     "reponse": "{delai}",
     "a_partir_de": "mulai {prix} / malam",
     "ouvrir_formulaire": "Lengkapi permintaan",
-    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}"
+    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}",
+    "sur_demande_titre": "Pemesanan atas permintaan",
+    "sur_demande_texte": "Penginapan ini tidak memiliki kalender daring: sampaikan tanggal yang Anda inginkan, kami periksa ketersediaannya dan mengonfirmasi harga secara tertulis.",
+    "sur_demande_calendrier": "Pilih tanggal yang Anda inginkan: ketersediaan diperiksa untuk setiap permintaan.",
+    "dates_a_preciser": "Tanggal dapat disampaikan dalam pesan Anda"
   },
   "formulaire": {
     "titre": "Permintaan Anda",
@@ -341,7 +349,8 @@
     "anti_spam": "Jangan isi kolom ini",
     "autres_moyens": "Atau hubungi kami langsung",
     "recapitulatif": "Ringkasan",
-    "nouvelle_demande": "Permintaan baru"
+    "nouvelle_demande": "Permintaan baru",
+    "objet_sur_demande": "Permintaan ketersediaan — {logement}"
   },
   "avantages": {
     "titre": "Mengapa pesan langsung?"
@@ -393,6 +402,12 @@
   ],
   "destination": {
     "quand_venir": "Kapan berkunjung?",
-    "comment_venir": "Cara ke sana"
+    "comment_venir": "Cara ke sana",
+    "adresses_titre": "Properti kami",
+    "logements_titre": "Semua penginapan kami"
+  },
+  "etablissement": {
+    "voir": "Lihat properti",
+    "voir_logement": "Lihat penginapan"
   }
 }

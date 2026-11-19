@@ -9,20 +9,25 @@ const { logement: l, etablissement: e, langue } = Astro.props;
 const nom = l.i18n[langue]?.nom ?? l.i18n.fr.nom;
 const barre = C.tarifs.afficher_prix_plateforme && l.prixPlateformeVerifie;
 const remise = l.tarif.remisePct;
+// Réservation « sur demande » (réglage « reservation » du logement) : pas de calendrier en ligne,
+// le voyageur envoie une demande avec ou sans dates ; jamais de paiement en ligne.
+const surDemande = l.reservation === 'sur-demande';
 const cles = ['arrivee', 'depart', 'choisir', 'selection_arrivee', 'selection_depart', 'verifier', 'envoyer_demande', 'demander_dispo',
   'hebergement', 'hebergement_simple', 'remise_semaine', 'remise_mois', 'remise_anticipee', 'remise_derniere-minute', 'menage', 'supplement_voyageurs',
   'frais_animaux', 'taxe_sejour', 'total', 'acompte', 'solde', 'caution', 'prix_plateforme', 'economie', 'disponible', 'indisponible', 'depart_possible',
   'dispo_a_confirmer', 'non_synchronise', 'maj', 'dates_alternatives', 'aucune_alternative', 'erreur_nuits-min', 'erreur_nuits-max', 'erreur_jour-arrivee',
   'erreur_jour-depart', 'erreur_trop-tot', 'erreur_trop-loin', 'erreur_capacite', 'erreur_animaux-refuses', 'erreur_indisponible', 'erreur_ferme',
-  'erreur_dates-invalides', 'erreur_depart-avant-arrivee', 'resume_sejour', 'a_partir_de', 'payer_acompte', 'taxe_incluse', 'detail_nuits', 'animaux', 'remise'];
+  'erreur_dates-invalides', 'erreur_depart-avant-arrivee', 'resume_sejour', 'a_partir_de', 'payer_acompte', 'taxe_incluse', 'detail_nuits', 'animaux', 'remise',
+  'sur_demande_calendrier', 'dates_a_preciser'];
 const textes: Record<string, string> = Object.fromEntries(cles.map((k) => [k, t(langue, `reservation.${k}`)]));
 for (const k of ['nuit_un', 'nuit_plusieurs', 'voyageur_un', 'voyageur_plusieurs']) textes[k] = t(langue, `commun.${k}`);
 textes.objet = t(langue, 'formulaire.objet_demande');
+textes.objetSurDemande = t(langue, 'formulaire.objet_sur_demande');
 textes.mention = C.tarifs.devis.mention;
 textes.paiementErreur = t(langue, 'paiement.erreur');
 textes.redirection = t(langue, 'paiement.redirection');
 const donnees = {
-  slug: l.slug, nom, langue, locale: locale(langue), devise: l.devise, fuseau: l.fuseau, capacite: l.capacite, animaux: l.regles.animaux,
+  slug: l.slug, nom, langue, locale: locale(langue), devise: l.devise, fuseau: l.fuseau, capacite: l.capacite, animaux: l.regles.animaux, surDemande,
   tarif: l.tarif, regles: l.reglesSejour, dispo: l.disponibilites, fraicheurMax: C.calendrier.fraicheur_max_heures,
   moisOrdi: C.calendrier.mois_affiches_ordinateur, moisMobile: C.calendrier.mois_affiches_mobile, premierJour: C.calendrier.premier_jour_semaine,
   suggerer: C.calendrier.suggerer_dates_alternatives, tempsReel: C.calendrier.temps_reel.active ? C.calendrier.temps_reel.url : null,
@@ -46,6 +51,12 @@ const voyageursDefaut = Math.min(2, l.capacite);
     <span class="texte-doux">{t(langue, 'commun.par_nuit')}</span>
     {remise > 0 && barre && <span class="reservation__remise">{t(langue, 'reservation.remise_directe', { pct: remise })}</span>}
   </div>
+  {surDemande && (
+    <div class="message reservation__sur-demande">
+      <Icone nom="message-circle" />
+      <span><strong>{t(langue, 'reservation.sur_demande_titre')}</strong> — {t(langue, 'reservation.sur_demande_texte')}</span>
+    </div>
+  )}
   <div class="dates-choix">
     <button type="button" data-choisir="arrivee" aria-pressed="false"><span>{t(langue, 'reservation.arrivee')}</span><strong data-valeur-arrivee>{t(langue, 'reservation.choisir')}</strong></button>
     <button type="button" data-choisir="depart" aria-pressed="false"><span>{t(langue, 'reservation.depart')}</span><strong data-valeur-depart>{t(langue, 'reservation.choisir')}</strong></button>
@@ -74,8 +85,8 @@ const voyageursDefaut = Math.min(2, l.capacite);
   </details>
   <div class="reservation__messages" data-messages aria-live="polite"></div>
   <div class="devis" data-devis hidden aria-live="polite"></div>
-  <button type="button" class="bouton bouton--primaire bouton--large" data-action-principale>{t(langue, 'reservation.verifier')}</button>
-  {C.paiement.niveau === 2 && C.paiement.worker_url && <button type="button" class="bouton bouton--large" data-payer hidden><Icone nom="credit-card" />{t(langue, 'reservation.payer_acompte')}</button>}
+  <button type="button" class="bouton bouton--primaire bouton--large" data-action-principale>{t(langue, surDemande ? 'reservation.demander_dispo' : 'reservation.verifier')}</button>
+  {C.paiement.niveau === 2 && C.paiement.worker_url && !surDemande && <button type="button" class="bouton bouton--large" data-payer hidden><Icone nom="credit-card" />{t(langue, 'reservation.payer_acompte')}</button>}
   <p class="reservation__note">{t(langue, 'reservation.pas_de_paiement')}</p>
   <div class="reservation__contacts">
     {donnees.whatsapp && <a class="bouton bouton--petit bouton--fantome" href={`https://wa.me/${donnees.whatsapp}`} target="_blank" rel="noopener noreferrer" data-whatsapp><Icone nom="message-circle" />WhatsApp</a>}
@@ -89,7 +100,7 @@ const voyageursDefaut = Math.min(2, l.capacite);
     <strong data-barre-prix>{prix(l.prixAPartirDe.direct, l.devise, langue)} <small class="texte-doux">{t(langue, 'commun.par_nuit')}</small></strong>
     <span data-barre-dates>{t(langue, 'reservation.choisir_dates')}</span>
   </div>
-  <button type="button" class="bouton bouton--primaire" data-action-mobile>{t(langue, 'reservation.verifier')}</button>
+  <button type="button" class="bouton bouton--primaire" data-action-mobile>{t(langue, surDemande ? 'reservation.demander_dispo' : 'reservation.verifier')}</button>
 </div>
 
 <dialog class="dialogue" id="dialogue-demande" aria-labelledby="titre-demande">

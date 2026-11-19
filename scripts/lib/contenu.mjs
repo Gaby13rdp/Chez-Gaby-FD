@@ -63,6 +63,9 @@ function chargerDossiers(collection, schema, quoi, ctx, rapport, type) {
 export function listerPhotos(dossier, legendesFormulaire = [], rapport, fichierContexte) {
   const dossierPhotos = `${dossier}/photos`;
   const fichiers = listerFichiers(dossierPhotos, EXTENSIONS_IMAGES);
+  // Dossier encore vide (photos pas encore importées) : pas d'avertissement
+  // sur les légendes, l'absence de photo est signalée une seule fois ailleurs.
+  if (!fichiers.length) return [];
   const legendes = {};
   const fichierYml = `${dossierPhotos}/photos.yml`;
   if (existsSync(fichierYml)) {

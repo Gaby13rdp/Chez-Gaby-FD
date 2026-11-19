@@ -46,16 +46,18 @@ hebergeur: github-pages
 # ----------------------------------------------------------------------------
 
 marque:
-  nom: "Séjours en Direct (EXEMPLE)"          # nom affiché partout
-  slogan: "Locations de vacances en direct, sans commission"
+  nom: "Chez Gaby"                            # nom affiché partout
+  slogan: "Au Mans et à Bali, réservez en direct avec le propriétaire"
   # Logo : chemin d'une image placée dans le dossier public/ (ex. "logo.svg").
   # Laisser vide pour un logo texte élégant généré automatiquement.
   logo: ""
-  logo_texte: "Séjours en Direct"             # texte du logo si pas d'image
+  logo_texte: "Chez Gaby"                     # texte du logo si pas d'image
   # Favicon (icône d'onglet) : vide = icône générée avec l'initiale du nom.
   favicon: ""
 
 contact:
+  # À COMPLÉTER : les 4 lignes marquées EXEMPLE ci-dessous (nom, e-mail,
+  # téléphone, WhatsApp). Le passage en mode réel est refusé tant qu'elles restent.
   nom: "Jean EXEMPLE"                         # votre prénom et nom
   email: "contact@exemple.fr"                 # EXEMPLE — adresse qui reçoit les demandes
   telephone: "+33 6 00 00 00 00"              # EXEMPLE — format international conseillé
@@ -155,7 +157,7 @@ synchronisation:
 
 # Règles de séjour par défaut (chaque logement peut les remplacer)
 sejour:
-  nuits_min: 2
+  nuits_min: 1
   nuits_max: 28
   # Jours d'arrivée / de départ autorisés. Vide = tous les jours.
   # Valeurs : lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche
@@ -182,11 +184,15 @@ liste:
 # ----------------------------------------------------------------------------
 # 5. TARIFS
 # ----------------------------------------------------------------------------
-# Dans chaque logement, vous saisissez le PRIX PLATEFORME (Booking) par nuit.
+# Dans chaque logement, vous saisissez le PRIX PLATEFORME (Booking ou Airbnb) par nuit.
 # Le site calcule automatiquement le prix direct = prix plateforme − remise.
 
 tarifs:
-  remise_directe_pct: 15                      # % de remise par rapport à Booking
+  # REMISE DIRECTE : prix affiché sur le site = prix plateforme (Booking ou
+  # Airbnb, saisi dans chaque logement) moins ce pourcentage. Un seul réglage
+  # pour tous les logements ; un logement peut avoir le sien
+  # (tarifs > remise_directe_pct dans sa fiche). Voir docs/05.
+  remise_directe_pct: 15
   # Afficher le prix plateforme barré et l'économie réalisée.
   # N'activez QUE si les prix plateforme saisis sont exacts et à jour
   # (obligation de loyauté envers le client). Le logement doit aussi avoir
@@ -240,7 +246,9 @@ boutons_contact:
 
 avis:
   active: true
-  afficher_note_moyenne: true                 # uniquement calculée sur de VRAIS avis
+  # Les avis publiés ne sont qu'une sélection : leur moyenne (9,2/10) serait
+  # plus flatteuse que la note réelle sur Booking (7,9/10). Laisser à false.
+  afficher_note_moyenne: false
   nombre_accueil: 3                           # avis affichés sur la page d'accueil
 
 # Arguments « Pourquoi réserver en direct » (accueil et pages logement).
@@ -343,9 +351,9 @@ paiement:
 # ----------------------------------------------------------------------------
 
 seo:
-  description: "Studios au cœur du Mans et villa à Bali : réservez en direct auprès du propriétaire, sans frais de service. (EXEMPLE)"
+  description: "Studios et appartements au Mans, villa avec piscine à Balangan (Bali) : réservez en direct auprès du propriétaire, sans frais de service."
   # Mots-clés principaux (servent aux textes et données structurées)
-  mots_cles: ["location saisonnière Le Mans", "studio Le Mans centre", "villa Bali piscine"]
+  mots_cles: ["location studio Le Mans", "appartement Le Mans 24 Heures", "villa Balangan Bali piscine"]
   # Codes de vérification (copiés depuis Google Search Console / Bing Webmaster Tools)
   google_site_verification: ""
   bing_site_verification: ""

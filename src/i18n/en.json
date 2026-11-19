@@ -74,10 +74,12 @@
     "appeler": "Call",
     "ecrire": "Send an email",
     "itineraire": "Directions",
-    "fermer_fenetre": "Close the window"
+    "fermer_fenetre": "Close the window",
+    "voyageurs_plage": "{min} to {max} guests",
+    "reservation_sur_demande": "Booking on request"
   },
   "demo": {
-    "bandeau": "Demo website: the rentals, prices and reviews shown are examples.",
+    "bandeau": "Website in preparation: prices, availability and details are not final yet.",
     "maintenance_titre": "Website under maintenance"
   },
   "accueil": {
@@ -90,7 +92,9 @@
     "avis_titre": "What our guests say",
     "faq_titre": "Your questions",
     "contact_titre": "A question? Let's talk",
-    "contact_texte": "We answer personally, in English or French."
+    "contact_texte": "We answer personally, in English or French.",
+    "adresses_titre": "Our places",
+    "adresses_sous_titre": "Where to stay"
   },
   "liste": {
     "titre": "Our rentals",
@@ -169,8 +173,8 @@
     "avis_moyenne": "Average rating {note}/5 from {n} reviews",
     "avis_exemple": "Example review (demo mode)",
     "voir_sur": "See on {plateforme}",
-    "logements_etablissement": "Rentals at {nom}",
-    "dans_etablissement": "Part of {nom}"
+    "logements_etablissement": "Rentals at this address",
+    "dans_etablissement": "Address: {nom}"
   },
   "lits": {
     "double": "Double bed",
@@ -309,7 +313,11 @@
     "reponse": "{delai}",
     "a_partir_de": "from {prix} / night",
     "ouvrir_formulaire": "Complete my request",
-    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}"
+    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}",
+    "sur_demande_titre": "Booking on request",
+    "sur_demande_texte": "This rental has no online calendar: tell us your preferred dates, we check availability and confirm the price in writing.",
+    "sur_demande_calendrier": "Choose your preferred dates: availability is checked for each request.",
+    "dates_a_preciser": "Dates to be specified in your message"
   },
   "formulaire": {
     "titre": "Your request",
@@ -341,7 +349,8 @@
     "anti_spam": "Leave this field empty",
     "autres_moyens": "Or contact us directly",
     "recapitulatif": "Summary",
-    "nouvelle_demande": "New request"
+    "nouvelle_demande": "New request",
+    "objet_sur_demande": "Availability request — {logement}"
   },
   "avantages": {
     "titre": "Why book direct?"
@@ -393,6 +402,12 @@
   ],
   "destination": {
     "quand_venir": "When to visit?",
-    "comment_venir": "Getting there"
+    "comment_venir": "Getting there",
+    "adresses_titre": "Our places",
+    "logements_titre": "All our rentals"
+  },
+  "etablissement": {
+    "voir": "See this place",
+    "voir_logement": "See the rental"
   }
 }

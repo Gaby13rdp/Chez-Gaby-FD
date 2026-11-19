@@ -26,16 +26,16 @@ Logo : déposez votre fichier (SVG ou PNG) dans `public/` et indiquez `logo: "lo
 
 ## 2. Prix : le principe
 
-Dans chaque logement, vous saisissez le **prix Booking** par nuit (`prix_nuit`). Le site affiche le **prix direct** = prix Booking − remise directe :
+Dans chaque logement, vous saisissez le **prix plateforme** par nuit (`prix_nuit`) : le prix **Booking** pour Le 84 et Le 47, le prix **Airbnb** (en roupies) pour la Villa Sagara. Le site affiche le **prix direct** = prix plateforme − remise directe. La remise est **un seul réglage**, dans `config/site.yml` :
 
 ```yaml
 tarifs:
-  remise_directe_pct: 15     # 15 % moins cher qu'en passant par Booking
+  remise_directe_pct: 15     # 15 % moins cher que sur la plateforme
   afficher_prix_plateforme: false
   remises_cumulables: false
 ```
 
-Exemple : prix Booking 100 € → prix direct affiché 85 €. Un logement peut avoir sa propre remise (`remise_directe_pct` dans sa rubrique Tarifs).
+Exemples : prix Booking 100 € → prix direct affiché 85 € ; prix Airbnb de la villa 3 000 000 IDR → 2 550 000 IDR. Un logement peut avoir sa propre remise (`remise_directe_pct` dans sa rubrique Tarifs).
 
 **Prix barré** (« ~~100 €~~ 85 € ») : il n'apparaît que si `afficher_prix_plateforme: true` **et** si le logement indique `prix_plateforme_verifie: true`. N'activez cette option que si vos prix Booking saisis sont exacts et tenus à jour : afficher un prix de référence inexact est une pratique commerciale trompeuse.
 
@@ -47,7 +47,7 @@ Rubrique **Tarifs** du logement :
 
 | Champ | Rôle | Exemple |
 |---|---|---|
-| `prix_nuit` | prix Booking de base, par nuit | `82` |
+| `prix_nuit` | prix plateforme de base, par nuit (Booking ou Airbnb) | `82` |
 | `frais_menage` | par séjour | `30` |
 | `voyageurs_inclus` | voyageurs compris dans le prix (vide = capacité maximale) | `2` |
 | `supplement_voyageur_nuit` | par voyageur en plus, par nuit | `10` |
@@ -78,20 +78,22 @@ Elle se règle dans chaque **établissement** (rubrique **Taxe de séjour**), ca
 | `fixe` | meublé **classé** (étoiles) | montant par adulte et par nuit |
 | `pourcentage` | meublé **non classé** (France) | % du prix par personne et par nuit, plafonné, × nombre d'adultes |
 
-Réglage d'exemple pour Le Mans Métropole (meublé non classé), **à vérifier** sur [taxedesejour.lemansmetropole.fr](https://taxedesejour.lemansmetropole.fr/) car les tarifs changent au 1er janvier :
+Réglage de Le 84 et Le 47 : grille de **Le Mans Métropole au 1er janvier 2027** (délibération du 25 juin 2026), logement **non classé** : 5 % du coût de la nuitée par personne, plafonné à 4 €, majoré de 10 % de taxe additionnelle départementale. Les tarifs changent au 1er janvier : vérifiez chaque année sur [taxedesejour.lemansmetropole.fr](https://taxedesejour.lemansmetropole.fr/).
 
 ```yaml
 taxe_sejour:
   mode: pourcentage
-  pourcentage: 2.5               # % du prix de la nuit par personne
+  pourcentage: 5                 # % du prix de la nuit par personne
   plafond_par_adulte_nuit: 4     # plafond, hors part départementale
   taxe_additionnelle_pct: 10     # taxe additionnelle départementale
   age_exoneration: 18            # les mineurs ne paient pas
 ```
 
-Exemple : nuit à 100 € pour 2 adultes → 50 € par personne × 2,5 % = 1,25 € par adulte et par nuit, + 10 % → 1,38 € par adulte et par nuit.
+Exemple : nuit à 100 € pour 2 adultes → 50 € par personne × 5 % = 2,50 € par adulte et par nuit (sous le plafond de 4 €), + 10 % → 2,75 € par adulte et par nuit, soit 5,50 € par nuit pour le couple. Le devis applique cette grille à tous les séjours, y compris ceux de décembre 2026 (encore à l'ancienne grille) : ajustez la facture si besoin.
 
-En réservation directe, **c'est vous qui collectez la taxe et la reversez** à la collectivité : voir [08-obligations-legales.md](08-obligations-legales.md). Pour la villa à Bali, la taxe locale (PBJT, 10 %) est incluse dans le prix dans l'exemple fourni.
+Si un logement obtient un **classement en étoiles**, passez en `mode: fixe` avec le montant de sa catégorie (ex. 3 étoiles : 1,50 € + 10 % → `montant_par_adulte_nuit: 1.5`, `taxe_additionnelle_pct: 10`).
+
+En réservation directe, **c'est vous qui collectez la taxe et la reversez** à la collectivité : voir [08-obligations-legales.md](08-obligations-legales.md). Pour la Villa Sagara, `mode: aucune` : la taxe locale sur l'hébergement (PBJT, 10 %) est comprise dans le prix, et la taxe touristique d'entrée à Bali (150 000 IDR par personne) est payée par le voyageur lui-même sur lovebali.baliprov.go.id.
 
 ## 6. Règles de séjour
 
@@ -107,6 +109,10 @@ sejour:
 ```
 
 Chaque logement peut remplacer ces valeurs (rubrique **Règles de séjour**), et une période spéciale peut imposer sa propre durée minimale. Le calendrier du site applique ces règles en direct et propose d'autres dates si celles choisies ne conviennent pas.
+
+### Réservation « sur demande »
+
+Réglage `reservation: sur-demande` dans un logement (avec `calendriers: []`) : pas de calendrier en ligne ni de paiement ; le voyageur envoie une demande avec ou sans dates, vous vérifiez et confirmez par écrit. Les règles de séjour (nuits minimum…) et le devis indicatif restent actifs quand il indique des dates. Utilisé pour la Villa Sagara (gestion déléguée, `nuits_min: 2`). Voir [10-ajouter-un-logement.md](10-ajouter-un-logement.md#étape-5--option--réservation-sur-demande-).
 
 ## 7. Politique d'annulation
 

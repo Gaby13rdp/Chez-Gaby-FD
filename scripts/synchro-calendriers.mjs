@@ -91,6 +91,13 @@ for (const slug of listerDossiers(chemin('content/logements'))) {
   let d;
   try { ({ donnees: d } = lireMarkdown(chemin('content/logements', slug, 'index.md'))); } catch (e) { console.log(`✗ ${slug} : fiche illisible (${e.message})`); continue; }
   if (d.publie === false) continue;
+  if (d.reservation === 'sur-demande') {
+    // Réservation sur demande : aucun calendrier à lire (disponibilité vérifiée à chaque demande).
+    resultat.logements[slug] = { statut: 'sur-demande', verifieLe: null, plages: [] };
+    console.log(`○ ${slug} : réservation sur demande (pas de calendrier)`);
+    lignesResume.push(`| ${slug} | sur demande | — | disponibilité vérifiée à chaque demande |`);
+    continue;
+  }
   const etab = etablissements[String(d.etablissement || '').split('/').filter(Boolean).pop()] || { fuseau: 'Europe/Paris', heureArrivee: '16:00', heureDepart: '11:00' };
   const today = aujourdhui(etab.fuseau, MAINTENANT.getTime());
   const limite = ajouterMois(today, horizonMois + 1);

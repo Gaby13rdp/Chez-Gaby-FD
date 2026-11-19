@@ -35,13 +35,17 @@ function demarrer(D: any) {
   let bloquees = new Set<number>();
   let statut = D.dispo.statut as string;
   let verifieLe = D.dispo.verifieLe as string | null;
+  // Réservation « sur demande » : aucun calendrier en ligne, le voyageur peut
+  // choisir des dates souhaitées (facultatif) puis envoie sa demande.
+  const surDemande = D.surDemande === true || statut === 'sur-demande';
+  const sansCalendrier = () => surDemande || statut === 'non-configure';
 
   function majDispo(dispo: any) {
     statut = dispo.statut; verifieLe = dispo.verifieLe;
-    bloquees = statut === 'non-configure' ? new Set() : nuitsBloquees(dispo.plages || [], D.regles.nuits_preparation || 0);
+    bloquees = sansCalendrier() ? new Set() : nuitsBloquees(dispo.plages || [], D.regles.nuits_preparation || 0);
   }
   majDispo(D.dispo);
-  const perime = () => statut !== 'exemple' && statut !== 'non-configure' && estPerime(verifieLe, D.fraicheurMax);
+  const perime = () => !sansCalendrier() && statut !== 'exemple' && estPerime(verifieLe, D.fraicheurMax);
 
   // ---- État initial depuis l'adresse (?arrivee=…&depart=…) -------------------
   const params = new URLSearchParams(location.search);
@@ -77,6 +81,11 @@ function demarrer(D: any) {
   function libelleJour(date: string, e: ReturnType<typeof etatJour>) {
     let s = fmtLong.format(objDate(date));
     if (e.passe || e.auDela) return s;
+    if (surDemande) {
+      if (date === etat.arrivee) s += ` (${T.arrivee})`;
+      if (date === etat.depart) s += ` (${T.depart})`;
+      return s;
+    }
     if (etat.mode === 'depart' && etat.arrivee && date > etat.arrivee) s += ', ' + (e.selectionnable ? T.depart_possible : T.indisponible);
     else s += ', ' + (e.arriveePossible ? T.disponible : e.departSeul ? T.depart_possible : T.indisponible);
     if (date === etat.arrivee) s += ` (${T.arrivee})`;
@@ -273,7 +282,7 @@ function demarrer(D: any) {
       problemes = verifierSejour({
         arrivee: etat.arrivee, depart: etat.depart, voyageurs: etat.adultes + etat.enfants, animaux: etat.animaux,
         regles: D.regles, capacite: D.capacite, animauxAcceptes: D.animaux,
-        bloquees: statut === 'non-configure' ? null : bloquees, aujourdhui: today,
+        bloquees: sansCalendrier() ? null : bloquees, aujourdhui: today,
         nuitsMinSaison: nuitsMinPour(etat.arrivee!, D.tarif), fermees: devisCourant?.fermees || [],
       });
     }
@@ -289,7 +298,8 @@ function demarrer(D: any) {
     if (eff) eff.hidden = !etat.arrivee;
     const etatCal = $('[data-etat-calendrier]', cal || document);
     if (etatCal) {
-      if (statut === 'non-configure') etatCal.textContent = T.non_synchronise;
+      if (surDemande) etatCal.textContent = T.sur_demande_calendrier;
+      else if (statut === 'non-configure') etatCal.textContent = T.non_synchronise;
       else if (verifieLe && statut !== 'exemple') etatCal.textContent = tr('maj', { quand: new Intl.DateTimeFormat(D.locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(verifieLe)) });
       else etatCal.textContent = '';
     }
@@ -308,18 +318,18 @@ function demarrer(D: any) {
     // Bouton principal
     const bouton = $('[data-action-principale]', carte) as HTMLButtonElement;
     const ok = complet && problemes.length === 0;
-    bouton.textContent = !complet ? T.verifier : statut === 'non-configure' || perime() ? T.demander_dispo : T.envoyer_demande;
+    bouton.textContent = surDemande ? T.demander_dispo : !complet ? T.verifier : statut === 'non-configure' || perime() ? T.demander_dispo : T.envoyer_demande;
     bouton.disabled = complet && !ok;
     const payer = $('[data-payer]', carte) as HTMLButtonElement | null;
     // En démonstration (données d'exemple), le bouton reste visible pour tester avec les clés de test Stripe :
     // le service refuse toute clé réelle tant que le site n'est pas en production.
-    if (payer) payer.hidden = !(ok && statut !== 'non-configure' && !perime());
+    if (payer) payer.hidden = !(ok && !sansCalendrier() && !perime());
 
     // Barre mobile
     const bd = $('[data-barre-dates]'), bp = $('[data-barre-prix]'), bm = $('[data-action-mobile]') as HTMLButtonElement | null;
     if (bd) bd.textContent = complet ? `${fmtCourt.format(objDate(etat.arrivee!))} → ${fmtCourt.format(objDate(etat.depart!))} · ${plur('nuit', ecartJours(etat.arrivee!, etat.depart!))}` : bd.textContent;
     if (bp && complet && devisCourant && D.devis) bp.textContent = `${argent(devisCourant.total)}`;
-    if (bm) { bm.textContent = ok ? T.envoyer_demande : T.verifier; bm.dataset.pret = ok ? '1' : ''; }
+    if (bm) { bm.textContent = surDemande ? T.demander_dispo : ok ? T.envoyer_demande : T.verifier; bm.dataset.pret = ok ? '1' : ''; }
 
     // WhatsApp prérempli
     const wa = $('[data-whatsapp]', carte) as HTMLAnchorElement | null;
@@ -341,6 +351,18 @@ function demarrer(D: any) {
           logement: D.nom, logement_id: D.slug, arrivee: etat.arrivee!, depart: etat.depart!, nuits: String(ecartJours(etat.arrivee!, etat.depart!)),
           adultes: String(etat.adultes), enfants: String(etat.enfants), animaux: String(etat.animaux),
           total_indicatif: devisCourant ? `${devisCourant.total} ${D.devise}` : '', texte_recapitulatif: texteRecap(devisCourant),
+        },
+      } }));
+    } else if (surDemande) {
+      // Demande sans dates : le voyageur les précise dans son message
+      const voyageurs = `${plur('voyageur', etat.adultes + etat.enfants)}${etat.animaux ? ` · ${etat.animaux} ${T.animaux.toLowerCase()}` : ''}`;
+      document.dispatchEvent(new CustomEvent('demande:maj', { detail: {
+        formulaire: D.formulaireId,
+        resume: `<strong>${echapper(D.nom)}</strong><span>${echapper(T.dates_a_preciser)}</span><span>${voyageurs}</span>`,
+        objet: tr('objetSurDemande', { logement: D.nom }),
+        champs: {
+          logement: D.nom, logement_id: D.slug, adultes: String(etat.adultes), enfants: String(etat.enfants), animaux: String(etat.animaux),
+          texte_recapitulatif: [D.nom, T.dates_a_preciser, `${voyageurs} (${etat.adultes} + ${etat.enfants})`].join('\n'),
         },
       } }));
     }
@@ -366,7 +388,9 @@ function demarrer(D: any) {
   });
 
   function ouvrirDemande() {
-    if (!(etat.arrivee && etat.depart) || problemes.length) { allerAuCalendrier(); return; }
+    const complet = !!(etat.arrivee && etat.depart);
+    // Sur demande : on peut écrire sans avoir choisi de dates
+    if (surDemande ? complet && problemes.length > 0 : !complet || problemes.length > 0) { allerAuCalendrier(); return; }
     dialogue?.showModal();
     setTimeout(() => dialogue?.querySelector<HTMLInputElement>('input[name="nom"]')?.focus(), 50);
   }
@@ -394,7 +418,7 @@ function demarrer(D: any) {
   });
 
   // Mode temps réel (facultatif) : disponibilités fraîches depuis le service worker
-  if (D.tempsReel) {
+  if (D.tempsReel && !surDemande) {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 5000);
     fetch(`${String(D.tempsReel).replace(/\/$/, '')}/disponibilites?logement=${encodeURIComponent(D.slug)}`, { signal: ctrl.signal })

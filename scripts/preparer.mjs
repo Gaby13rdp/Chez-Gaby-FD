@@ -91,11 +91,20 @@ const { destinations, etablissements, logements, avis, guides, pages, accueil } 
 const destParSlug = new Map(destinations.map((d) => [d.slug, d]));
 const etabParSlug = new Map(etablissements.map((e) => [e.slug, e]));
 
-// Publication en cascade
+// Publication en cascade. Un logement publié mais encore sans photo est
+// simplement masqué (avertissement) : il apparaît dès que sa photo 01 arrive
+// (dépôt manuel ou workflow « Importer les photos »), sans bloquer le site.
+const enAttenteDePhotos = [];
 for (const l of logements) {
   const e = etabParSlug.get(l.etablissement);
-  l.visible = l.publie && !!e && e.publie && !!destParSlug.get(e.destination)?.publie;
-  if (l.publie && e && !l.visible) rapport.avertissement(`Le logement « ${l.slug} » est publié mais son établissement ou sa destination ne l'est pas : il reste masqué.`, l.fichier);
+  l.photosBrutes = listerPhotos(l.dossier, l.legendes_photos, rapport, l.fichier);
+  const publiable = l.publie && !!e && e.publie && !!destParSlug.get(e.destination)?.publie;
+  l.visible = publiable && l.photosBrutes.length > 0;
+  if (l.publie && e && !publiable) rapport.avertissement(`Le logement « ${l.slug} » est publié mais son établissement ou sa destination ne l'est pas : il reste masqué.`, l.fichier);
+  if (publiable && !l.photosBrutes.length) {
+    enAttenteDePhotos.push(l.slug);
+    rapport.avertissement(`Le logement « ${l.slug} » n'a pas encore de photo : il reste masqué jusqu'à l'arrivée de sa photo de couverture (01) dans « ${relatif(l.dossier)}/photos/ » (dépôt manuel ou workflow « Importer les photos », docs/03).`, l.fichier);
+  }
 }
 const logementsVisibles = logements.filter((l) => l.visible);
 for (const e of etablissements) {
@@ -108,7 +117,11 @@ for (const d of destinations) {
   d.logements = logementsVisibles.filter((l) => etabParSlug.get(l.etablissement)?.destination === d.slug).map((l) => l.slug);
   d.visible = d.publie && d.logements.length > 0;
 }
-if (!logementsVisibles.length) rapport.erreur('Aucun logement publié : le site a besoin d’au moins un logement avec « publie: true ».');
+if (!logementsVisibles.length) {
+  rapport.erreur(enAttenteDePhotos.length
+    ? `Aucun logement visible : ${enAttenteDePhotos.length} logement(s) publié(s) attendent encore leurs photos (${enAttenteDePhotos.join(', ')}). Lancez « Importer les photos » (onglet Actions) ou déposez les photos, puis republiez. Le site en ligne reste inchangé.`
+    : 'Aucun logement publié : le site a besoin d’au moins un logement avec « publie: true » et au moins une photo.');
+}
 
 // Adresses (slugs) uniques par destination
 for (const d of destinations) {
@@ -180,7 +193,6 @@ for (const l of logements) {
 const empreintesExemple = new Set(existsSync(chemin('scripts/donnees/empreintes-photos-exemple.json'))
   ? JSON.parse(readFileSync(chemin('scripts/donnees/empreintes-photos-exemple.json'), 'utf8')).empreintes : []);
 
-for (const l of logements) l.photosBrutes = listerPhotos(l.dossier, l.legendes_photos, rapport, l.fichier);
 for (const e of etablissements) e.photosBrutes = listerPhotos(e.dossier, e.legendes_photos, rapport, e.fichier);
 for (const d of destinations) d.photosBrutes = listerPhotos(d.dossier, [], rapport, d.fichier);
 
@@ -194,9 +206,6 @@ function fichierMedia(ref, fichierContexte, quoi) {
 
 const demandes = [];
 for (const l of logementsVisibles) {
-  if (!l.photosBrutes.length) {
-    rapport.erreur(`Le logement « ${l.slug} » n'a pas de photo de couverture : ajoutez au moins une photo dans « ${relatif(l.dossier)}/photos/ » (ou passez « publie: false »).`, l.fichier);
-  }
   l.photosBrutes.forEach((p, i) => demandes.push({ fichier: p.fichier, og: i === 0 }));
   if (l.plan) { l.planFichier = fichierMedia(`logements/${l.slug}/${l.plan.replace(/^.*\//, '')}`, l.fichier, `Logement « ${l.slug} » (plan)`); if (l.planFichier) demandes.push({ fichier: l.planFichier }); }
 }
@@ -284,6 +293,9 @@ const avisPublies = avis.filter((a) => a.publie && config.avis.active && (!a.exe
 if (production && avis.some((a) => a.exemple)) rapport.info(`${avis.filter((a) => a.exemple).length} avis d'exemple ignoré(s) (mode production).`);
 
 function noteMoyenne(liste) {
+  // Désactivée dans les réglages : aucune note moyenne nulle part (cartes,
+  // fiches, données structurées pour Google).
+  if (!config.avis.afficher_note_moyenne) return null;
   const notes = liste.filter((a) => a.noteSur5 != null && !a.exemple);
   if (!notes.length) return null;
   return { valeur: Math.round((notes.reduce((s, a) => s + a.noteSur5, 0) / notes.length) * 10) / 10, nombre: notes.length };
@@ -369,7 +381,13 @@ const sortieLogements = logementsVisibles.map((l) => {
   const brut = dispoFichier.logements?.[l.slug];
   let dispo;
   const sansSource = !l.calendriers.length;
-  if (brut && Array.isArray(brut.plages) && !['non-configure'].includes(brut.statut)) {
+  const surDemande = l.reservation === 'sur-demande';
+  if (surDemande) {
+    // Réservation sur demande : aucune date bloquée affichée ; le voyageur
+    // indique ses dates et le propriétaire vérifie avant de confirmer.
+    dispo = { statut: 'sur-demande', verifieLe: null, plages: [] };
+    if (!sansSource) rapport.avertissement(`Logement « ${l.slug} » : réservation « sur-demande », ses calendriers iCal sont ignorés (retirez-les ou passez « reservation: directe »).`, l.fichier);
+  } else if (brut && Array.isArray(brut.plages) && !['non-configure', 'sur-demande'].includes(brut.statut)) {
     dispo = { statut: brut.statut || 'ok', verifieLe: brut.verifieLe || null, plages: bornerPlages(brut.plages, today, ajouterMois(today, 36)) };
   } else if (!production) {
     dispo = { statut: 'exemple', verifieLe: MAINTENANT.toISOString(), plages: dispoExemple(l.slug, today) };
@@ -384,7 +402,7 @@ const sortieLogements = logementsVisibles.map((l) => {
   const equip = l.equipements.filter((k) => equipements[k]).map((k) => ({ cle: k, icone: equipements[k].icone, categorie: equipements[k].categorie, filtre: equipements[k].filtre, libelle: Object.fromEntries(langues.map((g) => [g, equipements[k][g] || equipements[k].fr])) }));
   return {
     slug: l.slug, ordre: l.ordre, type: l.type, etablissement: l.etablissement, destination: e.destination,
-    capacite: l.capacite, chambres: l.chambres, lits: l.lits, salles_de_bain: l.salles_de_bain, surface_m2: l.surface_m2 ?? null,
+    reservation: l.reservation, capacite: l.capacite, chambres: l.chambres, lits: l.lits, salles_de_bain: l.salles_de_bain, surface_m2: l.surface_m2 ?? null,
     etage: l.etage || '', ascenseur: l.ascenseur, equipements: equip, regles: l.regles, annulation: l.annulation,
     tarif, reglesSejour: reglesIdx, prixAPartirDe: aPartirDe, prixPlateformeVerifie: l.tarifs.prix_plateforme_verifie,
     photos, plan: l.planFichier ? photo(l.planFichier, `Plan — ${l.nom}`) : null,
@@ -534,7 +552,7 @@ if (config.maintenance.active) {
     for (const g of sortieGuides) ajouterRoute('guide', g.slug, (l) => p(l, seg(l, 'guides'), g.slug), { langues: [langueDefaut] });
   }
   if (config.paiement.niveau >= 1) {
-    for (const lg of sortieLogements.filter((x) => config.paiement.niveau === 2 || x.lien_acompte)) {
+    for (const lg of sortieLogements.filter((x) => x.reservation !== 'sur-demande' && (config.paiement.niveau === 2 || x.lien_acompte))) {
       ajouterRoute('paiement', lg.slug, (l) => p(l, seg(l, 'paiement'), lg.slug), { noindex: true });
     }
     if (config.paiement.niveau === 2) {
@@ -607,7 +625,7 @@ if (!validationSeule) {
     production, site: adresse.url, marque: config.marque.nom, langueDefaut,
     paiement: { niveau: config.paiement.niveau, acomptePct: config.paiement.acompte_pct, soldeJours: config.paiement.solde_jours_avant_arrivee, fraicheurH: config.calendrier.fraicheur_max_heures },
     pages: { merci: cheminsRoute('paiement-merci'), annule: cheminsRoute('paiement-annule') },
-    logements: Object.fromEntries(sortieLogements.map((l) => [l.slug, { nom: l.i18n[langueDefaut].nom, capacite: l.capacite, tarif: l.tarif, regles: l.reglesSejour, fuseau: l.fuseau, animaux: l.regles.animaux, calendriers: logements.find((x) => x.slug === l.slug).calendriers.map((c) => c.secret), heureArrivee: sortieEtabParSlug.get(l.etablissement).arrivee.heure_arrivee, heureDepart: sortieEtabParSlug.get(l.etablissement).arrivee.heure_depart }])),
+    logements: Object.fromEntries(sortieLogements.map((l) => [l.slug, { nom: l.i18n[langueDefaut].nom, surDemande: l.reservation === 'sur-demande', capacite: l.capacite, tarif: l.tarif, regles: l.reglesSejour, fuseau: l.fuseau, animaux: l.regles.animaux, calendriers: logements.find((x) => x.slug === l.slug).calendriers.map((c) => c.secret), heureArrivee: sortieEtabParSlug.get(l.etablissement).arrivee.heure_arrivee, heureDepart: sortieEtabParSlug.get(l.etablissement).arrivee.heure_depart }])),
   }));
 }
 

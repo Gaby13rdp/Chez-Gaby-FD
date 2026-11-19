@@ -41,6 +41,7 @@ const lits = (l.lits || []).reduce((s: number, x: any) => s + (x.nombre || 1), 0
         <span class="texte-doux">{t(langue, 'commun.par_nuit')}</span>
       </div>
     )}
+    {l.reservation === 'sur-demande' && <span class="carte__mention"><Icone nom="message-circle" taille={14} />{t(langue, 'commun.reservation_sur_demande')}</span>}
     <span class="carte__sejour" data-prix-sejour hidden></span>
     {C.liste.comparateur && (
       <label class="carte__comparer"><input type="checkbox" data-comparer={l.slug} /> {t(langue, 'liste.comparer')}</label>

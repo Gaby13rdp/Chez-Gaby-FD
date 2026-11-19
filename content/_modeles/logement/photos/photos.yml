@@ -1,3 +1,5 @@
-# Légendes des photos (recommandées pour Google et l'accessibilité).
-# Une ligne par photo :   nom-du-fichier.jpg: "Légende"
-01-a-remplacer.jpg: "Photo à remplacer par la vraie photo de couverture"
+# Légendes des photos (affichées sous les photos, utiles à Google et à l'accessibilité).
+# Une ligne par photo, dans l'ordre :   nom-du-fichier.jpg: "Légende"
+# 01 = photo de couverture. Exemple :
+# 01-piece-de-vie.jpg: "Pièce de vie avec lit double"
+# 02-cuisine.jpg: "Coin cuisine équipé"

@@ -1,0 +1,45 @@
+---
+// Carte d'une adresse (établissement) : photo, ville, nombre de logements,
+// capacité et prix « à partir de ». Lien vers la page de l'adresse si elle
+// en a une (2 logements ou plus), sinon directement vers son logement unique.
+import Icone from './Icone.astro';
+import Photo from './Photo.astro';
+import { C, t, tn, lien, prix, logement, loc } from '../lib/site';
+interface Props { etablissement: any; langue: string; titreNiveau?: 'h2' | 'h3' }
+const { etablissement: e, langue, titreNiveau = 'h3' } = Astro.props;
+const txt = loc(e, langue);
+const logements = e.logements.map((s: string) => logement(s)).filter(Boolean);
+const premier = logements[0];
+const url = lien(e.aUnePage ? (e.url[langue] ?? e.url.fr) : (premier.url[langue] ?? premier.url.fr));
+const photo = e.photos[0] || premier.photos[0];
+const capacites = logements.map((l: any) => l.capacite);
+const cMin = Math.min(...capacites);
+const cMax = Math.max(...capacites);
+const prixMin = Math.min(...logements.map((l: any) => l.prixAPartirDe.direct));
+const surDemande = logements.every((l: any) => l.reservation === 'sur-demande');
+const Titre = titreNiveau;
+---
+<article class="carte carte--adresse" data-adresse={e.slug}>
+  <div class="carte__visuel">
+    <Photo photo={photo} tailles="(min-width: 1240px) 380px, (min-width: 700px) 45vw, 100vw" largeurCible={480} />
+  </div>
+  <div class="carte__corps">
+    <span class="carte__lieu"><Icone nom="map-pin" taille={14} />{e.ville}, {e.pays}</span>
+    <Titre class="carte__titre"><a href={url}>{txt.nom}</a></Titre>
+    <div class="carte__infos">
+      <span>{t(langue, `types.${e.type}`)}</span>
+      <span>{tn(langue, 'commun.logement', logements.length)}</span>
+      <span>{cMin === cMax ? tn(langue, 'commun.voyageur', cMax) : t(langue, 'commun.voyageurs_plage', { min: cMin, max: cMax })}</span>
+    </div>
+    {txt.resume && <p class="carte__resume">{txt.resume}</p>}
+    {C.tarifs.afficher_a_partir_de && Number.isFinite(prixMin) && (
+      <div class="carte__prix">
+        <span class="texte-doux">{t(langue, 'commun.a_partir_de')}</span>
+        <strong>{prix(prixMin, e.devise, langue)}</strong>
+        <span class="texte-doux">{t(langue, 'commun.par_nuit')}</span>
+      </div>
+    )}
+    {surDemande && <span class="carte__mention"><Icone nom="message-circle" taille={14} />{t(langue, 'commun.reservation_sur_demande')}</span>}
+    <span class="carte__lien" aria-hidden="true">{e.aUnePage ? t(langue, 'etablissement.voir') : t(langue, 'etablissement.voir_logement')}<Icone nom="arrow-right" taille={16} /></span>
+  </div>
+</article>

@@ -39,6 +39,12 @@ export async function traiterImages(demandes, { avif = true, rapport, empreintes
   const file = [...uniques.values()];
   let nouvelles = 0, enCache = 0;
   const travailleurs = Math.max(1, Math.min(4, cpus().length));
+  const verrous = new Map();
+  const sousVerrou = (cle, tache) => {
+    const suite = (verrous.get(cle) || Promise.resolve()).then(tache, tache);
+    verrous.set(cle, suite.catch(() => {}));
+    return suite;
+  };
 
   async function traiter(d) {
     const ext = d.fichier.split('.').pop().toLowerCase();
@@ -54,20 +60,25 @@ export async function traiterImages(demandes, { avif = true, rapport, empreintes
     const dossier = `${DOSSIER_SORTIE}/${cle}`;
     const fichierMeta = `${dossier}/meta.json`;
     let meta = null;
-    if (existsSync(fichierMeta)) {
-      try { meta = JSON.parse(readFileSync(fichierMeta, 'utf8')); } catch { meta = null; }
-      if (meta && (meta.avif !== avif || (d.og && !meta.og))) meta = null; // réglages différents : on refait
-      if (meta && !meta.variantes.every((w) => existsSync(`${dossier}/${w}.webp`))) meta = null;
-    }
-    if (!meta) {
-      try {
-        meta = await produire(tampon, dossier, { avif, og: d.og });
+    try {
+      // Une même photo peut se trouver dans plusieurs dossiers : son traitement
+      // est fait une seule fois à la fois (sinon deux écritures simultanées).
+      meta = await sousVerrou(cle, async () => {
+        let m = null;
+        if (existsSync(fichierMeta)) {
+          try { m = JSON.parse(readFileSync(fichierMeta, 'utf8')); } catch { m = null; }
+          if (m && (m.avif !== avif || (d.og && !m.og))) m = null; // réglages différents : on refait
+          if (m && !m.variantes.every((w) => existsSync(`${dossier}/${w}.webp`))) m = null;
+        }
+        if (m) { enCache++; return m; }
+        m = await produire(tampon, dossier, { avif, og: d.og });
         nouvelles++;
-      } catch (e) {
-        rapport?.erreur(`La photo « ${relatif(d.fichier)} » est illisible ou endommagée (${e.message}). Ré-enregistrez-la en JPG.`, d.fichier);
-        return;
-      }
-    } else enCache++;
+        return m;
+      });
+    } catch (e) {
+      rapport?.erreur(`La photo « ${relatif(d.fichier)} » est illisible ou endommagée (${e.message}). Ré-enregistrez-la en JPG.`, d.fichier);
+      return;
+    }
     if (meta.largeurOriginale < 1600) {
       rapport?.avertissement(`Photo petite (${meta.largeurOriginale} px de large) : « ${relatif(d.fichier)} ». 2000 px minimum conseillés pour un rendu net.`, d.fichier);
     }

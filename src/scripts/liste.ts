@@ -71,7 +71,7 @@ function demarrer(D: any) {
       c.classList.remove('carte--indispo');
       if (ok && datesOk && L) {
         const info = dispo?.logements?.[slug] || { statut: 'non-configure', plages: [] };
-        const bloquees = info.statut === 'non-configure' ? null : nuitsBloquees(info.plages || [], L.regles.nuits_preparation || 0);
+        const bloquees = ['non-configure', 'sur-demande'].includes(info.statut) ? null : nuitsBloquees(info.plages || [], L.regles.nuits_preparation || 0);
         const auj = aujourdhui(L.fuseau);
         const devis = calculerDevis(L.tarif, { arrivee: etat.arrivee, depart: etat.depart, adultes: Math.max(1, etat.voyageurs), enfants: 0, aujourdhui: auj });
         const pb = verifierSejour({

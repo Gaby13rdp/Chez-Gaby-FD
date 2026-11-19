@@ -127,8 +127,8 @@ const etageTxt = l.etage ? (/^\d+$/.test(l.etage) ? t(langue, 'commun.etage', { 
         </section>
 
         <section class="bloc" id="disponibilites" aria-labelledby="titre-dispo">
-          <h2 id="titre-dispo">{t(langue, 'logement.disponibilites')}</h2>
-          <Calendrier langue={langue} />
+          <h2 id="titre-dispo">{t(langue, l.reservation === 'sur-demande' ? 'reservation.choisir_dates' : 'logement.disponibilites')}</h2>
+          <Calendrier langue={langue} surDemande={l.reservation === 'sur-demande'} />
         </section>
 
         <section class="bloc" aria-labelledby="titre-infos">

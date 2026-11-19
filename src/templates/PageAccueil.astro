@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Icone from '../components/Icone.astro';
 import Photo from '../components/Photo.astro';
 import CarteLogement from '../components/CarteLogement.astro';
+import CarteEtablissement from '../components/CarteEtablissement.astro';
 import Avantages from '../components/Avantages.astro';
 import Avis from '../components/Avis.astro';
 import Faq from '../components/Faq.astro';
@@ -17,6 +18,8 @@ const a = D.accueil;
 const txt = loc(a, langue);
 const heros = a.image || D.logements[0]?.photos[0];
 const vedette = a.vedette.map((s: string) => logement(s)).filter(Boolean);
+// « Nos adresses » : toutes les adresses, automatiquement, dès qu'il y en a au moins 2
+const adresses = a.sections.etablissements !== false && D.etablissements.length >= 2 ? D.etablissements : [];
 const avis = D.avis.slice(0, C.avis.nombre_accueil);
 const liste = lienRoute('liste', 'logements', langue);
 const capaciteMax = Math.max(...D.logements.map((l: any) => l.capacite));
@@ -80,6 +83,18 @@ const jsonld = [organisation(langue), listeLd(vedette, langue), txt.faq?.length 
             );
           })}
         </div>
+      </div>
+    </section>
+  )}
+
+  {adresses.length > 0 && (
+    <section class="section" aria-labelledby="t-adresses">
+      <div class="conteneur">
+        <div class="entete-section">
+          <div><span class="surtitre">{t(langue, 'accueil.adresses_sous_titre')}</span><h2 id="t-adresses">{t(langue, 'accueil.adresses_titre')}</h2></div>
+          <a class="bouton" href={liste}>{t(langue, 'commun.voir_tout')}<Icone nom="arrow-right" /></a>
+        </div>
+        <div class="grille">{adresses.map((e: any) => <CarteEtablissement etablissement={e} langue={langue} />)}</div>
       </div>
     </section>
   )}

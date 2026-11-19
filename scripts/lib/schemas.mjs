@@ -125,6 +125,10 @@ export const schemaLogement = objet('Logement', {
   ordre: entier("Ordre d'affichage", { defaut: 100 }),
   type: choix('Type', ['studio', 'appartement', 'duplex', 'loft', 'maison', 'villa', 'chambre', 'gite', 'autre'], { defaut: 'appartement' }),
   resume: texteLong('Résumé (1 à 2 phrases)', { requis: true, max: 200 }),
+  reservation: choix('Mode de réservation', ['directe', 'sur-demande'], {
+    defaut: 'directe',
+    aide: 'directe = calendrier des disponibilités synchronisé ; sur-demande = pas de calendrier en ligne : le voyageur choisit ses dates et envoie une demande, vous vérifiez puis confirmez',
+  }),
   capacite: entier('Voyageurs maximum', { requis: true, min: 1, max: 60 }),
   chambres: entier('Chambres', { defaut: 0, min: 0, aide: '0 pour un studio' }),
   lits: liste('Lits', objet('Lit', {
@@ -151,7 +155,8 @@ export const schemaLogement = objet('Logement', {
     texte: texteLong('Texte personnalisé', { aide: 'Uniquement si « personnalisee »' }),
   }),
   tarifs: objet('Tarifs', {
-    prix_nuit: nombre('Prix plateforme par nuit (Booking)', { requis: true, min: 0, aide: 'Le site applique la remise directe' }),
+    prix_nuit: nombre('Prix plateforme par nuit (Booking ou Airbnb)', { requis: true, min: 0, aide: 'Le site applique la remise directe (réglage remise_directe_pct)' }),
+    remarque: texte('Remarque interne (jamais affichée)', { aide: 'ex. « À COMPLÉTER : prix provisoire » : tant que la mention reste, le passage en mode réel est refusé' }),
     prix_plateforme_verifie: booleen('Prix plateforme vérifié et à jour', false, { aide: 'Nécessaire pour afficher le prix barré' }),
     remise_directe_pct: nombre('Remise directe spécifique (%)', { min: 0, max: 90, aide: 'Vide = réglage général' }),
     frais_menage: nombre('Frais de ménage (par séjour)', { defaut: 0, min: 0 }),
@@ -290,6 +295,7 @@ export const schemaAccueil = objet('Accueil', {
   nombre_vedette: entier('Nombre de logements en vedette', { defaut: 6, min: 1, max: 12 }),
   sections: objet('Sections affichées', {
     destinations: booleen('Destinations', true),
+    etablissements: booleen('Nos adresses (immeubles, villas…)', true),
     vedette: booleen('Logements en vedette', true),
     avantages: booleen('Pourquoi réserver en direct', true),
     avis: booleen('Avis', true),

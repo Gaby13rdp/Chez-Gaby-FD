@@ -73,8 +73,9 @@ export function logementLd(l: any, langue: string, urlPage: string) {
       petsAllowed: l.regles.animaux !== 'non',
       smokingAllowed: l.regles.fumeurs,
     },
+    // Note moyenne seulement si elle est affichée sur le site (réglage avis.afficher_note_moyenne)
+    ...(l.noteMoyenne ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: l.noteMoyenne.valeur, ratingCount: l.noteMoyenne.nombre, bestRating: 5, worstRating: 1 } } : {}),
     ...(avis.length ? {
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: l.noteMoyenne.valeur, ratingCount: l.noteMoyenne.nombre, bestRating: 5, worstRating: 1 },
       review: avis.slice(0, 10).map((a: any) => ({
         '@type': 'Review', author: { '@type': 'Person', name: a.auteur }, datePublished: a.date,
         reviewRating: { '@type': 'Rating', ratingValue: a.note, bestRating: a.note_sur, worstRating: 1 },

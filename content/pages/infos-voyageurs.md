@@ -13,7 +13,7 @@ noindex: true
 
 ## Pendant le séjour
 
-- Tri des déchets : bacs dans la cour (EXEMPLE).
+- Tri des déchets : merci de suivre les consignes affichées dans le logement.
 - En cas d'urgence : 112 (numéro d'urgence européen).
 
 ## Au départ

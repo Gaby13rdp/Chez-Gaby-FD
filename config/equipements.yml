@@ -60,3 +60,14 @@ coffre-fort:       { icone: vault, categorie: securite, fr: "Coffre-fort", en: "
 accessible-pmr:    { icone: accessibility, categorie: essentiels, fr: "Accessible en fauteuil roulant", en: "Wheelchair accessible", id: "Akses kursi roda", filtre: true }
 moustiquaire:      { icone: blinds, categorie: essentiels, fr: "Moustiquaires", en: "Mosquito nets", id: "Kelambu" }
 generateur:        { icone: plug-zap, categorie: essentiels, fr: "Groupe électrogène de secours", en: "Backup generator", id: "Genset cadangan" }
+
+# --- Ajouts pour les logements du Mans et de Balangan -----------------------
+entree-privee:     { icone: door-closed, categorie: essentiels, fr: "Entrée privée", en: "Private entrance", id: "Pintu masuk pribadi" }
+bouilloire:        { icone: coffee, categorie: cuisine, fr: "Bouilloire électrique", en: "Electric kettle", id: "Ketel listrik" }
+grille-pain:       { icone: sandwich, categorie: cuisine, fr: "Grille-pain", en: "Toaster", id: "Pemanggang roti" }
+produits-accueil:  { icone: soap-dispenser-droplet, categorie: salle-de-bain, fr: "Produits d'accueil (savon, papier toilette…)", en: "Toiletries (soap, toilet paper…)", id: "Perlengkapan mandi (sabun, tisu toilet…)" }
+etendoir:          { icone: shirt, categorie: essentiels, fr: "Étendoir à linge", en: "Clothes drying rack", id: "Jemuran pakaian" }
+rideaux-occultants: { icone: blinds, categorie: chambre, fr: "Rideaux ou stores occultants", en: "Blackout curtains or blinds", id: "Tirai blackout" }
+menage-quotidien:  { icone: spray-can, categorie: services, fr: "Ménage quotidien inclus", en: "Daily housekeeping included", id: "Pembersihan harian termasuk" }
+bagagerie:         { icone: luggage, categorie: services, fr: "Dépôt de bagages possible", en: "Luggage drop-off", id: "Penitipan bagasi" }
+transfert-aeroport: { icone: plane-landing, categorie: services, fr: "Transfert aéroport (en supplément)", en: "Airport transfer (extra charge)", id: "Antar-jemput bandara (biaya tambahan)" }

@@ -74,10 +74,12 @@
     "appeler": "Appeler",
     "ecrire": "Écrire un e-mail",
     "itineraire": "Itinéraire",
-    "fermer_fenetre": "Fermer la fenêtre"
+    "fermer_fenetre": "Fermer la fenêtre",
+    "voyageurs_plage": "{min} à {max} voyageurs",
+    "reservation_sur_demande": "Réservation sur demande"
   },
   "demo": {
-    "bandeau": "Site de démonstration : les logements, prix et avis affichés sont des exemples.",
+    "bandeau": "Site en préparation : prix, disponibilités et informations ne sont pas encore définitifs.",
     "maintenance_titre": "Site en maintenance"
   },
   "accueil": {
@@ -90,7 +92,9 @@
     "avis_titre": "Ce que disent nos voyageurs",
     "faq_titre": "Vos questions",
     "contact_titre": "Une question ? Parlons-en",
-    "contact_texte": "Nous répondons personnellement, en français ou en anglais."
+    "contact_texte": "Nous répondons personnellement, en français ou en anglais.",
+    "adresses_titre": "Nos adresses",
+    "adresses_sous_titre": "Où séjourner"
   },
   "liste": {
     "titre": "Nos logements",
@@ -169,8 +173,8 @@
     "avis_moyenne": "Note moyenne {note}/5 sur {n} avis",
     "avis_exemple": "Avis d'exemple (mode démonstration)",
     "voir_sur": "Voir sur {plateforme}",
-    "logements_etablissement": "Les logements de {nom}",
-    "dans_etablissement": "Fait partie de {nom}"
+    "logements_etablissement": "Les logements à cette adresse",
+    "dans_etablissement": "Adresse : {nom}"
   },
   "lits": {
     "double": "Lit double",
@@ -309,7 +313,11 @@
     "reponse": "{delai}",
     "a_partir_de": "à partir de {prix} / nuit",
     "ouvrir_formulaire": "Compléter ma demande",
-    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}"
+    "resume_sejour": "{arrivee} → {depart} · {nuits} · {voyageurs}",
+    "sur_demande_titre": "Réservation sur demande",
+    "sur_demande_texte": "Ce logement n'a pas de calendrier en ligne : indiquez vos dates souhaitées, nous vérifions la disponibilité et vous confirmons le prix par écrit.",
+    "sur_demande_calendrier": "Choisissez vos dates souhaitées : la disponibilité est vérifiée à chaque demande.",
+    "dates_a_preciser": "Dates à préciser dans votre message"
   },
   "formulaire": {
     "titre": "Votre demande",
@@ -341,7 +349,8 @@
     "anti_spam": "Ne pas remplir ce champ",
     "autres_moyens": "Ou contactez-nous directement",
     "recapitulatif": "Récapitulatif",
-    "nouvelle_demande": "Nouvelle demande"
+    "nouvelle_demande": "Nouvelle demande",
+    "objet_sur_demande": "Demande de disponibilité — {logement}"
   },
   "avantages": {
     "titre": "Pourquoi réserver en direct ?"
@@ -393,6 +402,12 @@
   ],
   "destination": {
     "quand_venir": "Quand venir ?",
-    "comment_venir": "Comment venir"
+    "comment_venir": "Comment venir",
+    "adresses_titre": "Nos adresses",
+    "logements_titre": "Tous nos logements"
+  },
+  "etablissement": {
+    "voir": "Voir l'adresse",
+    "voir_logement": "Voir le logement"
   }
 }

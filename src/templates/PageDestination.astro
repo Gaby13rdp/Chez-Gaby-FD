@@ -4,6 +4,7 @@ import Icone from '../components/Icone.astro';
 import Photo from '../components/Photo.astro';
 import FilAriane from '../components/FilAriane.astro';
 import CarteLogement from '../components/CarteLogement.astro';
+import CarteEtablissement from '../components/CarteEtablissement.astro';
 import Carte from '../components/Carte.astro';
 import Faq from '../components/Faq.astro';
 import BlocContact from '../components/BlocContact.astro';
@@ -17,6 +18,8 @@ const d = D.destinations.find((x: any) => x.slug === route.id);
 const txt = loc(d, langue);
 const logements = d.logements.map((s: string) => logement(s));
 const etabs = d.etablissements.map((s: string) => etablissement(s));
+// Plusieurs adresses dans la destination : on les présente avant la liste complète des logements
+const plusieursAdresses = etabs.length >= 2;
 const photo = d.photos[0] || logements[0]?.photos[0];
 const ariane = [
   { nom: t(langue, 'nav.accueil'), chemin: lienRoute('accueil', 'accueil', langue) },
@@ -43,9 +46,18 @@ const lieu = {
     </div>
   </section>
 
-  <section class="section" aria-labelledby="t-logements">
+  {plusieursAdresses && (
+    <section class="section" aria-labelledby="t-adresses">
+      <div class="conteneur">
+        <div class="entete-section"><div><h2 id="t-adresses">{t(langue, 'destination.adresses_titre')}</h2><p class="texte-doux" style="margin:0">{tn(langue, 'commun.logement', logements.length)}</p></div></div>
+        <div class="grille">{etabs.map((e: any) => <CarteEtablissement etablissement={e} langue={langue} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class={plusieursAdresses ? 'section section--compacte' : 'section'} aria-labelledby="t-logements">
     <div class="conteneur">
-      <div class="entete-section"><div><h2 id="t-logements">{t(langue, 'liste.titre')}</h2><p class="texte-doux" style="margin:0">{tn(langue, 'commun.logement', logements.length)}</p></div></div>
+      <div class="entete-section"><div><h2 id="t-logements">{plusieursAdresses ? t(langue, 'destination.logements_titre') : t(langue, 'liste.titre')}</h2>{!plusieursAdresses && <p class="texte-doux" style="margin:0">{tn(langue, 'commun.logement', logements.length)}</p>}</div></div>
       <div class="grille">{logements.map((l: any, i: number) => <CarteLogement logement={l} langue={langue} />)}</div>
     </div>
   </section>

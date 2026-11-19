@@ -90,6 +90,11 @@ jobs:
       - name: Valider le HTML
         run: npx --no-install html-validate "dist/**/*.html"
 
+      - name: Choisir les pages à auditer
+        # D'après les vrais contenus (accueil, destination, adresse, logement…) :
+        # aucun nom de logement n'est écrit en dur dans lighthouserc.json.
+        run: node scripts/outils/urls-lighthouse.mjs
+
       - name: Audit Lighthouse (mobile)
         # Seuils dans lighthouserc.json (objectif : 95 partout ; l'audit
         # échoue sous 85 en performance et sous 95 ailleurs, car les mesures

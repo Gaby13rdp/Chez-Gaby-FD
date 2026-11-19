@@ -6,7 +6,7 @@ date: 2026-08-14
 source: airbnb                        # airbnb | booking | google | direct | autre
 note: 5
 note_sur: 5                           # 10 pour Booking.com
-logement: studio-cathedrale           # dossier du logement (ou « etablissement: … »)
+logement: le-47-studio                # dossier du logement (ou « etablissement: … »)
 langue: fr
 lien: ""                              # lien vers l'avis original (facultatif)
 publie: true

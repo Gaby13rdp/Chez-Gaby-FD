@@ -17,6 +17,8 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'README.md'
+      - 'config/photos-a-importer.yml'   # liste lue par « Importer les photos », qui publie lui-même
+      - 'scripts/windows/**'
       - 'paiement-worker/**'
       - '.github/dependabot.yml'
   workflow_dispatch:

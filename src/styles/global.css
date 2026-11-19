@@ -186,6 +186,12 @@ p, li { text-wrap: pretty; }
 .carte__sejour { font-size: .9rem; font-weight: 600; color: var(--texte); }
 .carte--indispo .carte__visuel { opacity: .55; }
 .carte__comparer { position: relative; z-index: 2; font-size: .85rem; display: inline-flex; align-items: center; gap: .4rem; }
+.carte__resume { margin: .2rem 0 0; font-size: .92rem; color: var(--texte-doux); display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.carte__mention { display: inline-flex; align-items: center; gap: .3rem; font-size: .85rem; font-weight: 600; color: var(--texte); }
+.carte__mention svg { width: 14px; height: 14px; }
+.carte__lien { display: inline-flex; align-items: center; gap: .3rem; margin-top: .35rem; font-size: .92rem; font-weight: 600; color: var(--lien); }
+.carte__lien svg { width: 16px; height: 16px; transition: transform 200ms ease; }
+.carte:hover .carte__lien svg { transform: translateX(3px); }
 
 /* ---------- Destinations ---------- */
 .destinations { display: grid; gap: var(--e-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }

@@ -76,6 +76,13 @@ Voir [04-calendriers-ical.md](04-calendriers-ical.md). C'est l'étape la plus im
 
 ## Étape 8 — Remplacer les exemples par vos vrais contenus
 
+> **Fait pour Chez Gaby (novembre 2026)** : Le 84, Le 47 et la Villa Sagara ont été créés, avec leurs photos à importer. Ordre à suivre pour ne jamais casser la publication :
+> 1. envoyer les nouveaux fichiers **sans rien supprimer** (les exemples restent en ligne en attendant) ;
+> 2. **Actions › Importer les photos › Run workflow** : les photos arrivent, vos logements apparaissent ;
+> 3. **ensuite seulement**, supprimer les dossiers et fichiers d'exemple (liste fournie avec la livraison).
+>
+> Pour la suite : [10 — ajouter un logement](10-ajouter-un-logement.md), [11 — ajouter une adresse](11-ajouter-une-adresse.md).
+
 - Textes, prix, équipements : [02-utilisation-quotidienne.md](02-utilisation-quotidienne.md) et [05-reglages-et-tarifs.md](05-reglages-et-tarifs.md).
 - Photos : [03-photos.md](03-photos.md).
 - Pages légales : [08-obligations-legales.md](08-obligations-legales.md).

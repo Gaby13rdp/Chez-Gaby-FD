@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       logement:
-        description: "Nom du dossier du logement (ex. studio-tesse)"
+        description: "Nom du dossier du logement (ex. le-84-studio)"
         type: string
         required: true
       action:

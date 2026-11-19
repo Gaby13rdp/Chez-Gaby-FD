@@ -1,10 +1,10 @@
 # Site de réservation directe — locations de vacances
 
-Site professionnel pour louer en direct, sans commission, des logements présents par ailleurs sur Airbnb et Booking.com : quatre studios et un appartement au Mans, une villa près d'Ubud (Bali), et autant de logements que nécessaire ensuite.
+Site « Chez Gaby » pour louer en direct, sans commission, des logements présents par ailleurs sur Airbnb et Booking.com : six studios et appartements au Mans (Le 84, Le 47), la Villa Sagara à Balangan (Bali), et autant d'adresses et de logements que nécessaire ensuite.
 
 - **Gratuit à héberger** (GitHub Pages ou Cloudflare), rapide, sans serveur à entretenir.
 - **Calendriers synchronisés** avec Airbnb, Booking.com et Google Agenda toutes les 30 minutes : les dates prises sont grisées sur le site.
-- **Devis automatique** : prix direct (−15 % par rapport à Booking, réglable), saisons, week-ends, périodes spéciales, remises, ménage, taxe de séjour, acompte.
+- **Devis automatique** : prix direct (−15 % par rapport à Booking ou Airbnb, réglable), saisons, week-ends, périodes spéciales, remises, ménage, taxe de séjour, acompte.
 - **Demande de réservation** par formulaire, téléphone ou WhatsApp (message prérempli) ; paiement en ligne de l'acompte en option.
 - **Français, anglais, indonésien** ; euros et roupies.
 - **Référencement soigné** (plan du site, données structurées, aperçus de partage), **accessible** (WCAG 2.2 AA visé) et **respectueux de la vie privée** (aucun cookie par défaut).
@@ -20,13 +20,15 @@ Suivez **[docs/01-mise-en-ligne.md](docs/01-mise-en-ligne.md)** : 30 à 45 minut
 |---|---|
 | [01 — Mise en ligne](docs/01-mise-en-ligne.md) | compte GitHub, publication, nom de domaine, Cloudflare |
 | [02 — Utilisation quotidienne](docs/02-utilisation-quotidienne.md) | Pages CMS, prix, logements, avis, traductions, formulaire, aide-mémoire Markdown |
-| [03 — Photos](docs/03-photos.md) | prise de vue, noms, envoi, légendes, iPhone |
+| [03 — Photos](docs/03-photos.md) | prise de vue, noms, envoi, légendes, import depuis Booking et Airbnb, iPhone |
 | [04 — Calendriers](docs/04-calendriers-ical.md) | Airbnb, Booking, Google Agenda « maître », secrets, délais |
 | [05 — Réglages et tarifs](docs/05-reglages-et-tarifs.md) | apparence, prix, taxe de séjour, règles de séjour, carte, statistiques |
 | [06 — Référencement](docs/06-referencement-visibilite.md) | Google Search Console, fiches locales, conseils |
 | [07 — Paiement (option)](docs/07-paiement-option.md) | niveaux 0/1/2, Stripe, Bali |
 | [08 — Obligations légales](docs/08-obligations-legales.md) | France (Le Mans) et Bali : repères vérifiés au 31/10/2026 |
 | [09 — Dépannage](docs/09-depannage.md) | messages d'erreur, calendriers, retour en arrière |
+| [10 — Ajouter un logement](docs/10-ajouter-un-logement.md) | mémo pas à pas : un logement de plus à une adresse existante |
+| [11 — Ajouter une adresse](docs/11-ajouter-une-adresse.md) | mémo pas à pas : nouvelle adresse et ses logements (ex. le 37, le 13 Rue de la Paille) |
 
 ## Au quotidien : où faire quoi
 
@@ -34,7 +36,8 @@ Suivez **[docs/01-mise-en-ligne.md](docs/01-mise-en-ligne.md)** : 30 à 45 minut
 |---|---|
 | changer un prix, un texte, un équipement | Pages CMS › Logements |
 | ajouter des photos | Pages CMS › Photos des logements, ou github.com (Add file › Upload files) |
-| créer un logement | Actions › **Créer un logement** |
+| créer un logement ou une adresse | Actions › **Créer un logement**, ou copier un modèle ([docs/10](docs/10-ajouter-un-logement.md), [docs/11](docs/11-ajouter-une-adresse.md)) |
+| récupérer les photos des annonces | lignes dans `config/photos-a-importer.yml`, puis Actions › **Importer les photos** |
 | masquer / supprimer un logement | décocher « Publié », ou Actions › **Archiver ou supprimer un logement** |
 | noter une réservation directe | agenda Google « direct » du logement |
 | mettre à jour les disponibilités tout de suite | Actions › **Synchroniser les calendriers** › Run workflow |
@@ -82,10 +85,10 @@ Tant que `production: false`, ces éléments s'affichent comme avertissements da
 
 ### Réglages (`config/site.yml`)
 
-- [ ] `marque` : nom (« Séjours en Direct (EXEMPLE) »), slogan, logo éventuel
-- [ ] `contact` : votre nom, e-mail, téléphone, WhatsApp, ville
+- [x] `marque` : « Chez Gaby », slogan (logo éventuel)
+- [ ] `contact` : votre nom, e-mail, téléphone, WhatsApp (encore ceux d'exemple)
 - [ ] `formulaire: web3forms_cle` (clé gratuite, [docs/02](docs/02-utilisation-quotidienne.md#recevoir-les-demandes-par-e-mail))
-- [ ] `seo: description` et `mots_cles`
+- [x] `seo: description` et `mots_cles`
 - [ ] `legal` : nom de l'éditeur, statut, adresse, directeur de la publication, SIRET éventuel, médiateur (ou `"aucun"`)
 - [ ] `reseaux_sociaux`, `liens_externes` (facultatif)
 - [ ] `url` si nom de domaine personnalisé ou hébergement Cloudflare
@@ -94,14 +97,14 @@ Tant que `production: false`, ces éléments s'affichent comme avertissements da
 
 ### Contenus
 
-- [ ] **Logements** (`content/logements/*`) : description, résumé, capacité, lits, surface, équipements, **prix réels** (prix Booking), saisons, périodes spéciales (les dates des 24 Heures du Mans sont des exemples), ménage, caution, règles, annulation, FAQ, numéro d'enregistrement (vide tant qu'aucun numéro n'est attribué)
-- [ ] **Photos** de chaque logement, établissement et destination ([docs/03](docs/03-photos.md)) + légendes `photos.yml` ; supprimer les images d'exemple
-- [ ] **Établissements** (`content/etablissements/*`) : adresse exacte, coordonnées GPS, heures d'arrivée et de départ, accès, parking, transports, « à proximité », **taxe de séjour** (tarif à vérifier)
-- [ ] **Destinations** (`content/destinations/*`) : textes de présentation
-- [ ] **Avis** : supprimer les trois avis d'exemple (`content/avis/exemple-*.md`) et ajouter de vrais avis
+- [ ] **Logements** (`content/logements/*`) : créés ; restent les **prix réels** (prix provisoires marqués « À COMPLÉTER » dans `tarifs > remarque`), les prix des dates d'événements du circuit, et le numéro d'enregistrement (vide tant qu'aucun numéro n'est attribué)
+- [ ] **Photos** : lancer **Importer les photos** (liste prête dans `config/photos-a-importer.yml`, légendes prêtes), puis supprimer les images d'exemple
+- [x] **Établissements** (`content/etablissements/*`) : Le 84, Le 47, Villa Sagara (coordonnées de la villa approximatives)
+- [x] **Destinations** : Le Mans et Balangan
+- [x] **Avis** : 10 vrais avis Booking du 84 ajoutés (note moyenne désactivée)
 - [ ] **Pages** : accueil (titre, image), à propos (votre histoire, photo), FAQ, et pages légales à relire ([docs/08](docs/08-obligations-legales.md)) : délai de restitution de la caution, assurance, acompte ou arrhes, droit applicable pour Bali
-- [ ] `content/medias/` : remplacer `accueil.jpg` et `a-propos.jpg`
-- [ ] Guide local d'exemple (`content/guides-locaux/`) si vous activez les guides
+- [ ] `content/medias/` : facultatif, une grande photo d'accueil (sinon : couverture du premier logement)
+- [ ] Guides locaux (`content/guides-locaux/`) : à écrire si vous activez la rubrique
 
 ### Calendriers et services
 

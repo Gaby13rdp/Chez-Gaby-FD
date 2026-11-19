@@ -1,8 +1,9 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # CRÉER UN LOGEMENT (formulaire)
 # Actions > « Créer un logement » > Run workflow > remplir > Run workflow.
-# Crée le dossier du logement depuis le modèle (content/_modeles/logement),
-# avec une photo provisoire, puis met le site à jour. Voir docs/02.
+# Copie le modèle prêt à l'emploi (content/_modeles/logement, et l'adresse si
+# elle est nouvelle) puis met le site à jour. Sans photo, le logement reste
+# masqué jusqu'à l'arrivée de sa photo 01. Voir docs/10 et docs/11.
 # ─────────────────────────────────────────────────────────────────────────────
 name: Créer un logement
 
@@ -10,11 +11,11 @@ on:
   workflow_dispatch:
     inputs:
       nom:
-        description: "Nom du logement (ex. Studio Cathédrale)"
+        description: "Nom affiché (ex. « Le 37 » ou « 13 Rue de la Paille – Studio 1 »)"
         type: string
         required: true
       etablissement:
-        description: "Établissement : dossier existant (ex. residence-cathedrale) ou nom d'un NOUVEL établissement"
+        description: "Adresse : dossier existant (ex. le-84, le-47) ou nom d'une NOUVELLE adresse (ex. Le 37)"
         type: string
         required: true
       type:
@@ -31,35 +32,40 @@ on:
         type: number
         default: 1
       prix_nuit:
-        description: "Prix Booking par nuit (la remise directe est automatique)"
+        description: "Prix plateforme par nuit, Booking ou Airbnb (la remise directe est automatique)"
         type: number
-        default: 100
+        default: 50
+      reservation:
+        description: "Réservation : directe (calendriers synchronisés) ou sur-demande (sans calendrier)"
+        type: choice
+        options: [directe, sur-demande]
+        default: directe
       publier:
-        description: "Publier tout de suite (sinon : masqué jusqu'à « publie: true »)"
+        description: "Publier dès l'arrivée des photos (décoché : masqué jusqu'à « publie: true »)"
         type: boolean
-        default: false
+        default: true
       destination:
-        description: "Nouvel établissement seulement : destination existante (ex. le-mans) ou nouvelle (ex. Annecy)"
+        description: "Nouvelle adresse seulement : destination existante (le-mans, balangan) ou nouvelle (ex. Annecy)"
         type: string
         required: false
       ville:
-        description: "Nouvel établissement seulement : ville"
+        description: "Nouvelle adresse seulement : ville"
         type: string
         required: false
       pays:
-        description: "Nouvel établissement seulement : pays (France, Indonésie…)"
+        description: "Nouvelle adresse seulement : pays (France, Indonésie…)"
         type: string
         default: France
       latitude:
-        description: "Nouvel établissement : latitude (ex. 48.0072)"
+        description: "Nouvelle adresse : latitude (ex. 48.0072)"
         type: string
         required: false
       longitude:
-        description: "Nouvel établissement : longitude (ex. 0.1975)"
+        description: "Nouvelle adresse : longitude (ex. 0.1975)"
         type: string
         required: false
       confirmer_nouvel_etablissement:
-        description: "Nouvel établissement : je confirme qu'il n'existe pas déjà"
+        description: "Nouvelle adresse : je confirme qu'elle n'existe pas déjà"
         type: boolean
         default: false
 
@@ -108,6 +114,7 @@ jobs:
           CHAMBRES: ${{ inputs.chambres }}
           PRIX_NUIT: ${{ inputs.prix_nuit }}
           PUBLIER: ${{ inputs.publier }}
+          RESERVATION: ${{ inputs.reservation }}
           DESTINATION: ${{ inputs.destination }}
           VILLE: ${{ inputs.ville }}
           PAYS: ${{ inputs.pays }}

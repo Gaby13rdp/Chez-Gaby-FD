@@ -18,7 +18,10 @@ GitHub vous envoie aussi un e-mail lorsqu'une exécution échoue.
 
 | Message (extrait) | Cause | Solution |
 |---|---|---|
-| « n'a pas de photo de couverture » | dossier `photos/` vide ou absent | ajoutez au moins une photo (`01-….jpg`) ou masquez le logement (`publie: false`) |
+| « n'a pas encore de photo : il reste masqué » (avertissement) | dossier `photos/` du logement encore vide | normal en attendant les photos : lancez **Importer les photos** ou déposez-les ; le logement apparaît tout seul |
+| « Aucun logement visible : … attendent encore leurs photos » | aucun logement n'a de photo (par ex. exemples supprimés avant l'import) | lancez **Actions › Importer les photos** (ou déposez les photos), le site se republie ; en attendant, le site en ligne reste inchangé |
+| « fait référence à « dossier-de-l-adresse », qui n'existe pas » | fiche copiée du modèle sans remplir `etablissement` | indiquez le dossier de l'adresse (ex. `le-47`) |
+| « Comments must be separated from other tokens » | un `#` collé à une valeur | ajoutez un espace avant le `#`, ou placez l'explication sur sa propre ligne |
 | « le champ … est obligatoire » | champ requis vide | complétez le champ indiqué |
 | « Vouliez-vous dire … ? » | faute de frappe dans un nom de réglage ou de dossier | corrigez selon la suggestion |
 | Erreur de lecture YAML, « ligne N » | indentation ou guillemet manquant dans la partie réglages | vérifiez les espaces en début de ligne et fermez les guillemets ; comparez avec le modèle `content/_modeles/` |
@@ -77,6 +80,15 @@ Ouvrez **Actions › Synchroniser les calendriers** › dernière exécution ›
 **Une photo n'apparaît pas** — vérifiez son emplacement (`content/logements/NOM/photos/`), son extension (`.jpg`, `.jpeg`, `.png`, `.webp`), et qu'elle fait moins de 25 Mo (limite de l'envoi par navigateur).
 
 **L'ordre n'est pas le bon** — l'ordre suit les numéros des noms de fichiers (`01-`, `02-`…), sauf si vous l'avez défini dans Pages CMS (« Photos : légendes et ordre »).
+
+**« Importer les photos » : des photos en échec ❌** — lisez la raison dans le résumé de l'exécution :
+- « HTTP 403 », « HTTP 429 » ou « connexion impossible » : le site (Booking, Airbnb) refuse temporairement les serveurs de GitHub. Relancez plus tard ; si cela persiste, utilisez le script Windows ([03-photos.md](03-photos.md#si-booking-ou-airbnb-refusent-les-serveurs-de-github--le-script-windows)).
+- « photo introuvable (HTTP 404) » : la photo a été retirée ou remplacée sur l'annonce. Copiez la nouvelle adresse de la photo dans `config/photos-a-importer.yml`.
+- « la réponse n'est pas une image » : adresse incorrecte (page de l'annonce au lieu de la photo). Sur l'annonce : clic droit sur la photo › **Copier l'adresse de l'image**.
+- « Dossier introuvable » : créez d'abord la fiche du logement ou de l'adresse (mémos [10](10-ajouter-un-logement.md) et [11](11-ajouter-une-adresse.md)), ou corrigez le nom du dossier dans la liste.
+- « La liste … est mal écrite » : décalage d'espaces dans `config/photos-a-importer.yml` ; comparez avec les blocs existants (2 espaces par niveau).
+
+**Le script Windows ne se lance pas** — clic droit sur `importer-photos.bat` › **Exécuter en tant qu'administrateur** n'est pas nécessaire ; vérifiez plutôt que vous l'ouvrez bien depuis votre copie du dépôt (GitHub Desktop › **Repository › Show in Explorer**), dans `scripts\windows`.
 
 ## Pages CMS
 

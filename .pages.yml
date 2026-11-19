@@ -111,6 +111,15 @@ content:
         label: Résumé (1 à 2 phrases)
         required: true
         type: text
+      - name: reservation
+        label: Mode de réservation
+        description: "directe = calendrier des disponibilités synchronisé ; sur-demande = pas de calendrier en ligne : le voyageur choisit ses dates et envoie une demande, vous vérifiez puis confirmez"
+        default: directe
+        type: select
+        options:
+          values:
+            - directe
+            - sur-demande
       - name: capacite
         label: Voyageurs maximum
         required: true
@@ -278,6 +287,24 @@ content:
               label: Moustiquaires
             - value: generateur
               label: Groupe électrogène de secours
+            - value: entree-privee
+              label: Entrée privée
+            - value: bouilloire
+              label: Bouilloire électrique
+            - value: grille-pain
+              label: Grille-pain
+            - value: produits-accueil
+              label: Produits d'accueil (savon, papier toilette…)
+            - value: etendoir
+              label: Étendoir à linge
+            - value: rideaux-occultants
+              label: Rideaux ou stores occultants
+            - value: menage-quotidien
+              label: Ménage quotidien inclus
+            - value: bagagerie
+              label: Dépôt de bagages possible
+            - value: transfert-aeroport
+              label: Transfert aéroport (en supplément)
           multiple: true
       - name: equipements_libres
         label: Autres équipements (texte libre)
@@ -339,12 +366,16 @@ content:
         type: object
         fields:
           - name: prix_nuit
-            label: Prix plateforme par nuit (Booking)
-            description: Le site applique la remise directe
+            label: Prix plateforme par nuit (Booking ou Airbnb)
+            description: Le site applique la remise directe (réglage remise_directe_pct)
             required: true
             type: number
             options:
               min: 0
+          - name: remarque
+            label: Remarque interne (jamais affichée)
+            description: "ex. « À COMPLÉTER : prix provisoire » : tant que la mention reste, le passage en mode réel est refusé"
+            type: string
           - name: prix_plateforme_verifie
             label: Prix plateforme vérifié et à jour
             description: Nécessaire pour afficher le prix barré
@@ -1326,6 +1357,10 @@ content:
         fields:
           - name: destinations
             label: Destinations
+            default: true
+            type: boolean
+          - name: etablissements
+            label: Nos adresses (immeubles, villas…)
             default: true
             type: boolean
           - name: vedette

@@ -64,12 +64,20 @@ Voir ci-dessus : **Adresse secrète au format iCal**.
 1. Dans le dépôt GitHub : **Settings › Secrets and variables › Actions › New repository secret**.
 2. **Name** : le nom du secret, sur le modèle `ICAL_<LOGEMENT>_<SOURCE>` :
 
+   Les secrets attendus par vos logements actuels :
+
    | Logement (dossier) | Source | Nom du secret |
    |---|---|---|
-   | studio-cathedrale | Airbnb | `ICAL_STUDIO_CATHEDRALE_AIRBNB` |
-   | studio-cathedrale | Booking | `ICAL_STUDIO_CATHEDRALE_BOOKING` |
-   | studio-cathedrale | Google « direct » | `ICAL_STUDIO_CATHEDRALE_DIRECT` |
-   | villa-kayu-manis | Airbnb | `ICAL_VILLA_KAYU_MANIS_AIRBNB` |
+   | le-84-studio-standard | Booking | `ICAL_LE_84_STUDIO_STANDARD_BOOKING` |
+   | le-84-appartement-1-chambre | Booking | `ICAL_LE_84_APPARTEMENT_1_CHAMBRE_BOOKING` |
+   | le-84-studio | Booking | `ICAL_LE_84_STUDIO_BOOKING` |
+   | le-84-grand-appartement | Booking | `ICAL_LE_84_GRAND_APPARTEMENT_BOOKING` |
+   | le-84-studio-canape-lit | Booking | `ICAL_LE_84_STUDIO_CANAPE_LIT_BOOKING` |
+   | le-47-studio | Airbnb | `ICAL_LE_47_STUDIO_AIRBNB` |
+   | le-47-studio | Booking | `ICAL_LE_47_STUDIO_BOOKING` |
+   | villa-sagara-2-chambres | — | aucun (réservation sur demande) |
+
+   Pour un calendrier Google « direct », ajoutez la ligne `- nom: Réservations directes` / `type: direct` dans la fiche et le secret `…_DIRECT` (ex. `ICAL_LE_47_STUDIO_DIRECT`).
 
    Majuscules, chiffres et `_` uniquement ; les tirets du nom du dossier deviennent des `_`.
 3. **Secret** : collez le lien iCal. **Add secret**.
@@ -84,16 +92,18 @@ Dans Pages CMS (**Logements** › le logement › **Calendriers**) ou dans `inde
 calendriers:
   - nom: Airbnb
     type: airbnb
-    secret: ICAL_STUDIO_CATHEDRALE_AIRBNB
+    secret: ICAL_LE_47_STUDIO_AIRBNB
   - nom: Booking.com
     type: booking
-    secret: ICAL_STUDIO_CATHEDRALE_BOOKING
+    secret: ICAL_LE_47_STUDIO_BOOKING
   - nom: Réservations directes
     type: direct
-    secret: ICAL_STUDIO_CATHEDRALE_DIRECT
+    secret: ICAL_LE_47_STUDIO_DIRECT
 ```
 
 Types possibles : `airbnb`, `booking`, `google-agenda`, `direct`, `channel-manager`, `autre`. Seul le **nom** du secret apparaît ici, jamais le lien. Si vous laissez `secret` vide, le nom est calculé automatiquement selon le modèle ci-dessus (`ICAL_` + dossier + type).
+
+Vos fiches actuelles n'indiquent pas la ligne `secret` : le nom est calculé automatiquement (tableau de l'étape 2). Un logement en `reservation: sur-demande` (Villa Sagara) n'a pas de calendrier : ses éventuelles lignes de calendrier sont ignorées.
 
 ## Étape 4 — Lancer et vérifier la synchronisation
 

@@ -4,6 +4,19 @@
 
 ---
 
+## 0. Mise à jour du 20 novembre 2026 — les vrais logements « Chez Gaby »
+
+- **Site** : https://gaby13rdp.github.io/Chez-Gaby-FD/ (dépôt `Gaby13rdp/Chez-Gaby-FD`), marque « Chez Gaby », toujours en `production: false`.
+- **Contenus réels** (exemples supprimés) : 3 adresses, 7 logements, 2 destinations.
+  - `le-84` (84 rue Gambetta, Le Mans) : `le-84-studio-standard`, `le-84-appartement-1-chambre`, `le-84-studio`, `le-84-grand-appartement`, `le-84-studio-canape-lit` (Booking seul).
+  - `le-47` (47 rue Sagebien, Le Mans) : `le-47-studio` (Booking + Airbnb).
+  - `villa-sagara` (Balangan, Bali) : `villa-sagara-2-chambres`, **réservation sur demande** (gestion déléguée, pas d'iCal), prix Airbnb −15 % en IDR, NIB 2104260244305.
+  - Destinations `le-mans` et `balangan` ; 10 vrais avis Booking du 84 (note moyenne désactivée : sélection plus flatteuse que la note Booking 7,9/10).
+- **Convention de nommage** : dossier du logement = dossier de l'adresse + précision (`le-47-studio`, plus tard `le-37-studio`, `13-rue-de-la-paille-studio-1…4`) ; nom affiché = nom de l'adresse s'il est seul.
+- **Évolutions du modèle** : rubrique « Nos adresses » (accueil, destinations) ; réglage `reservation: sur-demande` ; logement sans photo simplement masqué (plus d'échec de publication) ; modèles `content/_modeles/` prêts à copier ; workflow **Importer les photos** (`config/photos-a-importer.yml`, `scripts/importer-photos.mjs`) + secours Windows (`scripts/windows/`) ; tests indépendants des contenus (`tests/fixtures/contenu`) ; pages Lighthouse choisies d'après les contenus ; correction d'une écriture concurrente quand une même photo est dans deux dossiers.
+- **Reste À COMPLÉTER** : prix réels (remarque « À COMPLÉTER » dans chaque logement) et prix des événements du circuit 2027, coordonnées de contact, clé Web3Forms, secrets iCal, rubrique `legal`, numéros d'enregistrement du Mans (téléservice national), vérifications listées dans la livraison.
+- Mémos : `docs/10-ajouter-un-logement.md`, `docs/11-ajouter-une-adresse.md`.
+
 ## 1. En bref
 
 - **Objet** : site professionnel de réservation directe (sans commission) pour les locations de vacances de votre père : 4 studios et 1 appartement au Mans (immeuble « Résidence Cathédrale » + « Appartement des Halles »), 1 villa près d'Ubud (Bali), extensible à volonté.
@@ -84,6 +97,10 @@ Workflows : `deploy.yml` (Publier le site ; aussi appelé par les autres), `sync
 8. **Paiement** : niveau 0 par défaut ; au niveau 2, montant toujours recalculé côté serveur, disponibilités revérifiées avant et après paiement (y compris l'agenda Google « direct »), site démo = clés de test uniquement / site réel = clés réelles uniquement, paiements de test isolés (agenda `GCAL_TEST`, pas de coordonnées bancaires).
 9. **Titres Markdown normalisés** automatiquement (peu importe `##` ou `###`) et **encadrés « Modèle à faire valider »** des pages légales masqués automatiquement en production.
 10. **Données d'exemple bloquantes en production** : impossible de publier en `production: true` avec une photo, un texte « EXEMPLE » ou une mention « À COMPLÉTER ».
+11. **Logement sans photo masqué** (avertissement) au lieu de bloquer la publication : on peut créer une fiche avant ses photos ; seul « aucun logement visible » reste bloquant (novembre 2026).
+12. **Réservation sur demande** par simple réglage `reservation: sur-demande` (calendrier = choix de dates souhaitées, demande possible sans dates, pas de paiement en ligne) plutôt qu'un calendrier vide trompeur (novembre 2026).
+13. **« Importer les photos » publie lui-même** le site via le workflow réutilisable `deploy.yml` (comme « Créer un logement ») : un seul compte rendu, pas de permission `actions: write` (novembre 2026).
+14. **Page d'adresse automatique dès 2 logements** ; une adresse à 1 logement mène directement à son logement (novembre 2026).
 
 ## 6. Sécurité (règles et contrôles automatiques)
 

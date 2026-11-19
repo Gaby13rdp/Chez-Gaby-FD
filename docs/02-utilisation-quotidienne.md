@@ -43,7 +43,8 @@ Chaque champ est accompagné d'une aide. Enregistrez avec **Save** : Pages CMS c
 
 Dans **Logements** › le logement › rubrique **Tarifs** :
 
-- **Prix par nuit** : saisissez le **prix affiché sur Booking** (prix plateforme). Le site calcule le prix direct en appliquant la remise directe (15 % par défaut, réglable dans `config/site.yml`).
+- **Prix par nuit** : saisissez le **prix affiché sur la plateforme** (Booking au Mans, Airbnb pour la villa, en roupies). Le site calcule le prix direct en appliquant la remise directe (15 % par défaut, un seul réglage : `remise_directe_pct` dans `config/site.yml`).
+- **Remarque interne** : effacez la mention « À COMPLÉTER : prix provisoire » dès que le prix est le bon (tant qu'elle reste, le passage en mode réel est refusé).
 - **Saisons** (ex. Été du `07-01` au `08-31`) : prix par nuit différent sur une période qui revient chaque année. Format des dates : `MM-JJ`.
 - **Périodes spéciales** (ex. 24 Heures du Mans) : dates précises `AAAA-MM-JJ`, prix et durée minimale propres, ou logement fermé.
 - **Ménage, voyageur supplémentaire, animaux, caution, remises** (semaine, mois, réservation anticipée, dernière minute).
@@ -54,26 +55,29 @@ Détail de tous les réglages de prix : [05-reglages-et-tarifs.md](05-reglages-e
 
 **Logements** › le logement › **Description** (zone de texte). Mise en forme : voir l'aide-mémoire Markdown en bas de page.
 
-## Ajouter un logement
+## Ajouter un logement ou une adresse
 
-### Par le formulaire (conseillé)
+Deux mémos pas à pas :
 
-1. Onglet **Actions** › **Créer un logement** › **Run workflow**.
-2. Remplissez : nom, établissement (ex. `residence-cathedrale` pour un nouveau studio de l'immeuble ; ou le nom d'un nouvel établissement), type, capacité, chambres, prix Booking par nuit.
-   Pour un **nouvel** établissement, complétez aussi destination, ville, pays, latitude/longitude (clic droit sur Google Maps › copier les coordonnées) et cochez la confirmation.
-3. **Run workflow**. En 1 à 2 minutes, le logement est créé (masqué par défaut, sauf si vous avez coché « Publier tout de suite »), avec une photo provisoire.
-4. Ouvrez l'exécution terminée : le résumé indique les étapes suivantes (photos, textes, secrets de calendriers).
-5. Complétez la fiche dans Pages CMS, ajoutez les photos ([03-photos.md](03-photos.md)), reliez les calendriers ([04-calendriers-ical.md](04-calendriers-ical.md)), puis cochez **Publié**.
+- **[10 — Ajouter un logement à une adresse existante](10-ajouter-un-logement.md)** (ex. un 2e studio au 47) ;
+- **[11 — Ajouter une nouvelle adresse et ses logements](11-ajouter-une-adresse.md)** (ex. le 37, le 13 Rue de la Paille).
 
-### À la main
+En résumé : copier un dossier modèle (ou utiliser le formulaire **Actions › Créer un logement**), remplir les champs, ajouter les photos (ou leurs lignes dans `config/photos-a-importer.yml` puis **Actions › Importer les photos**). Rien d'autre à modifier : menus, accueil, destinations et listes se mettent à jour tout seuls. Un logement sans photo reste masqué jusqu'à l'arrivée de sa photo `01`.
 
-Copiez le dossier `content/_modeles/logement/` vers `content/logements/nom-du-logement/` (minuscules, tirets, sans accents) et suivez les commentaires du fichier `index.md`.
+Règle de nommage : dossier du logement = dossier de l'adresse + précision (`le-47-studio`, `13-rue-de-la-paille-studio-1`).
+
+### Réservation directe ou « sur demande »
+
+Chaque logement a un réglage `reservation` :
+
+- `directe` (par défaut) : calendrier des disponibilités synchronisé avec Booking et Airbnb ;
+- `sur-demande` : pas de calendrier en ligne. Le bouton **« Demander les disponibilités »** permet d'écrire avec ou sans dates ; vous vérifiez puis confirmez. C'est le cas de la Villa Sagara (gestion déléguée). Mettez aussi `calendriers: []`.
 
 ## Masquer ou supprimer un logement
 
 - **Masquer** (réversible) : décochez **Publié** dans Pages CMS. Le logement disparaît du site mais toutes ses données sont conservées.
 - **Par le formulaire** : **Actions › Archiver ou supprimer un logement › Run workflow** :
-  - dossier du logement (ex. `studio-tesse`) ;
+  - dossier du logement (ex. `le-84-studio`) ;
   - action **masquer** (réversible) ou **supprimer** (définitif : fiche, photos et avis associés retirés du site) ;
   - pour supprimer, tapez **SUPPRIMER** en majuscules dans la case de confirmation (sécurité contre les erreurs) ;
   - option **rediriger** : l'ancienne adresse renvoie vers l'établissement ou la destination, pour ne pas perdre les visiteurs venant de Google.
@@ -92,7 +96,7 @@ La synchronisation est automatique toutes les 30 minutes. Pour la forcer (par ex
 - indiquez la source et la date ;
 - **n'inventez jamais d'avis** et ne modifiez pas leur sens : c'est une pratique commerciale trompeuse, sanctionnée.
 
-La note moyenne et les données structurées pour Google sont calculées uniquement à partir des avis réels (les avis marqués « exemple » sont ignorés).
+La note moyenne est **désactivée** (`avis: afficher_note_moyenne: false` dans `config/site.yml`) : les avis publiés ne sont qu'une sélection, et leur moyenne serait plus flatteuse que la note réelle sur Booking. Les avis eux-mêmes restent affichés, points positifs et négatifs compris.
 
 ## Traduire le site (anglais, indonésien)
 
@@ -151,7 +155,7 @@ Règles utiles :
 
 ## Le fichier d'un logement, en bref
 
-Dans `content/logements/studio-cathedrale/` :
+Dans `content/logements/le-84-studio/` :
 
 ```
 index.md              la fiche (en haut, entre les lignes ---, les réglages ; en dessous, la description)

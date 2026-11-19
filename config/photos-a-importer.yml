@@ -1,0 +1,349 @@
+# ════════════════════════════════════════════════════════════════════════════
+#  PHOTOS À IMPORTER — lu par le workflow « Importer les photos » (docs/03)
+#
+#  Organisation : une adresse (dossier de content/etablissements), puis :
+#    photos:     photos de l'adresse (façade, parties communes)
+#    logements:  pour chaque logement (dossier de content/logements), ses photos
+#  Pour chaque photo, 3 lignes :
+#    - url:      adresse de la photo sur Booking ou Airbnb
+#      fichier:  nom du fichier à créer (01 = photo de couverture)
+#      legende:  légende en français (ajoutée à photos.yml si elle n'y est pas)
+#
+#  • Relancer le workflow est sans risque : une photo déjà présente n'est
+#    jamais re-téléchargée. Ajoutez simplement les lignes d'un nouveau
+#    logement ou d'une nouvelle adresse, puis relancez.
+#  • Ligne désactivée = « # » en début de ligne (sur ses 3 lignes).
+#  • Pour retirer une photo importée : supprimez le fichier ET ses 3 lignes.
+#  • La taille maximale est prise automatiquement (Airbnb : originale ;
+#    Booking : la plus grande proposée).
+# ════════════════════════════════════════════════════════════════════════════
+le-84:
+  photos:
+    - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781353329.jpg?k=e6ada163ce1ab95bd3ab297d4de6976f75155053b3bc500c144fea7710382c83&o=
+      fichier: 01-facade.jpg
+      legende: "Façade de l'immeuble du 84 rue Gambetta"
+  logements:
+    le-84-studio-standard:
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781351450.jpg?k=5e2decc50143bbb2e931a4af15e56796dcbe498ea3b4101cbc5e7c0976053113&o=
+        fichier: 01-piece-de-vie.jpg
+        legende: "Pièce de vie avec lit double et vue sur la ville"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781351443.jpg?k=a979637063fde2ed20ef52a9607a5dd3a673debc53c4769624a48dcfc7d34e13&o=
+        fichier: 02-coin-nuit.jpg
+        legende: "Coin nuit avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781351446.jpg?k=c5669ecf3b658b4693bd4c3dadb252b9548fa5496756ac032055fe44bb4d28e8&o=
+        fichier: 03-coin-cuisine.jpg
+        legende: "Coin cuisine équipé"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781351444.jpg?k=894aea7a8cdf376e4fbbcbbe65c3ce471fd536ac8a0528d8ecc745e42037c516&o=
+        fichier: 04-salle-d-eau.jpg
+        legende: "Salle d'eau avec douche"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781351442.jpg?k=db4230f85f475850648fae65f90e0e9c65e92d1bdbc0b5c3edbf711016c17109&o=
+        fichier: 05-studio.jpg
+        legende: "Autre vue du studio"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/843484108.jpg?k=666be72d5d670bbd2df7ecdbe07dacf4e93f6b98b7230def3e919c7cc3d4e2bf&o=
+        fichier: 06-studio.jpg
+        legende: "Autre vue du studio"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/843484060.jpg?k=118e09268ebfb6c398289372c7a898f0e07b6c1f9be7a089a5af892258c6f50c&o=
+        fichier: 07-studio.jpg
+        legende: "Autre vue du studio"
+    le-84-appartement-1-chambre:
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/843484278.jpg?k=5f6d213c2395702fdf8f2ad8629a41a029c0dbb1634105d2b55532193cb0bfb8&o=
+        fichier: 01-coin-salon.jpg
+        legende: "Coin salon avec canapé"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352098.jpg?k=6d86cbe17d70af910fa4ea51f42bca066fbee982822eced4b435e1bc2758d475&o=
+        fichier: 02-chambre.jpg
+        legende: "Chambre avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352097.jpg?k=6a9ca63a47ea3c89c04920c750dd599cf6c509f5e532c74751bf6a246768e669&o=
+        fichier: 03-chambre.jpg
+        legende: "Chambre avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352113.jpg?k=e85ddc4de1bb3ca616254d64b3f4d6e17360f962fa94dc4f5a03e1b65e320222&o=
+        fichier: 04-chambre.jpg
+        legende: "Chambre, autre vue"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352104.jpg?k=3cd35486b53128fccc975a12ebe1c494c68d7478b605828c7c643bb439e8ee22&o=
+        fichier: 05-coin-cuisine.jpg
+        legende: "Coin cuisine équipé"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352095.jpg?k=3a2554f302718d99ad00cb9bde98a73c003fcfe3f25ea017d99fa69e9fa9ec25&o=
+        fichier: 06-salle-d-eau.jpg
+        legende: "Salle d'eau avec WC et lavabo"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/781352100.jpg?k=32fe32169822978fec75d01cf8e008034a20bdebc6c37b4f903e31acda175aaf&o=
+        fichier: 07-salle-d-eau.jpg
+        legende: "Salle d'eau avec douche"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/843484332.jpg?k=1746291f3e412f27c6b31a7a65c78811ee0b0a7fbd7f90963c4b56751ad6bc1a&o=
+        fichier: 08-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/924653127.jpg?k=b52bc1b8328cbe23d877f4ecb789091fd90d9553b48bf47a34b384682821bc69&o=
+        fichier: 09-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/924653177.jpg?k=c87e08869305fa2fa4384aa706b908cec74fb0768e00e851d4f83727c1628634&o=
+        fichier: 10-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/924653032.jpg?k=b3d8648f4f412e624f61e8293695b482016c4957ac54f15337c954e8539293b3&o=
+        fichier: 11-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/924653407.jpg?k=5708833b241f9593de1588f182fe70c2baa5efb1bd61897e399d239a5c884879&o=
+        fichier: 12-appartement.jpg
+        legende: "Autre vue de l'appartement"
+    le-84-studio:
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/849599861.jpg?k=a76b836712600f31575986769cac2b85dbac73f658f235a0463dd1fd7d7b4dc2&o=
+        fichier: 01-piece-de-vie.jpg
+        legende: "Pièce de vie lumineuse avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134430.jpg?k=6657fb273731576999a007e638c1d24eddd57ee6c81f7ae5084fea5a51a57254&o=
+        fichier: 02-coin-nuit.jpg
+        legende: "Coin nuit avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134578.jpg?k=6a0d7d8cd27db3b361a830ef85e3a8a744235311ef5f32b9047800f6634fb6ca&o=
+        fichier: 03-coin-salon.jpg
+        legende: "Coin salon"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/849599827.jpg?k=ef371c1d20d065ea332b77343ab4c6de3e48da545a24d7967eec3042d5ea5ce2&o=
+        fichier: 04-coin-cuisine.jpg
+        legende: "Coin cuisine équipé"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134238.jpg?k=70ecab8084c22ef2840156e600ba99a09cf72b12e319216a77b345fd18c2830c&o=
+        fichier: 05-coin-cuisine.jpg
+        legende: "Coin cuisine, autre vue"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/849599881.jpg?k=4f477998076e4ef95e95104791781e41071eaef61750e062d8aabd26c34081b6&o=
+        fichier: 06-salle-d-eau.jpg
+        legende: "Salle d'eau avec douche"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134689.jpg?k=dd6f9dca6873605fac45bb5fa651d14b5b035922cf603a13b820e6ffb46f3f2f&o=
+        fichier: 07-studio.jpg
+        legende: "Autre vue du studio"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134128.jpg?k=aa25708aa57b9df8283690a529ff7d67dece33239ba1dc68c213df6fbe5845cb&o=
+        fichier: 08-studio.jpg
+        legende: "Autre vue du studio"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/874134637.jpg?k=b2fbb50c4c858a96b240a1abf6dd8a615b3e8a2547f47523ce71687878ed090c&o=
+        fichier: 09-studio.jpg
+        legende: "Autre vue du studio"
+    le-84-grand-appartement:
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878587683.jpg?k=7cbf3cc43765c2033355221137b2d5915e8aadf396639cc2d0136562aaba0d4e&o=
+        fichier: 01-sejour.jpg
+        legende: "Séjour avec coin salon et cuisine"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/880766928.jpg?k=763d9b93fb5365b5d34191acd1ace65e151c53c11d60304c261d81463a30949e&o=
+        fichier: 02-chambre.jpg
+        legende: "Chambre avec lit double"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878587744.jpg?k=42ef0eb639cccf3d1097f7fef2e6df6685f651585433827041ad7515379aeb87&o=
+        fichier: 03-chambre.jpg
+        legende: "Chambre, autre vue"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/880766665.jpg?k=9503d2a4b7d5351fec67e2c682ee45797e0bbf6a61c638f1d8c51b0ea4e1e29e&o=
+        fichier: 04-cuisine.jpg
+        legende: "Cuisine équipée"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878793402.jpg?k=dd303791593edc44609571a0261cb28df740f1a3053732f11f57a3aa1fc602c2&o=
+        fichier: 05-cuisine.jpg
+        legende: "Cuisine, autre vue"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878587782.jpg?k=6f83f65d1172e209abdabe87e310a52b78da691184299a82e2c44982d4b97b61&o=
+        fichier: 06-salle-d-eau.jpg
+        legende: "Salle d'eau avec douche vitrée et WC"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/880766357.jpg?k=b5af99c26260c13599024aec335ea11ca80468e0487147dd6565dd62bb679530&o=
+        fichier: 07-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/880766469.jpg?k=8413c67553235ff6459303dc9cdabed726911d4fed04d94a1cffcb8bfb932212&o=
+        fichier: 08-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/880766828.jpg?k=199a3b1915a30d550fc3fed791cfc237671d4bcd37fc17aef088a19a9db4650f&o=
+        fichier: 09-appartement.jpg
+        legende: "Autre vue de l'appartement"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/881238933.jpg?k=e35f4cf0a9951bfb00ea1c2ec15027e8b2ff8c157ca4ac2956f968eccf3a5731&o=
+        fichier: 10-appartement.jpg
+        legende: "Autre vue de l'appartement"
+    le-84-studio-canape-lit:
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878799125.jpg?k=caabc8981ddf23685d8764f923f7d597614e5892a76e6d76004e9dbb9bd8d611&o=
+        fichier: 01-piece-de-vie.jpg
+        legende: "Pièce de vie avec canapé-lit"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878798488.jpg?k=92e1fc3f98db66f916ae3c7ba746829674728adf4ebe5f7f9aea9fa19492c374&o=
+        fichier: 02-coin-cuisine.jpg
+        legende: "Coin cuisine équipé"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878799368.jpg?k=93c559409fa609bc6f981b26c02f8391773c12e5f359c3edcb5a70c14d6a3467&o=
+        fichier: 03-coin-cuisine.jpg
+        legende: "Coin cuisine, autre vue"
+      - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/878799730.jpg?k=70f22dfac7b7026896abe87c94987cea0c3c8572c96da80f5a6913ad99a0a8e4&o=
+        fichier: 04-salle-d-eau.jpg
+        legende: "Salle d'eau avec douche"
+    # PHOTOS DOUTEUSES, désactivées : Booking les associe à plusieurs logements.
+    # Pour en utiliser une, recopiez ses 3 lignes sous le bon logement sans le « # »
+    # et donnez-lui un nom de fichier libre (ex. 13-television.jpg).
+    # télévision, associée à 3 logements (Studio Standard, Appartement 1 chambre, Studio)
+    # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/842612265.jpg?k=e0baf958c6edfd14fdd3bb3e223c401bc2a40cb899e150ef81def09a70c29945&o=
+    #   fichier: XX-a-nommer.jpg
+    #   legende: "À légender"
+    # contenu inconnu, associée à 3 logements (Studio Standard, Appartement 1 chambre, Studio)
+    # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/845458338.jpg?k=b9ee65f1cb5762717ec68735398f5e887013edc141e97b928d0c21266cead6e2&o=
+    #   fichier: XX-a-nommer.jpg
+    #   legende: "À légender"
+    # contenu inconnu, associée aux 5 logements
+    # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/845458608.jpg?k=99962ec5208fe5fa27f6d599af4d58e9e337f05597bb8c8cb5ef6711e94de74b&o=
+    #   fichier: XX-a-nommer.jpg
+    #   legende: "À légender"
+
+le-47:
+  logements:
+    le-47-studio:
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/249fc8dc-b423-409f-9d90-d63149305424.png
+        fichier: 01-piece-de-vie.jpg
+        legende: "Pièce de vie avec lit double"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/50b4d7ee-25b7-4773-97b5-ea37c8a9f95a.png
+        fichier: 02-piece-de-vie.jpg
+        legende: "Lit double et rangements"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/8abd956a-8b25-4373-888b-6c6377ff76b3.png
+        fichier: 03-piece-de-vie.jpg
+        legende: "Pièce de vie, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/2ca13f16-f3c2-449a-aa96-2635e7307e37.png
+        fichier: 04-piece-de-vie.jpg
+        legende: "Pièce de vie, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/42f042a5-7be1-4efd-8cbd-fdc362ecb0d9.png
+        fichier: 05-piece-de-vie.jpg
+        legende: "Pièce de vie, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/912c5a43-8d81-4194-b3f1-1bc039687e5a.png
+        fichier: 06-kitchenette.jpg
+        legende: "Kitchenette équipée"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/3a205974-6339-422d-9d50-0e9ff39fe573.png
+        fichier: 07-kitchenette.jpg
+        legende: "Kitchenette, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/37740539-df64-4ba5-8dd7-05a672f05aee.png
+        fichier: 08-espace-repas.jpg
+        legende: "Espace repas avec table pour deux"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/cfd5550b-a737-4ed9-8dae-67cd2538aa59.png
+        fichier: 09-espace-repas.jpg
+        legende: "Espace repas, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/e1159916-3c46-4753-92ba-5e4448f86bbf.png
+        fichier: 10-coin-bureau.jpg
+        legende: "Coin bureau"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/2a10658a-f075-423b-8082-10d8e2d64f3d.png
+        fichier: 11-coin-bureau.jpg
+        legende: "Coin bureau, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/9acbd8ea-c9da-4b2f-986c-fb1e813f51cb.png
+        fichier: 12-coin-bureau.jpg
+        legende: "Coin bureau, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/ff255408-4238-463f-a6cb-0f897e22f793.png
+        fichier: 13-salle-d-eau.jpg
+        legende: "Salle d'eau avec WC"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1813116619201748725/original/5bfb7d08-ef1f-484c-8216-343e300bad25.png
+        fichier: 14-salle-d-eau.jpg
+        legende: "Salle d'eau, autre vue"
+      # Photos Booking en paysage, contenu inconnu (les autres sont celles d'Airbnb) :
+      # activez-les si l'une ferait une meilleure couverture (renommez-la alors en 01-…).
+      # Booking paysage 4000 × 3000
+      # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/926924909.jpg?k=bb6c6d0a4d71169f27b162ab918fa26ecdd443fd96056ba3e90106310eeeff20&o=
+      #   fichier: 15-vue.jpg
+      #   legende: "Le 47, autre vue"
+      # Booking paysage 1200 × 900
+      # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/926924896.jpg?k=aa9ef06cabd2ad0ed627d32d7ef035314416b1588d5843b44ea5bb41bd1b070d&o=
+      #   fichier: 16-vue.jpg
+      #   legende: "Le 47, autre vue"
+      # Booking paysage 1200 × 900
+      # - url: https://cf.bstatic.com/xdata/images/hotel/max1280x900/926924922.jpg?k=688e87900cf768c2e6b381f0dfec5074b63d744829db0b7280abb6b9d4e15641&o=
+      #   fichier: 17-vue.jpg
+      #   legende: "Le 47, autre vue"
+
+villa-sagara:
+  logements:
+    villa-sagara-2-chambres:
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/1738b23a-35ff-45a7-811c-ba216581f700.jpeg
+        fichier: 01-villa-et-piscine.jpg
+        legende: "La villa et sa piscine privée"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/fb64a238-4668-4442-b5aa-08c03805b22b.jpeg
+        fichier: 02-piscine.jpg
+        legende: "Piscine privée et jardin tropical"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/db7d67f3-c9bb-4d05-be35-64770a22d34c.jpeg
+        fichier: 03-piscine.jpg
+        legende: "Piscine et terrasse en bois"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/6904d70f-44f3-404a-bd2d-208a7f30b2e6.jpeg
+        fichier: 04-piscine.jpg
+        legende: "Piscine, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/6fc3b947-b371-4d77-afca-fa9b696b87a5.jpeg
+        fichier: 05-piscine.jpg
+        legende: "Piscine et façade de la villa"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/f885e6aa-8b00-47ac-a908-9a3e27d95de4.jpeg
+        fichier: 06-jardin.jpg
+        legende: "Jardin clos autour de la piscine"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/b2a5843e-6c28-4325-835d-845e97f812e2.jpeg
+        fichier: 07-salon.jpg
+        legende: "Salon lumineux"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/39a76153-6b44-4530-a1ba-47f50af6b00d.jpeg
+        fichier: 08-salon.jpg
+        legende: "Salon ouvert sur la piscine"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/1c0a1a91-5ba9-45df-a858-ffe4753f32c3.jpeg
+        fichier: 09-salon.jpg
+        legende: "Salon et espace repas"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/70cde4ed-921c-430e-bd22-439d2b4e8e5e.jpeg
+        fichier: 10-salon.jpg
+        legende: "Salon, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/913fadc0-9801-4865-9cc6-bd0bb6382722.jpeg
+        fichier: 11-salon.jpg
+        legende: "Salon, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/29f21404-df24-4db5-8433-3aa7e402a586.jpeg
+        fichier: 12-rez-de-chaussee.jpg
+        legende: "Rez-de-chaussée de la villa"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/b7622590-2158-4718-9024-772e9ebc6921.jpeg
+        fichier: 13-cuisine.jpg
+        legende: "Cuisine ouverte équipée"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/05b5580b-0b3c-4a3f-89e6-0155cde4a515.jpeg
+        fichier: 14-cuisine.jpg
+        legende: "Cuisine, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/8a924643-852f-454f-954f-17493cdad706.jpeg
+        fichier: 15-cuisine.jpg
+        legende: "Cuisine, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/b066a986-a01b-48be-8ac8-2904e5191b91.jpeg
+        fichier: 16-espace-repas.jpg
+        legende: "Espace repas"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/a20124ef-9221-4ac4-8273-c27e57c257fa.jpeg
+        fichier: 17-espace-repas.jpg
+        legende: "Espace repas, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/b37587f8-79b4-4829-8493-13c9b86b34f8.jpeg
+        fichier: 18-espace-repas.jpg
+        legende: "Espace repas ouvert sur la terrasse et la piscine"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/b41df9b3-04aa-42eb-b4c7-f710836dac5e.jpeg
+        fichier: 19-espace-repas.jpg
+        legende: "Espace repas et cuisine"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/18279f00-95c7-4ac5-933f-95d3270eae82.jpeg
+        fichier: 20-chambre-1.jpg
+        legende: "Chambre 1 avec lit king size"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/1a1eaf47-3a26-4e33-a78f-1b3ee7a659f3.jpeg
+        fichier: 21-chambre-1.jpg
+        legende: "Chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/ab671156-c795-4261-a5b1-98ee74177edc.jpeg
+        fichier: 22-chambre-1.jpg
+        legende: "Chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/8c258679-ea5c-4e43-b6f6-2907783178ea.jpeg
+        fichier: 23-chambre-1.jpg
+        legende: "Chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/194b5e04-4c08-444f-83cb-8f8778feb05e.jpeg
+        fichier: 24-chambre-1.jpg
+        legende: "Chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/f9677f2b-273e-4562-bfcc-6beb7bee8af6.jpeg
+        fichier: 25-chambre-1.jpg
+        legende: "Chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/40c022dd-076b-45b2-8c46-4b4257307806.jpeg
+        fichier: 26-salle-de-bain-1.jpg
+        legende: "Salle de bain de la chambre 1, douche à l'italienne"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/0daec6a8-f0d3-465e-98db-11bdfc155125.jpeg
+        fichier: 27-salle-de-bain-1.jpg
+        legende: "Salle de bain de la chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/953b7488-be80-4a6c-bbe3-45d309d80302.jpeg
+        fichier: 28-salle-de-bain-1.jpg
+        legende: "Salle de bain de la chambre 1, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/ae58bea8-c84b-4f74-b516-463e1fb18a60.jpeg
+        fichier: 29-chambre-2.jpg
+        legende: "Chambre 2 avec lit king size"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/60fd7a73-9b23-41f2-acfc-036119213924.jpeg
+        fichier: 30-chambre-2.jpg
+        legende: "Chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/52b951c8-9bdb-46a9-861d-6f6fb6c88b31.jpeg
+        fichier: 31-chambre-2.jpg
+        legende: "Chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/cecb3e45-d963-406f-9cac-39e606a43caf.jpeg
+        fichier: 32-chambre-2.jpg
+        legende: "Chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/3e1b5b2d-9a7a-4e4e-b0db-0dbcf2b807fe.jpeg
+        fichier: 33-chambre-2.jpg
+        legende: "Chambre 2, espace bureau"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/45cf9718-1d67-4371-bfb4-85195e1c6983.jpeg
+        fichier: 34-chambre-2.jpg
+        legende: "Chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/e0a61d40-01ab-463b-bf9a-eb31a573a31b.jpeg
+        fichier: 35-salle-de-bain-2.jpg
+        legende: "Salle de bain de la chambre 2, douche à l'italienne"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/ab382603-26ed-45e8-b467-129622a6fa5b.jpeg
+        fichier: 36-salle-de-bain-2.jpg
+        legende: "Salle de bain de la chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/e66c8fca-99cd-4812-ab73-a8306b061bb5.jpeg
+        fichier: 37-salle-de-bain-2.jpg
+        legende: "Salle de bain de la chambre 2, autre vue"
+      - url: https://a0.muscache.com/im/pictures/hosting/Hosting-1675153305410434056/original/1d067509-c2f6-4006-b756-fe9bf8e36100.jpeg
+        fichier: 38-abords.jpg
+        legende: "Les abords de la villa"

@@ -5,22 +5,46 @@
       "url": [
         "http://localhost/",
         "http://localhost/logements/",
-        "http://localhost/logements/le-mans/",
-        "http://localhost/logements/le-mans/studio-cathedrale/",
         "http://localhost/contact/"
       ],
       "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--no-sandbox",
-        "skipAudits": ["is-crawlable"]
+        "skipAudits": [
+          "is-crawlable"
+        ]
       }
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["error", { "minScore": 0.85, "aggregationMethod": "median-run" }],
-        "categories:accessibility": ["error", { "minScore": 0.95, "aggregationMethod": "median-run" }],
-        "categories:best-practices": ["error", { "minScore": 0.95, "aggregationMethod": "median-run" }],
-        "categories:seo": ["error", { "minScore": 0.95, "aggregationMethod": "median-run" }]
+        "categories:performance": [
+          "error",
+          {
+            "minScore": 0.85,
+            "aggregationMethod": "median-run"
+          }
+        ],
+        "categories:accessibility": [
+          "error",
+          {
+            "minScore": 0.95,
+            "aggregationMethod": "median-run"
+          }
+        ],
+        "categories:best-practices": [
+          "error",
+          {
+            "minScore": 0.95,
+            "aggregationMethod": "median-run"
+          }
+        ],
+        "categories:seo": [
+          "error",
+          {
+            "minScore": 0.95,
+            "aggregationMethod": "median-run"
+          }
+        ]
       }
     },
     "upload": {
